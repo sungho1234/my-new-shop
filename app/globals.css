@@ -1,0 +1,131 @@
+/* ==========================================================================
+   1. 전역 디자인 시스템 변수
+   ========================================================================== */
+:root {
+  --color-background: #FFFFFF;
+  --color-surface: #F9F9F9;
+  --color-border: #EAEAEA;
+  --color-text-primary: #111111;
+  --color-text-secondary: #7A7A7A;
+  --font-family-body: 'Inter', sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --border-width: 1px;
+}
+
+/* ==========================================================================
+   2. Tailwind CSS 기본 설정
+   ========================================================================== */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   3. 기본 태그 및 전역 스타일
+   ========================================================================== */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+#wrapper {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 32px;
+}
+
+#overview .card,
+#details .card {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ==========================================================================
+   4. 메인 페이지 상품 카드 스타일 (넓은 여백 + 작은 폰트 버전)
+   ========================================================================== */
+.product-card-light {
+    width: 100%;
+}
+.product-card-light a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+.product-image {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    background-color: #f9fafb;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    transition: box-shadow 0.3s ease;
+}
+.product-card-light:hover .product-image {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+/* 폰트 사이즈와 여백을 레퍼런스와 비슷하게 줄였습니다. */
+.product-title-light {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 500;
+    margin-top: 0.75rem; /* 12px */
+    line-height: 1.5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: auto;
+}
+.product-desc-light {
+    font-size: 0.75rem; /* 12px */
+    color: #6b7280;
+    margin-top: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.product-price-light {
+    font-size: 1rem; /* 16px */
+    font-weight: 700;
+    margin-top: 0.5rem; /* 8px */
+}
+.product-price-light.free {
+    color: #3b82f6;
+}
+
+/* Swiper 버튼 스타일 */
+.swiper-button-next,
+.swiper-button-prev {
+    color: #000000;
+    background-color: rgba(255, 255, 255, 0.7);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.swiper-button-next:after,
+.swiper-button-prev:after {
+    font-size: 16px;
+    font-weight: bold;
+}
+/* app/globals.css */
+
+/* --- 이 코드를 파일 맨 아래에 추가하세요 --- */
+
+/* 모든 브라우저에서 스크롤바를 숨기는 클래스 */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
