@@ -7,7 +7,7 @@ const stories = [
   {
     type: 'video',
     videoId: '77BOyzPOMcE',
-    title: '5줄 글쓰기로 우울증 극복하는 법',
+    title: '친구에게 작업질당한것 같습니다.',
     youtubeLink: 'https://www.youtube.com/watch?v=77BOyzPOMcE',
     channelName: '메신저가 되자',
     channelAvatar: 'https://yt3.ggpht.com/ytc/AIdro_kvhx-22299t_s3GT26i_MQy-f2d-2_Hvu2g1_g=s88-c-k-c0x00ffffff-no-rj',
@@ -15,7 +15,7 @@ const stories = [
   {
     type: 'video',
     videoId: 'sJ01gD2i63c',
-    title: '초사고 글쓰기 후 딱 10배가 느는...',
+    title: '',
     youtubeLink: 'https://www.youtube.com/watch?v=sJ01gD2i63c',
     channelName: '메신저가 되자',
     channelAvatar: 'https://yt3.ggpht.com/ytc/AIdro_kvhx-22299t_s3GT26i_MQy-f2d-2_Hvu2g1_g=s88-c-k-c0x00ffffff-no-rj',
@@ -23,7 +23,7 @@ const stories = [
   {
     type: 'video',
     videoId: 'pXz4bX8bY-M',
-    title: '48억이나 팔렸다는 초사고 글쓰...',
+    title: '',
     youtubeLink: 'https://www.youtube.com/watch?v=pXz4bX8bY-M',
     channelName: '메신저가 되자',
     channelAvatar: 'https://yt3.ggpht.com/ytc/AIdro_kvhx-22299t_s3GT26i_MQy-f2d-2_Hvu2g1_g=s88-c-k-c0x00ffffff-no-rj',
@@ -31,23 +31,23 @@ const stories = [
   {
     type: 'image',
     thumbnail: 'https://via.placeholder.com/600x400/CCCCCC/000000?text=AI%EB%A1%9C+%EC%A1%B0%ED%9A%8C%EC%88%98+13%EB%B0%B0',
-    title: 'AI로 조회수 13배, 매출 15배 상승',
-    author: '콘텐츠 크리에이터',
-    description: '조회수 13배 증가, 매출 15배 상승했습니다',
+    title: '',
+    author: 'Analyst(Berlin) | The Archive Vol.1 ',
+    description: '분석 모델을 시스템으로 전환하기까지: Maria G.의 회고',
   },
   {
     type: 'image',
     thumbnail: 'https://via.placeholder.com/600x400/CCCCCC/000000?text=%EC%A1%B0%ED%9A%8C%EC%88%98+30%EB%B0%B0+%EC%A6%9D%EA%B0%80',
-    title: '조회수 30배 증가, 업무 70% 단축',
-    author: '필라테스 대표',
-    description: '조회수 30배 증가, 업무 70% 단축시켰습니다',
+    title: '',
+    author: 'Trader(London) | Quant System Lite',
+    description: '런던의 변동성을 지배하는 방법: John S.의 트레이딩 로그',
   },
   {
     type: 'image',
     thumbnail: 'https://via.placeholder.com/600x400/CCCCCC/000000?text=19%EC%82%B4+%EB%8C%80%ED%95%99%EC%83%9D',
-    title: '19살 대학생, AI로 과제 85% 단축',
-    author: '대학생',
-    description: '19살 대학생, AI로 대학 학업 이뤘습니다',
+    title: '',
+    author: 'Market Expert(Tokyo) | MAXX Quant System v4.0',
+    description: '노이즈 속에서 알파(α)를 찾는 기술: 키노아 요코.의 전략 노트',
   },
 ];
 
@@ -116,7 +116,7 @@ const YoutubeBanner = () => {
                         {/* 2. 텍스트 영역 (카드 아래의 텍스트는 그대로 유지) */}
                         <div className="p-4">
                             <p className="text-xs text-gray-500">
-                                {story.author} | 2025 일반인을 위한 AI 올인원
+                                {story.author} 
                             </p>
                             <p className="mt-1 text-sm font-semibold text-gray-900">
                                 {story.description}
@@ -130,7 +130,7 @@ const YoutubeBanner = () => {
         {/* 버튼 */}
         <div className="mt-12 flex justify-center">
           <button className="rounded-md bg-indigo-600 px-6 py-3 text-lg font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-            콘텐츠 및 수강생 성공사례 보러가기 →
+            시스템 및 실제 데이터 확인하기 →
           </button>
         </div>
       </div>
