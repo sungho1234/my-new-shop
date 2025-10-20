@@ -49,8 +49,27 @@ const reviews = [
   },
 ];
 
+// ▼▼▼ 1. 여기에 타입을 정의합니다 ▼▼▼
+interface Review {
+  stars: number;
+  quote: string;
+  author: string;
+  date: string;
+  product: string;
+  flag?: string; // ?는 이 속성이 있어도 되고 없어도 된다는 의미입니다.
+  location?: string;
+}
+
+// ReviewCard 컴포넌트가 받을 props의 타입을 정의합니다.
+interface ReviewCardProps {
+  review: Review;
+}
+// ▲▲▲ 여기까지 추가 ▲▲▲
+
+
+// ▼▼▼ 2. 여기에 props 타입을 적용합니다 ▼▼▼
 // 후기 카드 UI 컴포넌트
-const ReviewCard = ({ review }) => (
+const ReviewCard = ({ review }: ReviewCardProps) => (
   <div className="flex-shrink-0 w-80 sm:w-96 h-96">
     <div className="bg-white rounded-xl shadow-lg p-6 h-full flex flex-col justify-between border border-gray-100">
       <div>
@@ -82,7 +101,8 @@ export default function GlobalProof() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [isPaused, setIsPaused] = useState(false);
 
-  const scroll = (direction) => {
+  // ▼▼▼ 3. 여기에 파라미터 타입을 적용합니다 ▼▼▼
+  const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const scrollAmount = 344;
       scrollContainerRef.current.scrollBy({ 
@@ -91,6 +111,7 @@ export default function GlobalProof() {
       });
     }
   };
+  // ▲▲▲ 여기까지 수정 ▲▲▲
 
   useEffect(() => {
     if (isPaused || !scrollContainerRef.current) return;
