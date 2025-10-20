@@ -1,3 +1,6 @@
+/* /app/products/maxx-quant-v4/ProductDetail.module.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Judson:wght@700&display=swap');
+
 .card {
     background-color: var(--color-background);
     border: var(--border-width) solid var(--color-border);
@@ -39,14 +42,27 @@
     align-items: flex-start;
 }
 .contentColumn {
-    width: 648px;
+    width: 760px;
     display: flex;
     flex-direction: column;
     gap: var(--space-lg);
     margin-top: var(--space-xxl);
 }
-.mediaContainer { padding: 0; overflow: hidden; }
-.mediaContainer video { width: 100%; display: block; }
+.mediaContainer {
+    position: relative;
+    padding: 0;
+    padding-bottom: 56.25%; /* 16:9 영상 비율을 유지합니다 */
+    height: 0;
+    overflow: hidden;
+}
+.mediaContainer iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
 .sidebarColumn {
     position: sticky;
     top: 128px;
@@ -182,6 +198,7 @@
 .buyButton:hover {
     background-color: #333333;
 }
+
 .descriptionBox h3, .royaltiesBox h3, .detailsBox h3, .featuresBox h3, .trustBox h3, .guideBox h3, .performanceDataBox h3 {
     font-family: var(--font-family-body);
     font-size: 18px;
@@ -193,12 +210,39 @@
     border-bottom: none;
     padding-bottom: 0;
 }
-.descriptionBox p, .royaltiesBox p, .detailsBox p, .guideBox p, .performanceDataBox p {
-    color: var(--color-text-secondary);
-    line-height: 1.7;
-    font-size: 15px;
+
+.descriptionBox h3 {
+    font-size: 22px;
+    font-weight: var(--font-weight-extrabold);
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--space-md);
+    margin-bottom: var(--space-xl);
 }
-.descriptionBox p strong { color: var(--color-text-primary); font-weight: var(--font-weight-semibold); }
+
+.descriptionBox p {
+    color: #333333;
+    line-height: 1.9;
+    font-size: 16px;
+    margin-bottom: 1em; 
+}
+
+.descriptionBox p:last-child {
+    margin-bottom: 0;
+}
+
+.descriptionBox p strong { 
+    color: var(--color-text-primary); 
+    font-weight: var(--font-weight-semibold); 
+}
+
+.subheading {
+    font-size: 18px;
+    font-weight: var(--font-weight-bold);
+    color: #3182CE; 
+    margin-bottom: var(--space-md);
+}
+
 .keyValueList { list-style-type: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-lg); }
 .keyValueList li { display: flex; justify-content: space-between; align-items: center; font-size: 16px; }
 .keyValueList li span { color: var(--color-text-secondary); }
@@ -376,4 +420,328 @@
     display: flex;
     align-items: center;
     gap: var(--space-sm);
+}
+
+.additionalContent {
+    padding: var(--space-lg) 0; 
+}
+
+.contentTitle {
+    font-size: 28px;
+    font-weight: 800;
+    margin-top: var(--space-xl);
+    margin-bottom: var(--space-lg);
+    color: var(--color-text-primary);
+}
+
+.contentSeparator {
+    border: 0;
+    border-top: 1px solid var(--color-border);
+    margin: var(--space-xl) 0;
+}
+
+.mentoringList {
+    list-style-type: '• ';
+    padding-left: var(--space-lg);
+    margin-top: var(--space-sm);
+    color: #333333;
+}
+.mentoringList li {
+    margin-bottom: var(--space-sm);
+    font-size: 16px;
+    padding-left: var(--space-sm);
+}
+
+.numberedFeatureList {
+    list-style: none;
+    padding-left: 0;
+    counter-reset: feature-counter;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    margin-top: var(--space-lg);
+}
+
+.numberedFeatureList li {
+    display: flex;
+    align-items: flex-start;
+}
+
+.numberedFeatureList li::before {
+    counter-increment: feature-counter;
+    content: counter(feature-counter);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #f0f2f5;
+    color: var(--color-text-primary);
+    font-weight: 700;
+    font-size: 16px;
+    margin-right: var(--space-md);
+    flex-shrink: 0;
+}
+
+.numberedFeatureContent {
+    display: flex;
+    flex-direction: column;
+}
+
+.numberedFeatureTitle {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-size: 16px;
+    margin: 0;
+    padding-top: 5px; 
+}
+
+.numberedFeatureDesc {
+    color: #333333;
+    font-size: 16px;
+    margin: 4px 0 0 0;
+}
+
+.whatYouGetCard {
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+.whatYouGetCard h3 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-md) 0;
+    padding: 0;
+    border-bottom: none;
+}
+
+.whatYouGetSection h4 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.whatYouGetList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.whatYouGetItem h5 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 4px 0;
+}
+
+.whatYouGetItem p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.pdfLabel {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #3B82F6;
+    background-color: #EFF6FF;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-right: 8px;
+}
+
+.targetAudienceSection {
+    padding: var(--space-xl) 0;
+}
+
+.targetAudienceSection > h3 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-lg) 0;
+}
+
+.targetAudienceList {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-xl) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.targetAudienceList li {
+    font-size: 16px;
+    color: var(--color-text-primary);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.targetAudienceList li::before {
+    content: '✓';
+    color: #10B981;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.warningText {
+    padding: var(--space-md);
+    background-color: #FEF2F2;
+    border-left: 4px solid #EF4444;
+    color: #B91C1C;
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0 0 var(--space-xxl) 0;
+    line-height: 1.6;
+}
+
+.benefitsGrid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: var(--space-xl);
+}
+
+@media (min-width: 768px) {
+    .benefitsGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.benefitColumn h4 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-md) 0;
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.benefitColumn ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.benefitColumn li {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+.faqBox {
+    margin-top: 0; 
+}
+
+.faqBox h3 {
+    font-size: 22px;
+    font-weight: var(--font-weight-extrabold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+}
+
+.accordionItem {
+    border-bottom: 1px solid var(--color-border); 
+}
+
+.accordionTitle {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: var(--space-lg) 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    text-align: left;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    transition: color 0.2s ease;
+}
+
+.accordionTitle:hover {
+    color: #3B82F6; 
+}
+
+.icon {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    transition: transform 0.3s ease;
+}
+
+.accordionTitle[aria-expanded="true"] .icon {
+    transform: rotate(45deg);
+    color: #3B82F6; 
+}
+
+.accordionContent {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease-in-out; 
+}
+
+.accordionContent.show {
+    max-height: 150px; 
+}
+
+.accordionContent p {
+    padding: 0 0 var(--space-lg) 0;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.productTitle {
+    font-family: 'Judson', serif;
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0 0 var(--space-lg) 0;
+    line-height: 1.2;
+}
+/* ... (기존 CSS 코드 맨 아래에 추가) ... */
+
+/* 하트 버튼 관련 스타일 추가 */
+.actionBtn svg {
+  transition: all 0.2s ease-in-out;
+}
+
+.actionBtn.liked svg {
+  color: #ef4444; /* 빨간색 */
+  fill: #ef4444;   /* 내부를 빨간색으로 채움 */
+}
+/* ... (기존 CSS 코드 맨 아래에 추가) ... */
+
+/* 스크롤 페이드인 효과를 위한 스타일 */
+.animatedItem {
+  /* 훅에서 opacity와 transform을 직접 제어하므로, CSS에서는 비워둡니다. */
+  /* 이 클래스는 단지 자바스크립트에서 어떤 요소에 효과를 줄지 식별하는 용도입니다. */
 }
