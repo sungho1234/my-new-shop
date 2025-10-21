@@ -5,10 +5,12 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation'; // useRouter를 다시 추가합니다.
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const { user } = useAuth();
+  const { user, logout } = useAuth(); // 원래 코드처럼 logout 함수를 가져옵니다.
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,21 +21,29 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // 로그아웃 버튼 클릭 시 실행될 함수
   const handleLogoutClick = () => {
-    // 1. 카카오 REST API 키는 환경변수에서 가져오는 것이 더 안전합니다. (선택사항)
-    const KAKAO_REST_API_KEY = process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY; 
+    const KAKAO_REST_API_KEY = "ecddb30378573c07b10d4d51a98e6b0a"; // 사용하시던 키
+    let LOGOUT_REDIRECT_URI = "http://localhost:3000/logout"; // 기본값은 로컬 주소
 
-    // 2. 고정된 주소 대신, 환경변수에서 현재 사이트의 기본 URL을 가져옵니다.
-    const LOGOUT_REDIRECT_URI = `${process.env.NEXT_PUBLIC_BASE_URL}/logout`;
-
-    if (!KAKAO_REST_API_KEY) {
-        alert("카카오 REST API 키가 설정되지 않았습니다.");
-        return;
+    // 1. 현재 브라우저의 주소가 'localhost'가 아닌 경우 (즉, 배포된 사이트인 경우)
+    if (window.location.hostname !== 'localhost') {
+        // 로그아웃 후 돌아올 주소를 현재 사이트의 주소로 변경합니다.
+        LOGOUT_REDIRECT_URI = `${window.location.origin}/logout`;
     }
 
+    // 2. 카카오 로그아웃 페이지로 이동
     const kakaoLogoutUrl = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_REST_API_KEY}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`;
     
+    // 3. 우리 앱의 상태도 로그아웃 처리 (기존 로직 유지)
+    logout(); 
+    
+    // 4. 카카오 로그아웃 페이지로 이동
     window.location.href = kakaoLogoutUrl;
+
+    // 만약 카카오 로그아웃을 먼저 하지 않고 바로 홈으로 보내고 싶다면 아래 코드를 대신 사용하세요.
+    // logout();
+    // router.push('/');
   };
 
   return (
