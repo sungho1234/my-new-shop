@@ -1,5 +1,3 @@
-// 파일 경로: /app/products/maxx-quant-v4/page.tsx
-
 "use client"; 
 
 import React, { useState } from 'react';
@@ -10,15 +8,18 @@ import Footer from '@/components/Footer';
 import PaymentModal, { PaymentItem } from "@/components/PaymentModal";
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-
-// 1. 스크롤 애니메이션 훅 import
 import { useScrollFadeIn } from '@/hooks/useScrollFadeIn';
 
+// [수정] heroicons v2 버전에 맞게 아이콘 import 경로를 수정합니다.
+import { HeartIcon } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
+
+
 const faqItems = [
-  { question: 'Q1. 코딩 지식이 필요한가요?', answer: '아닙니다. 이 원장은 전략의 논리를 다룹니다. 엑셀 수준으로 충분합니다.' },
-  { question: 'Q2. 수익을 보장하나요?', answer: '아니요. 우리는 지식을 제공하고, 당신은 가치를 판단하면 됩니다.' },
-  { question: 'Q3. Vol.1만으로 실전이 가능한가요?', answer: '네. Vol.1 하나로 완전한 시스템 구축이 가능합니다.' },
-  { question: 'Q4. 디브리핑은 어떻게 진행되나요?', answer: '구매 후 3일간 텔레그램/이메일로 현역 팀원과 1:1 소통합니다.' },
+    { question: 'Q1. 코딩 지식이 필요한가요?', answer: '아닙니다. 이 원장은 전략의 논리를 다룹니다. 엑셀 수준으로 충분합니다.' },
+    { question: 'Q2. 수익을 보장하나요?', answer: '아니요. 우리는 지식을 제공하고, 당신은 가치를 판단하면 됩니다.' },
+    { question: 'Q3. Vol.1만으로 실전이 가능한가요?', answer: '네. Vol.1 하나로 완전한 시스템 구축이 가능합니다.' },
+    { question: 'Q4. 디브리핑은 어떻게 진행되나요?', answer: '구매 후 3일간 텔레그램/이메일로 현역 팀원과 1:1 소통합니다.' },
 ];
 
 const itemForPay: PaymentItem = {
@@ -34,13 +35,27 @@ const ProductDetailPage = () => {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [paymentOpen, setPaymentOpen] = useState(false);
     
-    const { user } = useAuth();
+    // [수정] useAuth 훅에서 찜하기 관련 함수들을 모두 가져옵니다.
+    const { user, addToWishlist, removeFromWishlist, isLiked } = useAuth();
     const router = useRouter();
 
-    const [isLiked, setIsLiked] = useState(false);
-    const [likeCount, setLikeCount] = useState(0);
+    // [삭제] 이 페이지에서만 사용되던 isLiked와 likeCount 상태를 삭제합니다.
+    // const [isLiked, setIsLiked] = useState(false);
+    // const [likeCount, setLikeCount] = useState(0);
 
-    // 2. 애니메이션 훅 호출
+    // [추가] 이 상품의 정보를 담는 객체를 정의합니다.
+    const productInfo = {
+        id: 'maxx-quant-v4',
+        title: 'MAXX Quant System v4.1',
+        author: 'kobba',
+        price: '2,100,000',
+        thumbnail: '/로고.png', // 찜목록에 표시될 대표 이미지입니다.
+    };
+    
+    // [수정] '좋아요' 여부를 전역 상태(Context)를 통해 확인합니다.
+    const liked = isLiked(productInfo.id);
+
+    // 기존 스크롤 애니메이션 훅 (전부 그대로 유지)
     const animMedia = useScrollFadeIn('up', 1, 0);
     const animTabs = useScrollFadeIn('up', 1, 0.1);
     const animDesc = useScrollFadeIn('up', 1, 0);
@@ -50,10 +65,12 @@ const ProductDetailPage = () => {
     const animFaq = useScrollFadeIn('up', 1, 0);
     const animTrust = useScrollFadeIn('up', 1, 0.1);
 
+    // 기존 아코디언 토글 함수 (그대로 유지)
     const toggleAccordion = (index: number) => {
         setActiveIndex(activeIndex === index ? null : index);
     };
 
+    // 기존 결제 요청 핸들러 (그대로 유지)
     const handlePayRequest = (item: PaymentItem, method: "KAKAOPAY" | "NAVERPAY") => {
         // @ts-ignore
         const { IMP } = window;
@@ -81,6 +98,7 @@ const ProductDetailPage = () => {
         });
     };
 
+    // 기존 '바로 구매' 버튼 핸들러 (그대로 유지)
     const handleBuyNowClick = () => {
         if (user) {
             setPaymentOpen(true);
@@ -91,17 +109,23 @@ const ProductDetailPage = () => {
         }
     };
 
+    // [수정] 하트 버튼 클릭 시 전역 찜 목록을 변경하는 함수
     const handleLikeClick = () => {
-        if (user) {
-            setIsLiked(!isLiked);
-            setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
-        } else {
+        if (!user) {
             if (window.confirm("로그인이 필요한 서비스입니다. 로그인 하시겠습니까?")) {
                 router.push('/login');
             }
+            return;
+        }
+
+        if (liked) {
+            removeFromWishlist(productInfo.id);
+        } else {
+            addToWishlist(productInfo);
         }
     };
 
+    // 기존 공유 버튼 핸들러 (그대로 유지)
     const handleShareClick = () => {
         const currentUrl = window.location.href;
         navigator.clipboard.writeText(currentUrl).then(() => {
@@ -193,7 +217,7 @@ const ProductDetailPage = () => {
                                         <li>실전 적용 시 막히는 부분을 검토받을 수 있습니다</li>
                                         <li>자신의 케이스를 분석 요청할 수 있습니다</li>
                                         <li>추가 학습 방향을 안내받을 수 있습니다</li>
-                                    </ul>  
+                                    </ul>  
                                     <p>이것은 멘토링입니다. The Archive는 단순히 PDF를 판매하는 상품이 아닙니다.</p>
                                 </div>
                             </div>
@@ -347,11 +371,16 @@ const ProductDetailPage = () => {
                                 </div>
                             </div>
                             <div className={styles.actionBar}>
+                                {/* [수정] 하트 버튼 부분을 전역 상태와 연결하고, 아이콘으로 변경합니다. */}
                                 <button
                                     onClick={handleLikeClick}
-                                    className={`${styles.actionBtn} ${isLiked ? styles.liked : ''}`}
+                                    className={`${styles.actionBtn} ${liked ? styles.liked : ''}`}
                                 >
-                                    ♡ {likeCount}
+                                    {liked ? (
+                                        <HeartIconSolid className="w-5 h-5 text-red-500" />
+                                    ) : (
+                                        <HeartIcon className="w-5 h-5 text-gray-500" />
+                                    )}
                                 </button>
                                 <button onClick={handleShareClick} className={styles.actionBtn}>
                                     ↑ Share
