@@ -11,12 +11,12 @@ export interface Product {
     thumbnail: string;
 }
 
-// [수정] User 인터페이스에 email 속성을 추가합니다.
+// [수정 1] Vercel 빌드 에러 해결을 위해 User 타입에 email 속성 추가
 interface User {
     id: number;
     nickname: string;
     profileImage: string;
-    email?: string; // 카카오 API에서 이메일 정보가 선택 항목일 수 있으므로 '?'를 붙여 optional로 지정합니다.
+    email?: string; // Header.tsx에서 사용하는 email 속성을 optional로 추가
 }
 
 interface AuthContextType {
@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const router = useRouter();
 
     useEffect(() => {
+        // 이 부분은 브라우저 환경에서만 실행되므로 안전합니다.
         try {
             const storedUser = localStorage.getItem('user');
             if (storedUser) {
@@ -48,26 +49,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 setWishlist(JSON.parse(storedWishlist));
             }
         } catch (error) {
-            console.error("Failed to parse localStorage data", error);
+            console.error("localStorage 데이터 파싱 오류:", error);
         }
     }, []);
 
-    // [수정] login 함수에서 email 정보도 함께 저장하도록 수정합니다.
+    // [수정 2] login 함수에 email 정보 저장을 추가하여 빌드 에러 방지
     const login = (kakaoUser: any) => {
         const newUser: User = {
             id: kakaoUser.id,
             nickname: kakaoUser.kakao_account.profile.nickname,
             profileImage: kakaoUser.kakao_account.profile.profile_image_url,
-            email: kakaoUser.kakao_account.email, // 이메일 정보 추가
+            email: kakaoUser.kakao_account.email, // email 정보 추가
         };
         localStorage.setItem('user', JSON.stringify(newUser));
         setUser(newUser);
     };
 
+    // [수정 3] 로그아웃 시 찜 목록(wishlist) 데이터는 삭제하지 않도록 원상 복구
     const logout = () => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('wishlist'); 
-        setWishlist([]);
+        localStorage.removeItem('user'); // user 정보만 삭제
         setUser(null);
         router.push('/');
     };
@@ -92,7 +92,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return wishlist.some((item) => item.id === productId);
     };
 
-    const value = { user, login, logout, wishlist, addToWishlist, removeFromWishlist, isLiked };
+    const value = {
+        user,
+        login,
+        logout,
+        wishlist,
+        addToWishlist,
+        removeFromWishlist,
+        isLiked,
+    };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
