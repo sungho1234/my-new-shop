@@ -11,10 +11,12 @@ export interface Product {
     thumbnail: string;
 }
 
+// [수정] User 인터페이스에 email 속성을 추가합니다.
 interface User {
     id: number;
     nickname: string;
     profileImage: string;
+    email?: string; // 카카오 API에서 이메일 정보가 선택 항목일 수 있으므로 '?'를 붙여 optional로 지정합니다.
 }
 
 interface AuthContextType {
@@ -34,24 +36,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [wishlist, setWishlist] = useState<Product[]>([]);
     const router = useRouter();
 
-    // [수정 1] 페이지가 처음 로드될 때, user 정보와 함께 wishlist 정보도 localStorage에서 불러옵니다.
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
-        
-        const storedWishlist = localStorage.getItem('wishlist');
-        if (storedWishlist) {
-            setWishlist(JSON.parse(storedWishlist));
+        try {
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                setUser(JSON.parse(storedUser));
+            }
+            
+            const storedWishlist = localStorage.getItem('wishlist');
+            if (storedWishlist) {
+                setWishlist(JSON.parse(storedWishlist));
+            }
+        } catch (error) {
+            console.error("Failed to parse localStorage data", error);
         }
     }, []);
 
+    // [수정] login 함수에서 email 정보도 함께 저장하도록 수정합니다.
     const login = (kakaoUser: any) => {
         const newUser: User = {
             id: kakaoUser.id,
             nickname: kakaoUser.kakao_account.profile.nickname,
             profileImage: kakaoUser.kakao_account.profile.profile_image_url,
+            email: kakaoUser.kakao_account.email, // 이메일 정보 추가
         };
         localStorage.setItem('user', JSON.stringify(newUser));
         setUser(newUser);
@@ -59,11 +66,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const logout = () => {
         localStorage.removeItem('user');
+        localStorage.removeItem('wishlist'); 
+        setWishlist([]);
         setUser(null);
         router.push('/');
     };
 
-    // [수정 2] 찜 목록에 상품을 추가할 때, localStorage에도 변경된 목록을 저장합니다.
     const addToWishlist = (product: Product) => {
         setWishlist((prev) => {
             const newWishlist = [...prev, product];
@@ -72,7 +80,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
     };
 
-    // [수정 3] 찜 목록에서 상품을 제거할 때, localStorage에도 변경된 목록을 저장합니다.
     const removeFromWishlist = (productId: string) => {
         setWishlist((prev) => {
             const newWishlist = prev.filter((item) => item.id !== productId);
@@ -85,15 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return wishlist.some((item) => item.id === productId);
     };
 
-    const value = {
-        user,
-        login,
-        logout,
-        wishlist,
-        addToWishlist,
-        removeFromWishlist,
-        isLiked,
-    };
+    const value = { user, login, logout, wishlist, addToWishlist, removeFromWishlist, isLiked };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
