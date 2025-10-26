@@ -1,0 +1,523 @@
+/* /app/products/maxx-quant-v4/ProductDetail.module.css */
+/* 이 파일은 모든 스타일을 포함한 완성본입니다. 기존 내용을 모두 지우고 이것으로 덮어쓰세요. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Judson:wght@700&display=swap');
+
+.card {
+    background-color: var(--color-background);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    padding: 25px;
+}
+.mainHeader {
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+.logo {
+    font-size: 22px;
+    font-weight: var(--font-weight-bold);
+}
+.headerNav { display: flex; align-items: center; gap: var(--space-lg); }
+.headerNav a { font-weight: var(--font-weight-semibold); }
+.walletButton {
+    background-color: var(--color-text-primary);
+    color: var(--color-background);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--border-radius-md);
+    border: none;
+    font-size: 14px;
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+}
+
+/* --- 1. 기본 레이아웃 --- */
+.mainContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+.contentColumn {
+    width: 760px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    margin-top: var(--space-xxl);
+}
+.sidebarColumn {
+    position: sticky;
+    top: 128px;
+    width: 420px;
+}
+.sidebarContent {
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- 2. 미디어 (유튜브) --- */
+.mediaContainer {
+    position: relative;
+    padding: 0;
+    padding-bottom: 56.25%; /* 16:9 영상 비율 */
+    height: 0;
+    overflow: hidden;
+}
+.mediaContainer iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* --- 3. 사이드바 --- */
+.collectionInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+.collectionInfo img {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+}
+.collectionInfo a {
+    font-size: 14px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+.productTitle {
+    font-family: 'Judson', serif;
+    font-size: 27px;
+    font-weight: 700;
+    margin: 0 0 var(--space-lg) 0;
+    line-height: 1.2;
+}
+.participants {
+    display: flex;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+}
+.participantItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+.participantItem img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+.participantItem span {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-medium);
+}
+.participantItem a {
+    font-size: 16px;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    text-decoration: underline;
+}
+.actionBar {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+.actionBtn {
+    font-family: var(--font-family-body);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-semibold);
+    font-size: 14px;
+    padding: var(--space-sm);
+}
+.actionBtn:hover {
+    color: var(--color-text-primary);
+}
+.actionBtn svg {
+  transition: all 0.2s ease-in-out;
+}
+.actionBtn.liked svg {
+  color: #ef4444; /* 빨간색 */
+  fill: #ef4444;   /* 내부를 빨간색으로 채움 */
+}
+.separator {
+    border: none;
+    height: 1px;
+    background-color: var(--color-border);
+    margin-bottom: var(--space-lg);
+}
+.priceBox {
+    background-color: var(--color-background);
+    border-radius: 18px;
+    padding: 30px;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.06);
+}
+.priceInfo {
+    background-color: var(--color-surface);
+    border-radius: 14px;
+    padding: 25px 20px;
+    text-align: left;
+    margin-bottom: 0;
+}
+.priceInfo span:first-child {
+    font-size: 14px;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    text-transform: none;
+    letter-spacing: normal;
+}
+.priceInfo .price {
+    display: block;
+    font-size: 28px;
+    font-weight: var(--font-weight-extrabold);
+    margin: 4px 0;
+    color: var(--color-text-primary);
+}
+.priceInfo .priceSecondary {
+    display: block;
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-regular);
+    margin-top: 0;
+}
+.buyButton {
+    width: 90%;
+    margin: 0 auto;
+    background-color: var(--color-text-primary);
+    color: var(--color-background);
+    padding: 18px var(--space-md);
+    border-radius: 14px;
+    border: none;
+    font-size: 15px;
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.buyButton:hover {
+    background-color: #333333;
+}
+
+
+/* --- 4. 메인 콘텐츠 (신규/수정 스타일) --- */
+
+.contentArea {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.sectionSpacing {
+    margin-bottom: 80px; /* 섹션 간의 기본 여백 */
+}
+
+.moduleSpacing {
+    margin-top: 60px; /* 모듈 간의 여백 */
+}
+
+/* 4-1. 시각적 계층 (Typography) */
+.mainHeadline {
+    font-size: 34px; /* H2 */
+    font-weight: 800;
+    line-height: 1.4;
+    letter-spacing: -0.5px;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-md);
+}
+.mainSubheadline {
+    font-size: 20px; /* H2 Sub */
+    font-weight: 500;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+}
+.sectionTitle {
+    font-size: 28px; /* H3 */
+    font-weight: 800;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-xl) 0;
+    padding-bottom: var(--space-md);
+    border-bottom: 2px solid var(--color-border);
+    letter-spacing: -0.4px;
+}
+.moduleTitle {
+    font-size: 22px; /* H4 */
+    font-weight: 700;
+    color: #3182CE; /* 멘토링, 원론집 등 */
+    margin-bottom: var(--space-lg);
+}
+.subsectionTitle {
+    font-size: 18px; /* H5 */
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-md);
+}
+
+/* 4-2. 텍스트 (Readability) */
+.bodyText {
+    font-size: 17px;
+    line-height: 1.9;
+    color: #333; /* #333이 var(--color-text-secondary)보다 약간 진함 */
+    margin: 0;
+    padding: 0;
+    margin-bottom: 1.5em; /* 문단 간 여백 */
+}
+.bodyText:last-child {
+    margin-bottom: 0;
+}
+.bodyText strong {
+    color: var(--color-text-primary);
+    font-weight: 700;
+}
+
+/* 4-3. 강조 박스 (USP Highlight) */
+.highlightBox {
+    background-color: var(--color-surface); /* 연한 배경색 */
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-xl);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+.calloutBox {
+    padding: var(--space-xl);
+    background-color: var(--color-surface); /* 연한 회색 배경 */
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--color-border);
+    text-align: center;
+}
+.calloutBox p {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.8;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+.calloutBox p:first-child {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: var(--space-sm);
+}
+.sectionSeparator {
+    border: 0;
+    border-top: 1px solid #e5e7eb; /* 구분선 */
+    margin: 0; /* .sectionSpacing이 여백을 제어하므로 여기선 0 */
+}
+
+/* 4-4. 목록 (Lists) */
+.styledList {
+    list-style-type: '— '; /* 기본 목록 스타일 (대시) */
+    padding-left: 20px;
+    margin-top: 0;
+    margin-bottom: var(--space-lg);
+}
+.styledList li {
+    font-size: 17px;
+    line-height: 1.9;
+    color: #333;
+    margin-bottom: var(--space-lg); /* 목록 아이템 간 여백 */
+    padding-left: 8px;
+}
+.styledList li strong {
+    color: var(--color-text-primary);
+    font-weight: 700;
+}
+
+/* 4-5. 체크마크 목록 (Benefits) */
+.styledListCheck {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 0;
+    margin-bottom: var(--space-lg);
+}
+.styledListCheck li {
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-xl);
+    padding-left: 38px;
+    position: relative;
+}
+.styledListCheck li::before {
+    content: '✓';
+    color: #10B981;
+    font-size: 24px;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+    top: -2px;
+}
+.styledListCheck li span {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-top: 4px;
+    display: block;
+}
+.styledListCheck li strong {
+    font-weight: 700;
+}
+
+
+/* 4-6. 번호 목록 (과제집) - 기존 스타일 재활용 */
+.numberedFeatureList {
+    list-style: none;
+    padding-left: 0;
+    counter-reset: feature-counter;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    margin-top: var(--space-lg);
+}
+.numberedFeatureList li {
+    display: flex;
+    align-items: flex-start;
+}
+.numberedFeatureList li::before {
+    counter-increment: feature-counter;
+    content: counter(feature-counter);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #f0f2f5;
+    color: var(--color-text-primary);
+    font-weight: 700;
+    font-size: 16px;
+    margin-right: var(--space-md);
+    flex-shrink: 0;
+}
+.numberedFeatureContent {
+    display: flex;
+    flex-direction: column;
+}
+.numberedFeatureTitle {
+    font-weight: 700;
+    color: var(--color-text-primary);
+    font-size: 17px;
+    margin: 0;
+    padding-top: 5px; 
+}
+.numberedFeatureDesc {
+    color: #333;
+    font-size: 16px;
+    margin: 4px 0 0 0;
+    line-height: 1.7;
+}
+
+/* 4-7. FAQ (Accordion) */
+.faqBox {
+    margin-top: 0; 
+}
+.faqBox .sectionTitle {
+    margin-bottom: var(--space-lg);
+}
+.accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+}
+.accordionItem {
+    border-bottom: 1px solid var(--color-border); 
+}
+.accordionTitle {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: var(--space-lg) 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    text-align: left;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    transition: color 0.2s ease;
+}
+.accordionTitle:hover {
+    color: #3B82F6; 
+}
+.icon {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    transition: transform 0.3s ease;
+}
+.accordionTitle[aria-expanded="true"] .icon {
+    transform: rotate(45deg);
+    color: #3B82F6; 
+}
+.accordionContent {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease-in-out; 
+}
+.accordionContent.show {
+    max-height: 150px; /* FAQ 답변 길이에 맞춰 조절 가능 */
+}
+.accordionContent p {
+    padding: 0 5px var(--space-lg) 5px;
+    font-size: 17px;
+    line-height: 1.9;
+    color: #333;
+    margin: 0;
+}
+
+/* 4-8. 기타 (기존 스타일 오버라이드) */
+.descriptionBox {
+    /* .card 스타일을 상속받되, 내부 p 태그는 .bodyText를 따름 */
+}
+.descriptionBox p {
+    font-size: 17px;
+    line-height: 1.9;
+    color: #333;
+    margin-bottom: 1.5em;
+}
+.descriptionBox p:last-child {
+    margin-bottom: 0;
+}
+.descriptionBox p strong { 
+    color: var(--color-text-primary); 
+    font-weight: 700; 
+}
+.descriptionBox h3 {
+     /* .sectionTitle 클래스로 대체됨 */
+    all: unset;
+    display: block;
+}
+
+/* --- 5. 불필요한 스타일 (정리) --- */
+/* .tabPane, .tabsNav, .tabLink, .whatYouGetCard, .whatYouGetSection,
+   .performanceCarouselSection, .guideBox, .performanceDataBox 등
+   기존 템플릿의 스타일은 .contentArea 하위의 새 스타일로 대체되었으며,
+   page.tsx에서 사용되지 않으므로 CSS에서 삭제하거나 무시해도 됩니다.
+   (이 파일에서는 충돌 방지를 위해 일단 남겨두거나, 필요한 부분만 재정의했습니다.)
+*/
+
+/* 탭 영역을 대체하는 새 콘텐츠 영역 */
+.tabPane {
+    display: none;
+    flex-direction: column;
+    gap: 50px;
+}
+.tabPane.active {
+    display: flex;
+}
