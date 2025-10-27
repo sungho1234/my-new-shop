@@ -1,0 +1,55 @@
+// 1. Prisma 클라이언트 설정 (수정 불필요)
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 2. 데이터베이스 연결 설정 (수정 불필요)
+// 우리가 '까만색 창'에서 성공했던 그 '열쇠 이름'입니다.
+datasource db {
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  directUrl    = env("DATABASE_URL_UNPOOLED")
+  relationMode = "prisma"
+}
+
+// 3. User (회원) 테이블 설계도
+model User {
+  id        String    @id @default(cuid())
+  kakaoId   String    @unique // [핵심 추가] 카카오 고유 ID (이걸로 유저 식별)
+  name      String?   // 닉네임 (카카오 'nickname' 저장용)
+  email     String?   @unique
+  image     String?   // 프로필 이미지 (카카오 'profileImage' 저장용)
+  
+  // 4. 우리 앱의 커스텀 항목 (찜목록, 구매내역)
+  wishlist  WishlistItem[]
+  purchases Purchase[]
+}
+
+// 5. WishlistItem (찜 목록) 테이블 설계도 (원본 유지)
+model WishlistItem {
+  id        String   @id @default(cuid())
+  productId String   // 상품 ID (예: 'g1', 'c2')
+  createdAt DateTime @default(now())
+  
+  // User 모델과 연결 (N:1 관계)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 한 유저가 같은 상품을 여러 번 찜하는 것 방지
+  @@unique([userId, productId]) 
+}
+
+// 6. Purchase (구매 내역) 테이블 설계도 (원본 유지)
+model Purchase {
+  id        String   @id @default(cuid())
+  productId String
+  amount    Int
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// --- [삭제됨] ---
+// NextAuth.js 전용 테이블(Account, Session, VerificationToken)은
+// 우리 SDK 방식에서는 필요 없으므로 모두 삭제했습니다.

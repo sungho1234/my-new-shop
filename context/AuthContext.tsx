@@ -11,12 +11,11 @@ export interface Product {
     thumbnail: string;
 }
 
-// [수정 1] Vercel 빌드 에러 해결을 위해 User 타입에 email 속성 추가
 interface User {
     id: number;
     nickname: string;
     profileImage: string;
-    email?: string; // Header.tsx에서 사용하는 email 속성을 optional로 추가
+    email?: string;
 }
 
 interface AuthContextType {
@@ -37,7 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const router = useRouter();
 
     useEffect(() => {
-        // 이 부분은 브라우저 환경에서만 실행되므로 안전합니다.
+        // --- 원본 코드 유지 ---
         try {
             const storedUser = localStorage.getItem('user');
             if (storedUser) {
@@ -53,21 +52,50 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     }, []);
 
-    // [수정 2] login 함수에 email 정보 저장을 추가하여 빌드 에러 방지
+    // [수정 2] login 함수
     const login = (kakaoUser: any) => {
         const newUser: User = {
             id: kakaoUser.id,
             nickname: kakaoUser.kakao_account.profile.nickname,
             profileImage: kakaoUser.kakao_account.profile.profile_image_url,
-            email: kakaoUser.kakao_account.email, // email 정보 추가
+            email: kakaoUser.kakao_account.email,
         };
         localStorage.setItem('user', JSON.stringify(newUser));
         setUser(newUser);
+
+        // ▼▼▼▼▼ [핵심 추가] 이 코드가 '몰래' 실행됩니다 ▼▼▼▼▼
+        // UI 변경 없이, 백그라운드에서 DB에 유저 정보를 저장/업데이트합니다.
+        try {
+          fetch('/api/auth/login', { // 3단계에서 만든 '비밀 사무실' 주소
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newUser), // 카카오에서 받은 정보를 그대로 DB로 전송
+          })
+          .then(response => {
+            if (!response.ok) {
+              console.error("DB 동기화 실패 (서버 응답):", response.statusText);
+              return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+          })
+          .then(dbUser => {
+            console.log("DB에 유저 정보 동기화 성공:", dbUser.name);
+          })
+          .catch(error => {
+            console.error("DB 동기화 fetch 요청 오류:", error);
+            // DB 저장이 실패해도, 사용자는 이미 localStorage 기준으로 로그인됩니다.
+          });
+        } catch (error) {
+           console.error("DB 동기화 fetch 요청 최상위 오류:", error);
+        }
+        // ▲▲▲▲▲ [핵심 추가] 여기까지 입니다 ▲▲▲▲▲
     };
 
-    // [수정 3] 로그아웃 시 찜 목록(wishlist) 데이터는 삭제하지 않도록 원상 복구
+    // --- 나머지 코드는 모두 원본 유지 ---
     const logout = () => {
-        localStorage.removeItem('user'); // user 정보만 삭제
+        localStorage.removeItem('user');
         setUser(null);
         router.push('/');
     };

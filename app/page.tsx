@@ -8,7 +8,7 @@ import HeroSection from "@/components/HeroSection"; // 새로 만든 HeroSection
 
 // systemsData와 strategiesData는 그대로 유지됩니다.
 const systemsData = [
-  { imgSrc: "https://via.placeholder.com/300x400/F3F4F6/9CA3AF?text=MAXX+%ED%80%88%ED%8A%B8+%EC%8B%9C%EC%8A%A4%ED%85%9C+v4.0", title: "2025 일반인을 위한 시스템 투자 올인원", desc: "⭐4.8 ㅣ 구매 280명", price: "210,000원", href: '/products/maxx-quant-v4' },
+  { imgSrc: "https://via.placeholder.com/300x400/F3F4F6/9CA3AF?text=MAXX+%ED%80%88%ED%8A%B8+%EC%8B%9C%EC%8A%A4%ED%85%9C+v4.0", title: "2025 일반인을 위한 시스템 투자 올인원", desc: "⭐4.8 ㅣ 구매 280명", price: "210,000원", href: '/products/g1' },
   { imgSrc: "https://via.placeholder.com/300x400/F3F4F6/9CA3AF?text=%ED%80%88%ED%8A%B8+%EC%8B%9C%EC%8A%A4%ED%85%9C+Lite", title: "일반인을 위한 첫번째 안내서: 거래소 선택부터 차트 셋업까지", desc: "⭐4.8 ㅣ 구매 280명", price: "70,000원", href: '/products/g2' },
   { imgSrc: "https://via.placeholder.com/300x400/F3F4F6/9CA3AF?text=%ED%80%88%ED%8A%B8+%EC%8B%9C%EC%8A%A4%ED%85%9C+Pro", title: "일반인의 성장책: 스캠필터와 챌린지", desc: "⭐4.8 ㅣ 구매 280명", price: "60,000원", href: '/products/g3'  },
 ];
