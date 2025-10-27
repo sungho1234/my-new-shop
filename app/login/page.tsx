@@ -1,5 +1,3 @@
-// /app/login/page.tsx
-
 "use client";
 
 import React, { useEffect } from 'react';
@@ -9,9 +7,10 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 
-// 1. 제공해주신 JavaScript 키를 여기에 입력합니다.
+// 1. 제공해주신 JavaScript 키를 여기에 입력합니다. (원본 동일)
 const KAKAO_JAVASCRIPT_KEY = "7943adf01d59eb4d9b2343d093a9eb95";
 
+// 로고 (원본 동일)
 const Logo = () => (
     <svg width="34" height="24" viewBox="0 0 34 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M2.208.5h9.072v22.96H2.208V.5zm20.48 0h9.072v22.96h-9.072V.5z" stroke="#111" strokeWidth="1"></path>
@@ -24,13 +23,14 @@ const LoginPage = () => {
     const router = useRouter();
 
     const initializeKakao = () => {
-        // @ts-ignore
+        // @ts-ignore (원본 동일)
         if (window.Kakao && !window.Kakao.isInitialized()) {
             // @ts-ignore
             window.Kakao.init(KAKAO_JAVASCRIPT_KEY);
         }
     };
 
+    // ▼▼▼▼▼ [핵심 변경] handleKakaoLogin 함수 내부 수정 ▼▼▼▼▼
     const handleKakaoLogin = () => {
         // @ts-ignore
         if (!window.Kakao) {
@@ -42,11 +42,20 @@ const LoginPage = () => {
         window.Kakao.Auth.login({
             success: function (authObj: any) {
                 // @ts-ignore
+                // [유지] 사용자 정보를 요청합니다.
                 window.Kakao.API.request({
                     url: '/v2/user/me',
                     success: function (res: any) {
-                        login(res);
-                        router.push('/');
+                        // 1. [변경] AuthContext의 login 함수를 호출하고, 결과(성공 여부)를 받습니다.
+                        const loginSuccess = login(res);
+
+                        // 2. [변경] login 함수가 true를 반환했을 때만 메인 페이지로 이동합니다.
+                        if (loginSuccess) {
+                            router.push('/'); // 성공 시에만 이동
+                        } else {
+                            // AuthContext의 login 함수 내부에서 이미 alert를 띄우므로 여기서 추가 알림은 생략합니다.
+                            console.error("AuthContext login failed, redirect cancelled.");
+                        }
                     },
                     fail: function (error: any) {
                         alert('사용자 정보 요청에 실패했습니다: ' + JSON.stringify(error));
@@ -58,7 +67,9 @@ const LoginPage = () => {
             },
         });
     };
+    // ▲▲▲▲▲ [핵심 변경] handleKakaoLogin 함수 수정 완료 ▲▲▲▲▲
 
+    // --- UI 부분은 100% 대표님 코드와 동일 ---
     return (
         <div className="flex min-h-screen flex-col">
             <Script

@@ -1,10 +1,8 @@
-// /app/layout.tsx
-
+// /app/layout.tsx (진짜 원본)
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "@/context/AuthContext";
-import SessionProvider from "@/context/SessionProvider"; // <-- 1. [추가] 방금 만든 세션 제공자 임포트
+import { AuthProvider } from "@/context/AuthContext"; // AuthProvider만 있어야 합니다.
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,10 +19,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {/* 2. [수정] AuthProvider를 SessionProvider로 감싸줍니다. */}
-        <SessionProvider>
-          <AuthProvider>{children}</AuthProvider>
-        </SessionProvider>
+        {/* SessionProvider 없이 AuthProvider만 있어야 합니다. */}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

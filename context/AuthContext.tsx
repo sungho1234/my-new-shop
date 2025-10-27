@@ -1,142 +1,200 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 export interface Product {
-    id: string;
-    title: string;
-    author: string;
-    price: string;
-    thumbnail: string;
+  id: string; // 상품 ID (예: 'maxx-quant-v4')
+  title: string;
+  author: string;
+  price: string;
+  thumbnail: string;
+}
+
+export interface WishlistItem {
+  id: string; // DB의 CUID
+  productId: string; // 상품 ID (예: 'maxx-quant-v4')
+  userId: string; // DB의 User CUID
+  createdAt?: Date; // 옵션
 }
 
 interface User {
-    id: number;
-    nickname: string;
-    profileImage: string;
-    email?: string;
+  id: number; // 카카오 ID
+  nickname: string;
+  profileImage: string;
+  email?: string;
 }
 
 interface AuthContextType {
-    user: User | null;
-    login: (userData: any) => void;
-    logout: () => void;
-    wishlist: Product[];
-    addToWishlist: (product: Product) => void;
-    removeFromWishlist: (productId: string) => void;
-    isLiked: (productId: string) => boolean;
+  user: User | null;
+  login: (kakaoUser: any) => boolean; // 로그인 성공 여부 반환
+  logout: () => void;
+  wishlist: WishlistItem[];
+  addToWishlist: (product: Product) => Promise<void>;
+  removeFromWishlist: (productId: string) => Promise<void>;
+  isLiked: (productId: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [wishlist, setWishlist] = useState<Product[]>([]);
-    const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+  const router = useRouter();
 
-    useEffect(() => {
-        // --- 원본 코드 유지 ---
-        try {
-            const storedUser = localStorage.getItem('user');
-            if (storedUser) {
-                setUser(JSON.parse(storedUser));
-            }
-            
-            const storedWishlist = localStorage.getItem('wishlist');
-            if (storedWishlist) {
-                setWishlist(JSON.parse(storedWishlist));
-            }
-        } catch (error) {
-            console.error("localStorage 데이터 파싱 오류:", error);
-        }
-    }, []);
+  // 1. 찜 목록 로드 헬퍼 (useCallback으로 안정화 – Hooks 규칙 준수)
+  const fetchWishlist = useCallback(async (kakaoId: number) => {
+    console.log("📋 fetchWishlist 호출: kakaoId =", kakaoId);
+    try {
+      const res = await fetch(`/api/wishlist?kakaoId=${kakaoId}`);
+      if (!res.ok) throw new Error(`Failed to fetch wishlist: ${res.status}`);
+      const data: WishlistItem[] = await res.json();
+      setWishlist(data);
+      console.log("✅ DB 찜 목록 로드 성공:", data.length, "개");
+    } catch (err) {
+      console.error("❌ DB 찜 목록 로드 실패:", err);
+      setWishlist([]);
+    }
+  }, []); // 의존성 없음 – 안정적
 
-    // [수정 2] login 함수
-    const login = (kakaoUser: any) => {
-        const newUser: User = {
-            id: kakaoUser.id,
-            nickname: kakaoUser.kakao_account.profile.nickname,
-            profileImage: kakaoUser.kakao_account.profile.profile_image_url,
-            email: kakaoUser.kakao_account.email,
-        };
-        localStorage.setItem('user', JSON.stringify(newUser));
-        setUser(newUser);
+  // 2. 초기 로드: localStorage에서 user 복원 (로그인 상태 유지)
+  useEffect(() => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        const loadedUser: User = JSON.parse(storedUser);
+        console.log("🔄 localStorage에서 user 복원: ", loadedUser.nickname);
+        setUser(loadedUser);
+        // wishlist는 아래 useEffect가 처리
+      }
+    } catch (error) {
+      console.error("❌ localStorage User 파싱 오류:", error);
+      localStorage.removeItem('user'); // 손상된 데이터 삭제
+    }
+  }, []);
 
-        // ▼▼▼▼▼ [핵심 추가] 이 코드가 '몰래' 실행됩니다 ▼▼▼▼▼
-        // UI 변경 없이, 백그라운드에서 DB에 유저 정보를 저장/업데이트합니다.
-        try {
-          fetch('/api/auth/login', { // 3단계에서 만든 '비밀 사무실' 주소
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(newUser), // 카카오에서 받은 정보를 그대로 DB로 전송
-          })
-          .then(response => {
-            if (!response.ok) {
-              console.error("DB 동기화 실패 (서버 응답):", response.statusText);
-              return response.json().then(err => Promise.reject(err));
-            }
-            return response.json();
-          })
-          .then(dbUser => {
-            console.log("DB에 유저 정보 동기화 성공:", dbUser.name);
-          })
-          .catch(error => {
-            console.error("DB 동기화 fetch 요청 오류:", error);
-            // DB 저장이 실패해도, 사용자는 이미 localStorage 기준으로 로그인됩니다.
-          });
-        } catch (error) {
-           console.error("DB 동기화 fetch 요청 최상위 오류:", error);
-        }
-        // ▲▲▲▲▲ [핵심 추가] 여기까지 입니다 ▲▲▲▲▲
+  // 3. user 변경 시 wishlist 자동 로드 (로그인 후 동기화 – Hooks 안전)
+  useEffect(() => {
+    if (user) {
+      fetchWishlist(user.id);
+    } else {
+      setWishlist([]); // 로그아웃 시 초기화
+    }
+  }, [user, fetchWishlist]); // user 의존성 추가
+
+  // 4. login 함수 (async 호출 제거 – setUser만, useEffect가 처리)
+  const login = (kakaoUser: any): boolean => {
+    console.log("🔑 login 호출: kakaoUser =", kakaoUser);
+    if (!kakaoUser || !kakaoUser.id) {
+      console.error("❌ 카카오 ID 누락");
+      alert("로그인에 필요한 정보가 없습니다. 다시 시도해주세요.");
+      return false;
+    }
+
+    const nickname = kakaoUser?.kakao_account?.profile?.nickname ?? '사용자';
+    const profileImage = kakaoUser?.kakao_account?.profile?.profile_image_url ?? '';
+    const email = kakaoUser?.kakao_account?.email ?? '';
+
+    const newUser: User = {
+      id: kakaoUser.id,
+      nickname,
+      profileImage,
+      email,
     };
 
-    // --- 나머지 코드는 모두 원본 유지 ---
-    const logout = () => {
-        localStorage.removeItem('user');
-        setUser(null);
-        router.push('/');
-    };
+    localStorage.setItem('user', JSON.stringify(newUser));
+    setUser(newUser); // 이게 useEffect([user]) 트리거 → wishlist 로드
 
-    const addToWishlist = (product: Product) => {
-        setWishlist((prev) => {
-            const newWishlist = [...prev, product];
-            localStorage.setItem('wishlist', JSON.stringify(newWishlist));
-            return newWishlist;
-        });
-    };
+    // DB 동기화 (async – login 성공 여부에 영향 안 줌)
+    fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newUser),
+    })
+      .then((res) => res.json())
+      .then((dbUser) => console.log("✅ DB 로그인/회원가입 성공:", dbUser?.name || '새 사용자 생성'))
+      .catch((err) => console.error("❌ DB 로그인 실패:", err));
 
-    const removeFromWishlist = (productId: string) => {
-        setWishlist((prev) => {
-            const newWishlist = prev.filter((item) => item.id !== productId);
-            localStorage.setItem('wishlist', JSON.stringify(newWishlist));
-            return newWishlist;
-        });
-    };
+    console.log("✅ login 성공: ", newUser.nickname);
+    return true;
+  };
 
-    const isLiked = (productId: string) => {
-        return wishlist.some((item) => item.id === productId);
-    };
+  // 5. logout
+  const logout = () => {
+    console.log("🚪 logout 호출");
+    localStorage.removeItem('user');
+    setUser(null); // useEffect가 wishlist 초기화
+    router.push('/');
+  };
 
-    const value = {
-        user,
-        login,
-        logout,
-        wishlist,
-        addToWishlist,
-        removeFromWishlist,
-        isLiked,
-    };
+  // 6. addToWishlist (DB 후 재로드)
+  const addToWishlist = async (product: Product) => {
+    if (!user) {
+      console.warn("⚠️ addToWishlist: 로그인 필요");
+      return;
+    }
+    console.log("❤️ addToWishlist: ", product.id);
+    try {
+      const response = await fetch('/api/wishlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kakaoId: user.id, product }),
+      });
+      if (!response.ok) throw new Error(`Add failed: ${response.status}`);
+      await fetchWishlist(user.id); // 재로드
+      console.log("✅ 찜 추가 성공");
+    } catch (error) {
+      console.error("❌ 찜 추가 실패:", error);
+      throw error; // 상위 (e.g., ProductDetail)로 에러 전파
+    }
+  };
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  // 7. removeFromWishlist (DB 후 재로드)
+  const removeFromWishlist = async (productId: string) => {
+    if (!user) {
+      console.warn("⚠️ removeFromWishlist: 로그인 필요");
+      return;
+    }
+    console.log("🗑️ removeFromWishlist: ", productId);
+    try {
+      const response = await fetch(`/api/wishlist?kakaoId=${user.id}&productId=${productId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error(`Remove failed: ${response.status}`);
+      await fetchWishlist(user.id); // 재로드
+      console.log("✅ 찜 제거 성공");
+    } catch (error) {
+      console.error("❌ 찜 제거 실패:", error);
+      throw error;
+    }
+  };
+
+  // 8. isLiked
+  const isLiked = (productId: string) => {
+    return wishlist.some((item) => item.productId === productId);
+  };
+
+  const value: AuthContextType = {
+    user,
+    login,
+    logout,
+    wishlist,
+    addToWishlist,
+    removeFromWishlist,
+    isLiked,
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

@@ -1,50 +1,65 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma'; // 1단계에서 만든 'Prisma 도우미'
+import prisma from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
-    // 1. 브라우저(AuthContext)가 보낸 유저 정보를 받습니다.
-    const body = await request.json();
-    const { id, nickname, email, profileImage } = body;
+    // 1. [변경] 브라우저로부터 '보안 카드(accessToken)'를 받습니다.
+    const { accessToken } = await request.json();
 
-    // 2. 필수 정보(카카오 ID)가 있는지 확인합니다.
-    if (!id) {
-      return NextResponse.json({ error: 'Kakao ID is required' }, { status: 400 });
+    if (!accessToken) {
+      return NextResponse.json({ error: 'Access Token is required' }, { status: 400 });
     }
 
-    const kakaoIdString = String(id); // ID를 문자열로 변환
-
-    // 3. DB에서 이 'kakaoId'로 유저를 찾습니다.
-    const user = await prisma.user.findUnique({
-      where: { kakaoId: kakaoIdString },
+    // 2. [핵심] '비밀 사무실'(우리 서버)이 '카카오 서버'에게 직접 '보안 카드'가 진짜인지 물어봅니다.
+    const kakaoResponse = await fetch('https://kapi.kakao.com/v2/user/me', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+      },
     });
 
-    let dbUser;
-
-    if (user) {
-      // 4. [로그인] 유저가 이미 DB에 있다면, 최신 정보로 '업데이트'합니다.
-      dbUser = await prisma.user.update({
-        where: { kakaoId: kakaoIdString },
-        data: {
-          name: nickname, // 'name' 필드에 'nickname' 저장
-          email: email,
-          image: profileImage, // 'image' 필드에 'profileImage' 저장
-        },
-      });
-    } else {
-      // 5. [회원가입] 유저가 DB에 없다면, '새로 생성'합니다.
-      dbUser = await prisma.user.create({
-        data: {
-          kakaoId: kakaoIdString,
-          name: nickname,
-          email: email,
-          image: profileImage,
-        },
-      });
+    if (!kakaoResponse.ok) {
+      // '보안 카드'가 가짜이거나 만료되었습니다.
+      return NextResponse.json({ error: 'Failed to verify Kakao token' }, { status: 401 });
     }
 
-    // 6. 처리된 유저 정보를 브라우저에 다시 보내줍니다.
-    return NextResponse.json(dbUser, { status: 200 });
+    // 3. '카카오 서버'가 "이 사람은 진짜"라며 '보증된' 유저 정보를 줍니다.
+    const kakaoUser = await kakaoResponse.json();
+
+    // 4. [기존 로직] 이 '보증된' 정보로 DB에 회원가입 또는 로그인을 진행합니다.
+    const kakaoIdString = String(kakaoUser.id);
+    const { nickname, profile_image_url } = kakaoUser.kakao_account.profile;
+    const email = kakaoUser.kakao_account.email;
+
+    const dbUser = await prisma.user.upsert({
+      where: { kakaoId: kakaoIdString },
+      // [업데이트] 유저가 이미 있다면 (로그인)
+      update: {
+        name: nickname,
+        image: profile_image_url,
+        email: email,
+      },
+      // [생성] 유저가 없다면 (회원가입)
+      create: {
+        kakaoId: kakaoIdString,
+        name: nickname,
+        image: profile_image_url,
+        email: email,
+      },
+    });
+
+    // 5. [중요] DB에 저장된 정보가 아닌,
+    // 프론트엔드(AuthContext)가 사용하는 '원본' 포맷으로 다시 맞춰서 보내줍니다.
+    // (이렇게 해야 Header.tsx 등 다른 UI가 깨지지 않습니다.)
+    const frontendUserFormat = {
+      id: kakaoUser.id,
+      nickname: nickname,
+      profileImage: profile_image_url,
+      email: email,
+    };
+
+    return NextResponse.json(frontendUserFormat, { status: 200 });
 
   } catch (error) {
     console.error("Login API Error:", error);
