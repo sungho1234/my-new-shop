@@ -1,5 +1,6 @@
 "use client"; 
 
+
 import React, { useState } from 'react';
 import Script from 'next/script';
 import styles from './ProductDetail.module.css';
@@ -10,8 +11,10 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useScrollFadeIn } from '@/hooks/useScrollFadeIn';
 
+
 import { HeartIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
+
 
 
 const faqItems = [
@@ -21,13 +24,15 @@ const faqItems = [
     { question: 'Q: 환불 정책은 어떻게 되나요?', answer: 'A: 구매 후 24시간 이내, 멘토링 채널 개설 전 100% 환불 가능합니다.' },
 ];
 
+
 const itemForPay: PaymentItem = {
     title: "2025 일반인을 위한 시스템 투자 올인원",
     subtitle: "디지털 콘텐츠",
-    priceLabel: "2,100,000원",
-    priceValue: 2100000,
+    priceLabel: "210,000원",
+    priceValue: 210000,
     thumbnail: "/로고.png",
 };
+
 
 const ProductDetailPage = () => {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -36,15 +41,17 @@ const ProductDetailPage = () => {
     const { user, addToWishlist, removeFromWishlist, isLiked } = useAuth();
     const router = useRouter();
 
+
     const productInfo = {
         id: 'maxx-quant-v4', 
         title: '2025 일반인을 위한 시스템 투자 올인원',
         author: 'kobba',
-        price: '2,100,000',
+        price: '210,000',
         thumbnail: "/로고.png",
     };
     
     const liked = isLiked(productInfo.id);
+
 
     // 스크롤 애니메이션 훅
     const animMedia = useScrollFadeIn('up', 1, 0);
@@ -59,9 +66,11 @@ const ProductDetailPage = () => {
     const animFaq = useScrollFadeIn('up', 1, 0);
     const animFinal = useScrollFadeIn('up', 1, 0.1);
 
+
     const toggleAccordion = (index: number) => {
         setActiveIndex(activeIndex === index ? null : index);
     };
+
 
     const handlePayRequest = (item: PaymentItem, method: "KAKAOPAY" | "NAVERPAY") => {
         // @ts-ignore
@@ -76,7 +85,10 @@ const ProductDetailPage = () => {
             pay_method: method === 'NAVERPAY' ? 'naverpay' : 'card',
             merchant_uid: `MAXX-${new Date().getTime()}`,
             name: item.title,
-            amount: 100,
+
+            // [수정] 하드코딩된 100을 실제 상품 가격인 item.priceValue로 변경
+            amount: item.priceValue,
+
             buyer_email: "test@example.com", 
             buyer_name: user?.nickname || "테스터",
             buyer_tel: "010-1234-5678",
@@ -90,6 +102,7 @@ const ProductDetailPage = () => {
         });
     };
 
+
     const handleBuyNowClick = () => {
         if (user) {
             setPaymentOpen(true);
@@ -100,6 +113,7 @@ const ProductDetailPage = () => {
         }
     };
 
+
     const handleLikeClick = () => {
         if (!user) {
             if (window.confirm("로그인이 필요한 서비스입니다. 로그인 하시겠습니까?")) {
@@ -108,12 +122,14 @@ const ProductDetailPage = () => {
             return;
         }
 
+
         if (liked) {
             removeFromWishlist(productInfo.id);
         } else {
             addToWishlist(productInfo);
         }
     };
+
 
     const handleShareClick = () => {
         const currentUrl = window.location.href;
@@ -124,6 +140,7 @@ const ProductDetailPage = () => {
             alert("클립보드 복사에 실패했습니다.");
         });
     };
+
 
     return (
         <div>
@@ -144,7 +161,9 @@ const ProductDetailPage = () => {
                             </iframe>
                         </section>
 
+
                         <div className={styles.contentArea}>
+
 
                             {/* 메인 헤드라인 */}
                             <section {...animHeadline} className={styles.sectionSpacing}>
@@ -157,6 +176,7 @@ const ProductDetailPage = () => {
                                     바뀌는 순간을 경험하세요.
                                 </p>
                             </section>
+
 
                             {/* 이런 분들을 위해 준비했습니다 */}
                             <section {...animPainPoints} className={styles.sectionSpacing}>
@@ -172,6 +192,7 @@ const ProductDetailPage = () => {
                                 </ul>
                             </section>
 
+
                             {/* 콜아웃 박스 */}
                             <section {...animCallout} className={styles.sectionSpacing}>
                                 <div className={styles.calloutBox}>
@@ -182,6 +203,7 @@ const ProductDetailPage = () => {
                                     </p>
                                 </div>
                             </section>
+
 
                             {/* 도입부 문단 */}
                             <section {...animCoreValue} className={styles.sectionSpacing}>
@@ -198,6 +220,7 @@ const ProductDetailPage = () => {
                                 </p>
                             </section>
 
+
                             {/* 패키지 앵커 제목 */}
                             <hr className={styles.sectionSeparator} />
                             <section {...animPackageIntro} className={styles.sectionSpacing}>
@@ -207,6 +230,7 @@ const ProductDetailPage = () => {
                                     성장에 필요한 모든 것을 담았습니다.
                                 </p>
                             </section>
+
 
                             {/* 패키지 구성 */}
                             <section {...animModules} className={styles.sectionSpacing} style={{marginTop: "-60px"}}>
@@ -236,6 +260,7 @@ const ProductDetailPage = () => {
                                     </ul>
                                 </div>
 
+
                                 {/* 2. 원론집 */}
                                 <div className={styles.moduleSpacing}>
                                     <h4 className={styles.moduleTitle}>MODULE 2. 📘 원론집 (Foundation Guidebook)</h4>
@@ -250,6 +275,7 @@ const ProductDetailPage = () => {
                                     </ul>
                                 </div>
 
+
                                 {/* 3. 지식 심화 */}
                                 <div className={styles.moduleSpacing}>
                                     <h4 className={styles.moduleTitle}>MODULE 3. 📚 지식 심화 (Deep Knowledge Library)</h4>
@@ -262,6 +288,7 @@ const ProductDetailPage = () => {
                                         <li>지지선/저항선, 거래량 분석, 백테스팅 방법론 등</li>
                                     </ul>
                                 </div>
+
 
                                 {/* 4. 도구 세팅 */}
                                 <div className={styles.moduleSpacing}>
@@ -277,6 +304,7 @@ const ProductDetailPage = () => {
                                     </ul>
                                 </div>
 
+
                                 {/* 5. 스캠 필터링 */}
                                 <div className={styles.moduleSpacing}>
                                     <h4 className={styles.moduleTitle}>MODULE 5. 🛡️ 스캠 필터링 체크리스트</h4>
@@ -290,6 +318,7 @@ const ProductDetailPage = () => {
                                         <li><strong>의심스러운 링크와 스마트 컨트랙트 검증 방법</strong></li>
                                     </ul>
                                 </div>
+
 
                                 {/* 6. 과제집 */}
                                 <div className={styles.moduleSpacing}>
@@ -334,7 +363,9 @@ const ProductDetailPage = () => {
                                 </div>
                             </section>
 
+
                             <hr className={styles.sectionSeparator} />
+
 
                             {/* 왜 특별한가? */}
                             <section {...animSpecial} className={styles.sectionSpacing}>
@@ -361,6 +392,7 @@ const ProductDetailPage = () => {
                                 </ul>
                             </section>
 
+
                             {/* 기대 결과 */}
                             <section {...animResults} className={styles.sectionSpacing}>
                                 <h3 className={styles.sectionTitle}>이런 결과를 기대할 수 있습니다</h3>
@@ -370,6 +402,7 @@ const ProductDetailPage = () => {
                                     <li><strong>90일 후,</strong> 자신만의 매매 시스템을 구축하고 지속적으로 개선할 수 있습니다.</li>
                                 </ul>
                             </section>
+
 
                             <hr className={styles.sectionSeparator} />
                             
@@ -394,6 +427,7 @@ const ProductDetailPage = () => {
                                 </div>
                             </section>
 
+
                             {/* 마지막으로 */}
                             <section className={`${styles.descriptionBox} ${styles.card}`} {...animFinal}>
                                 <h3 className={styles.sectionTitle}>마지막으로</h3>
@@ -408,6 +442,7 @@ const ProductDetailPage = () => {
                             </section>
                         </div>
                     </main>
+
 
                     {/* 사이드바 */}
                     <aside className={styles.sidebarColumn}>
@@ -448,8 +483,8 @@ const ProductDetailPage = () => {
                             <div className={`${styles.priceBox} ${styles.card}`}>
                                 <div className={styles.priceInfo}>
                                     <span>Price</span>
-                                    <span className={styles.price}>2,100,000원</span>
-                                    <span className={styles.priceSecondary}>($1,500)</span>
+                                    <span className={styles.price}>210,000원</span>
+                                    <span className={styles.priceSecondary}>($150)</span>
                                 </div>
                                 <button className={styles.buyButton} onClick={handleBuyNowClick}>
                                     Buy now
@@ -460,6 +495,7 @@ const ProductDetailPage = () => {
                 </div>
             </div>
             <Footer />
+
 
             {user && (
                 <PaymentModal
@@ -472,5 +508,6 @@ const ProductDetailPage = () => {
         </div>
     );
 };
+
 
 export default ProductDetailPage;

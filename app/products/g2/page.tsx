@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Script from 'next/script';
-import styles from './ProductDetail.module.css'; // [정보] CSS 파일은 기존 v4와 동일한 것을 공유합니다.
+import styles from './ProductDetail.module.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PaymentModal, { PaymentItem } from "@/components/PaymentModal";
@@ -13,7 +13,6 @@ import { useScrollFadeIn } from '@/hooks/useScrollFadeIn';
 import { HeartIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 
-// [ 1. 수정 ] FAQ 내용을 새 상품에 맞게 변경
 const faqItems = [
     { 
         question: 'Q. 이 안내서에도 1:1 멘토링이 포함되나요?', 
@@ -29,13 +28,12 @@ const faqItems = [
     },
 ];
 
-// [ 2. 수정 ] 결제 정보를 새 상품에 맞게 변경
 const itemForPay: PaymentItem = {
     title: "일반인을 위한 첫번째 안내서",
     subtitle: "거래소 선택부터 차트 셋업까지",
     priceLabel: "70,000원",
-    priceValue: 70000, // 실제 결제될 금액
-    thumbnail: "/로고.png", // (상품 썸네일 이미지 경로)
+    priceValue: 70000,
+    thumbnail: "/로고.png",
 };
 
 const ProductDetailPage = () => {
@@ -45,18 +43,16 @@ const ProductDetailPage = () => {
     const { user, addToWishlist, removeFromWishlist, isLiked } = useAuth();
     const router = useRouter();
 
-    // [ 3. 수정 ] 찜하기 정보를 새 상품에 맞게 변경
     const productInfo = {
-        id: 'first-guide', // 고유 ID (폴더명과 일치 권장)
+        id: 'first-guide',
         title: '일반인을 위한 첫번째 안내서',
         author: 'kobba',
         price: '70,000',
-        thumbnail: "/로고.png", // (상품 썸네일 이미지 경로)
+        thumbnail: "/로고.png",
     };
     
     const liked = isLiked(productInfo.id);
 
-    // 스크롤 애니메이션 훅 (기존과 동일)
     const animMedia = useScrollFadeIn('up', 1, 0);
     const animHeadline = useScrollFadeIn('up', 1, 0.1);
     const animIntro = useScrollFadeIn('up', 1, 0);
@@ -64,13 +60,12 @@ const ProductDetailPage = () => {
     const animModules = useScrollFadeIn('up', 1, 0); 
     const animRecommend = useScrollFadeIn('up', 1, 0.1); 
     const animFaq = useScrollFadeIn('up', 1, 0);
-    // (animFinal은 이 페이지에서 사용되지 않음)
 
     const toggleAccordion = (index: number) => {
         setActiveIndex(activeIndex === index ? null : index);
     };
 
-    // (결제, 구매, 찜하기, 공유 핸들러 함수들은 기존과 모두 동일)
+    // --- [수정된 부분!] ---
     const handlePayRequest = (item: PaymentItem, method: "KAKAOPAY" | "NAVERPAY") => {
         // @ts-ignore
         const { IMP } = window;
@@ -82,21 +77,48 @@ const ProductDetailPage = () => {
         const payData = {
             pg: method === 'KAKAOPAY' ? 'kakaopay' : 'html5_inicis.INIpayTest',
             pay_method: method === 'NAVERPAY' ? 'naverpay' : 'card',
-            merchant_uid: `GUIDE-${new Date().getTime()}`, // (상품 고유 Prefix)
+            merchant_uid: `GUIDE-${new Date().getTime()}`,
             name: item.title,
-            amount: 100, // 테스트 금액 (실제 결제 시 item.priceValue 사용)
+            amount: 100, // 테스트 금액
             buyer_email: "test@example.com", 
             buyer_name: user?.nickname || "테스터",
             buyer_tel: "010-1234-5678",
         };
-        IMP.request_pay(payData, (rsp: any) => {
+        
+        IMP.request_pay(payData, async (rsp: any) => { 
             if (rsp.success) {
-                alert("결제가 완료되었습니다. 주문번호: " + rsp.merchant_uid);
+                try {
+                    const response = await fetch('/api/purchases', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        // [수정!] userId 대신 kakaoId를 보내도록 수정합니다.
+                        body: JSON.stringify({
+                            kakaoId: user?.id, // user.id는 숫자 카카오 ID이므로, kakaoId라는 이름으로 전송
+                            productId: productInfo.id,
+                            amount: payData.amount, 
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || '구매 기록 저장에 실패했습니다.');
+                    }
+
+                    alert("결제가 완료되었습니다. 구매내역 페이지에서 확인하실 수 있습니다.");
+                    
+                } catch (error) {
+                    console.error(error);
+                    const errorMessage = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
+                    alert(`결제는 성공했으나 구매 기록 저장 중 오류가 발생했습니다: ${errorMessage}. 관리자에게 문의해주세요.`);
+                }
             } else {
                 alert("결제에 실패하였습니다. 에러: " + rsp.error_msg);
             }
         });
     };
+    // --- 여기까지 수정 ---
 
     const handleBuyNowClick = () => {
         if (user) {
@@ -144,7 +166,7 @@ const ProductDetailPage = () => {
                         
                         <section className={`${styles.mediaContainer} ${styles.card}`} {...animMedia}>
                             <iframe 
-                                src="https://www.youtube.com/embed/YOUTUBE_VIDEO_ID" // (가이드북용 영상 ID로 변경)
+                                src="https://www.youtube.com/embed/YOUTUBE_VIDEO_ID"
                                 title="YouTube video player" 
                                 frameBorder="0" 
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
@@ -152,10 +174,8 @@ const ProductDetailPage = () => {
                             </iframe>
                         </section>
 
-                        {/* [ 4. 수정 ] 메인 콘텐츠 영역을 새 상품 내용으로 전체 교체 */}
                         <div className={styles.contentArea}>
 
-                            {/* 메인 헤드라인 */}
                             <section {...animHeadline} className={styles.sectionSpacing}>
                                 <h2 className={styles.mainHeadline}>
                                     일반인을 위한 첫번째 안내서
@@ -165,7 +185,6 @@ const ProductDetailPage = () => {
                                 </p>
                             </section>
 
-                            {/* 도입부 문단 */}
                             <section {...animIntro} className={styles.sectionSpacing}>
                                 <p className={styles.bodyText}>
                                     이 안내서는 [Your Team Name] 트레이딩 팀이 수많은 시행착오 끝에 결론내린,<br/>
@@ -180,16 +199,13 @@ const ProductDetailPage = () => {
                                 </p>
                             </section>
 
-                            {/* 패키지 앵커 제목 */}
                             <hr className={styles.sectionSeparator} />
                             <section {...animPackageIntro} className={styles.sectionSpacing}>
                                 <h3 className={styles.sectionTitle}>이 안내서에 포함된 모든 것</h3>
                             </section>
 
-                            {/* 패키지 구성 */}
                             <section {...animModules} className={styles.sectionSpacing} style={{marginTop: "-60px"}}>
                                 
-                                {/* PART 1. 원론집 */}
                                 <div className={styles.moduleSpacing}>
                                     <h4 className={styles.moduleTitle}>PART 1. 📘 원론집 (확실한 기준 세우기)</h4>
                                     <p className={styles.bodyText}>
@@ -211,7 +227,6 @@ const ProductDetailPage = () => {
                                     </ul>
                                 </div>
 
-                                {/* PART 2. 지식 심화 */}
                                 <div className={styles.moduleSpacing}>
                                     <h4 className={styles.moduleTitle}>PART 2. 📚 지식 심화 (실전 용어 해석집)</h4>
                                     <p className={styles.bodyText}>
@@ -219,7 +234,7 @@ const ProductDetailPage = () => {
                                     </p>
                                     <h5 className={styles.subsectionTitle}>현역 트레이더의 퀀트 용어집</h5>
                                     <p className={styles.bodyText}>
-                                        단순히 용어를 정의(Define)하지 않습니다. '우리 팀은 이 용어를 실전에서 이렇게 해석하고 활용한다'는 '관점(Perspective)'을 더한 실전 용어집입니다.
+                                        단순히 용어를 정의([translate:Define])하지 않습니다. '우리 팀은 이 용어를 실전에서 이렇게 해석하고 활용한다'는 '관점([translate:Perspective])'을 더한 실전 용어집입니다.
                                     </p>
                                     <h5 className={styles.subsectionTitle}>핵심 용어 15가지 (실전 차트 포함)</h5>
                                     <p className={styles.bodyText}>
@@ -227,7 +242,6 @@ const ProductDetailPage = () => {
                                     </p>
                                 </div>
 
-                                {/* PART 3. 도구 세팅 */}
                                 <div className={styles.moduleSpacing}>
                                     <h4 className={styles.moduleTitle}>PART 3. ⚙️ 도구 세팅 (차트 즉시 복사)</h4>
                                     <p className={styles.bodyText}>
@@ -246,7 +260,6 @@ const ProductDetailPage = () => {
 
                             <hr className={styles.sectionSeparator} />
 
-                            {/* 추천 대상 */}
                             <section {...animRecommend} className={styles.sectionSpacing}>
                                 <h3 className={styles.sectionTitle}>이런 분들에게 추천합니다</h3>
                                 <ul className={styles.styledListCheck}>
@@ -260,7 +273,6 @@ const ProductDetailPage = () => {
 
                             <hr className={styles.sectionSeparator} />
                             
-                            {/* FAQ */}
                             <section className={styles.faqBox} {...animFaq}>
                                 <h3 className={styles.sectionTitle}>자주 묻는 질문 (FAQ)</h3>
                                 <div className={styles.accordion}>
@@ -280,13 +292,10 @@ const ProductDetailPage = () => {
                                     ))}
                                 </div>
                             </section>
-
-                            {/* [ 5. 수정 ] '마지막으로' 섹션은 이 상품에 없으므로 삭제함 */}
                             
                         </div>
                     </main>
 
-                    {/* 사이드바 */}
                     <aside className={styles.sidebarColumn}>
                         <div className={styles.sidebarContent}>
                             <div className={styles.collectionInfo}>
@@ -294,7 +303,6 @@ const ProductDetailPage = () => {
                                 <a href="#">MAXX Quant System</a>
                             </div>
                             
-                            {/* [ 6. 수정 ] 사이드바 상품명 변경 */}
                             <h1 className={styles.productTitle}>일반인을 위한 첫번째 안내서</h1>
                             
                             <div className={styles.participants}>
@@ -327,9 +335,8 @@ const ProductDetailPage = () => {
                             <div className={`${styles.priceBox} ${styles.card}`}>
                                 <div className={styles.priceInfo}>
                                     <span>Price</span>
-                                    {/* [ 7. 수정 ] 사이드바 가격 변경 */}
                                     <span className={styles.price}>70,000원</span>
-                                    {/* (달러 가격은 제거) */}
+                                    <span className={styles.priceSecondary}>($50)</span>
                                 </div>
                                 <button className={styles.buyButton} onClick={handleBuyNowClick}>
                                     Buy now

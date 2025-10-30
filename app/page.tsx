@@ -14,8 +14,8 @@ const systemsData = [
 ];
 
 const strategiesData = [
-  { imgSrc: "https://via.placeholder.com/300x400/CA8A04/FFFFFF?text=Strategy+Guide", title: "시스템 빌더 풀 패키지: 실행 엔진, 1:1 지원, 멤버십 키 ", desc: "⭐4.8 ㅣ 구매 280명", price: "₩55,000", href: '/products/c1' },
-  { imgSrc: "https://via.placeholder.com/300x400/CA8A04/FFFFFF?text=Risk+Mgmt", title: "프로의 전략 원본: 시스템 설계도와 데이터 분석 ", desc: "⭐4.8 ㅣ 구매 280명", price: "₩350,000", href: '/products/c2' },
+  { imgSrc: "https://via.placeholder.com/300x400/CA8A04/FFFFFF?text=Strategy+Guide", title: "시스템 빌더 풀 패키지: 실행 엔진, 1:1 지원, 멤버십 키 ", desc: "⭐4.8 ㅣ 구매 280명", price: "₩210,000", href: '/products/c1' },
+  { imgSrc: "https://via.placeholder.com/300x400/CA8A04/FFFFFF?text=Risk+Mgmt", title: "프로의 전략 원본: 시스템 설계도와 데이터 분석 ", desc: "⭐4.8 ㅣ 구매 280명", price: "₩90,000", href: '/products/c2' },
   { imgSrc: "https://via.placeholder.com/300x400/CA8A04/FFFFFF?text=Risk+Mgmt", title: "리스크 관리 전략", desc: "계좌를 지키는 기술", price: "₩350,000" },
 ];
 

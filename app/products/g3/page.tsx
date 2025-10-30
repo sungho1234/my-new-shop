@@ -315,6 +315,7 @@ const ProductDetailPage = () => {
                                     <span>Price</span>
                                     {/* [ 6. 수정 ] 사이드바 가격 변경 (임시 50,000원) */}
                                     <span className={styles.price}>50,000원</span>
+                                    <span className={styles.priceSecondary}>($35)</span>
                                     {/* (달러 가격은 제거) */}
                                 </div>
                                 <button className={styles.buyButton} onClick={handleBuyNowClick}>

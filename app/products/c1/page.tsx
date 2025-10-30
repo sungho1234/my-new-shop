@@ -33,8 +33,8 @@ const faqItems = [
 const itemForPay: PaymentItem = {
     title: "시스템 빌더 풀 패키지",
     subtitle: "실행 엔진, 1:1 지원, 멤버십 키",
-    priceLabel: "1,500,000원", // (원하시는 가격으로 수정)
-    priceValue: 1500000,        // (원하시는 가격으로 수정)
+    priceLabel: "210,000원", // (원하시는 가격으로 수정)
+    priceValue: 210000,        // (원하시는 가격으로 수정)
     thumbnail: "/로고.png", // (상품 썸네일 이미지 경로)
 };
 
@@ -50,7 +50,7 @@ const ProductDetailPage = () => {
         id: 'system-builder', // 고유 ID (폴더명과 일치 권장)
         title: '시스템 빌더 풀 패키지',
         author: 'kobba',
-        price: '1,500,000',     // (원하시는 가격으로 수정)
+        price: '210,000',     // (원하시는 가격으로 수정)
         thumbnail: "/로고.png", // (상품 썸네일 이미지 경로)
     };
     
@@ -340,9 +340,9 @@ const ProductDetailPage = () => {
                             <div className={`${styles.priceBox} ${styles.card}`}>
                                 <div className={styles.priceInfo}>
                                     <span>Price</span>
-                                    {/* [ 6. 수정 ] 사이드바 가격 변경 (임시 1,500,000원) */}
-                                    <span className={styles.price}>1,500,000원</span>
-                                    <span className={styles.priceSecondary}>($1,100)</span>
+                                    {/* [ 6. 수정 ] 사이드바 가격 변경 (임시 210,000원) */}
+                                    <span className={styles.price}>210,000원</span>
+                                    <span className={styles.priceSecondary}>($150)</span>
                                 </div>
                                 <button className={styles.buyButton} onClick={handleBuyNowClick}>
                                     Buy now

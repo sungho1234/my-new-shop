@@ -3,8 +3,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// 2. 데이터베이스 연결 설정 (수정 불필요)
-// 우리가 '까만색 창'에서 성공했던 그 '열쇠 이름'입니다.
+// 2. 데이터베이스 연결 설정 (기존 설정 유지)
 datasource db {
   provider     = "postgresql"
   url          = env("DATABASE_URL")
@@ -12,44 +11,45 @@ datasource db {
   relationMode = "prisma"
 }
 
-// 3. User (회원) 테이블 설계도
+// 3. User (회원) 테이블 설계도 (하나로 통합)
 model User {
   id        String    @id @default(cuid())
-  kakaoId   String    @unique // [핵심 추가] 카카오 고유 ID (이걸로 유저 식별)
-  name      String?   // 닉네임 (카카오 'nickname' 저장용)
+  kakaoId   String    @unique
+  name      String?   // 카카오 'nickname' 저장용 (기존 파일의 nickname, name 필드 통합)
   email     String?   @unique
-  image     String?   // 프로필 이미지 (카카오 'profileImage' 저장용)
+  image     String?   // 프로필 이미지 저장용
+  createdAt DateTime  @default(now())
   
-  // 4. 우리 앱의 커스텀 항목 (찜목록, 구매내역)
+  // 관계 설정: User는 여러개의 찜 목록과 구매 내역을 가질 수 있습니다.
   wishlist  WishlistItem[]
   purchases Purchase[]
 }
 
-// 5. WishlistItem (찜 목록) 테이블 설계도 (원본 유지)
+// 4. WishlistItem (찜 목록) 테이블 설계도 (기존 정의 유지)
 model WishlistItem {
   id        String   @id @default(cuid())
   productId String   // 상품 ID (예: 'g1', 'c2')
   createdAt DateTime @default(now())
   
-  // User 모델과 연결 (N:1 관계)
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // User 모델과 연결
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // 한 유저가 같은 상품을 여러 번 찜하는 것 방지
-  @@unique([userId, productId]) 
+  @@unique([userId, productId])
 }
 
-// 6. Purchase (구매 내역) 테이블 설계도 (원본 유지)
+// 5. Purchase (구매 내역) 테이블 설계도 (하나로 통합)
 model Purchase {
   id        String   @id @default(cuid())
   productId String
-  amount    Int
+  amount    Int      // 결제 금액 (기존 파일의 amount 필드 유지)
   createdAt DateTime @default(now())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // User 모델과 연결
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 특정 유저의 구매내역을 빠르게 찾기 위한 인덱스
+  @@index([userId])
 }
-
-// --- [삭제됨] ---
-// NextAuth.js 전용 테이블(Account, Session, VerificationToken)은
-// 우리 SDK 방식에서는 필요 없으므로 모두 삭제했습니다.
