@@ -3,25 +3,26 @@
 import type { Product, WishlistItem } from '@/context/AuthContext';
 
 // 모든 상품 정보를 이 파일 한 곳에서만 관리합니다.
+// 각 상품의 title은 해당 페이지의 itemForPay.title과 일치해야 합니다.
 export const ALL_PRODUCTS: Product[] = [
   {
-    // DB ID: maxx-quant-v4
-    id: 'maxx-quant-v4',
-    title: '2025 일반인을 위한 시스템 투자 올인원',
-    author: 'MAXX Systems Team',
-    price: '210,000',
-    thumbnail: '/assets/product_g3.png',
-  },
-  {
-    // DB ID: first-guide
+    // DB ID: first-guide (g1 페이지)
     id: 'first-guide',
-    title: '2025 일반인을 위한 첫번째 안내서',
+    title: '일반인을 위한 시스템 투자 올인원',
     author: 'kobba',
-    price: '70,000',
+    price: '100',
     thumbnail: '/assets/product_g1.png',
   },
   {
-    // DB ID: growth-book
+    // DB ID: system-builder (g2 페이지)
+    id: 'system-builder',
+    title: '일반인을 위한 첫번째 안내서',
+    author: 'kobba',
+    price: '100',
+    thumbnail: '/assets/product_g2.png',
+  },
+  {
+    // DB ID: growth-book (g3 페이지)
     id: 'growth-book',
     title: '일반인의 성장책: 스캠필터와 챌린지',
     author: 'kobba',
@@ -29,28 +30,20 @@ export const ALL_PRODUCTS: Product[] = [
     thumbnail: '/assets/product_general-growth.png',
   },
   {
-    // DB ID: system-builder
-    id: 'system-builder',
-    title: '2025 일반인을 위한 시스템 투자 올인원',
-    author: 'kobba',
-    price: '210,000',
-    thumbnail: '/assets/product_g2.png',
-  },
-  {
-    // DB ID: strategy-source
-    id: 'strategy-source',
-    title: '프로의 전략 원본:시스템 설계도와 데이터 분석',
-    author: 'Trader (London)',
-    price: '90,000',
-    thumbnail: '/assets/product_c2.png',
-  },
-  // 아래는 예시로 남겨둡니다. (퀀트 포트폴리오 전략집)
-  {
+    // DB ID: strategy-vol1 (c1 페이지)
     id: 'strategy-vol1',
-    title: '퀀트 포트폴리오 전략집 Vol.1',
+    title: '시스템 빌더 풀 패키지',
     author: 'Analyst (Berlin)',
     price: '450000',
     thumbnail: '/assets/product_c1.png',
+  },
+  {
+    // DB ID: strategy-source (c2 페이지)
+    id: 'strategy-source',
+    title: '프로의 전략 원본',
+    author: 'kobba',
+    price: '90,000',
+    thumbnail: '/assets/product_c2.png',
   },
 ];
 

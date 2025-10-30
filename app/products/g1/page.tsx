@@ -26,10 +26,10 @@ const faqItems = [
 
 
 const itemForPay: PaymentItem = {
-    title: "2025 일반인을 위한 시스템 투자 올인원",
-    subtitle: "디지털 콘텐츠",
-    priceLabel: "210,000원",
-    priceValue: 210000,
+    title: "일반인을 위한 시스템 투자 올인원",
+    subtitle: "시스템 투자 올인원 패키지",
+    priceLabel: "100원",
+    priceValue: 100,
     thumbnail: "/로고.png",
 };
 
@@ -38,15 +38,15 @@ const ProductDetailPage = () => {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [paymentOpen, setPaymentOpen] = useState(false);
     
-    const { user, addToWishlist, removeFromWishlist, isLiked } = useAuth();
+    const { user, addToWishlist, removeFromWishlist, isLiked, isPurchased } = useAuth();
     const router = useRouter();
 
 
     const productInfo = {
-        id: 'maxx-quant-v4', 
-        title: '2025 일반인을 위한 시스템 투자 올인원',
+        id: 'first-guide',
+        title: '일반인을 위한 시스템 투자 올인원',
         author: 'kobba',
-        price: '210,000',
+        price: '100',
         thumbnail: "/로고.png",
     };
     
@@ -85,17 +85,39 @@ const ProductDetailPage = () => {
             pay_method: method === 'NAVERPAY' ? 'naverpay' : 'card',
             merchant_uid: `MAXX-${new Date().getTime()}`,
             name: item.title,
-
-            // [수정] 하드코딩된 100을 실제 상품 가격인 item.priceValue로 변경
             amount: item.priceValue,
-
-            buyer_email: "test@example.com", 
+            buyer_email: "test@example.com",
             buyer_name: user?.nickname || "테스터",
             buyer_tel: "010-1234-5678",
         };
-        IMP.request_pay(payData, (rsp: any) => {
+
+        IMP.request_pay(payData, async (rsp: any) => {
             if (rsp.success) {
-                alert("결제가 완료되었습니다. 주문번호: " + rsp.merchant_uid);
+                try {
+                    const response = await fetch('/api/purchases', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            kakaoId: user?.id,
+                            productId: productInfo.id,
+                            amount: payData.amount,
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || '구매 기록 저장에 실패했습니다.');
+                    }
+
+                    alert("결제가 완료되었습니다. 구매내역 페이지에서 확인하실 수 있습니다.");
+
+                } catch (error) {
+                    console.error(error);
+                    const errorMessage = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
+                    alert(`결제는 성공했으나 구매 기록 저장 중 오류가 발생했습니다: ${errorMessage}. 관리자에게 문의해주세요.`);
+                }
             } else {
                 alert("결제에 실패하였습니다. 에러: " + rsp.error_msg);
             }
@@ -104,13 +126,20 @@ const ProductDetailPage = () => {
 
 
     const handleBuyNowClick = () => {
-        if (user) {
-            setPaymentOpen(true);
-        } else {
+        if (!user) {
             if (window.confirm("로그인이 필요한 서비스입니다. 로그인 하시겠습니까?")) {
                 router.push('/login');
             }
+            return;
         }
+
+        // 중복 구매 체크
+        if (isPurchased(productInfo.id)) {
+            alert("이미 구매하신 상품입니다.");
+            return;
+        }
+
+        setPaymentOpen(true);
     };
 
 

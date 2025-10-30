@@ -30,9 +30,9 @@ const faqItems = [
 
 const itemForPay: PaymentItem = {
     title: "일반인을 위한 첫번째 안내서",
-    subtitle: "거래소 선택부터 차트 셋업까지",
-    priceLabel: "70,000원",
-    priceValue: 70000,
+    subtitle: "시스템 투자 올인원 패키지",
+    priceLabel: "100원",
+    priceValue: 100,
     thumbnail: "/로고.png",
 };
 
@@ -40,14 +40,14 @@ const ProductDetailPage = () => {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [paymentOpen, setPaymentOpen] = useState(false);
     
-    const { user, addToWishlist, removeFromWishlist, isLiked } = useAuth();
+    const { user, addToWishlist, removeFromWishlist, isLiked, isPurchased } = useAuth();
     const router = useRouter();
 
     const productInfo = {
-        id: 'first-guide',
-        title: '일반인을 위한 첫번째 안내서',
+        id: 'system-builder',
+        title: '2025 일반인을 위한 시스템 투자 올인원',
         author: 'kobba',
-        price: '70,000',
+        price: '210,000',
         thumbnail: "/로고.png",
     };
     
@@ -97,7 +97,7 @@ const ProductDetailPage = () => {
                         body: JSON.stringify({
                             kakaoId: user?.id, // user.id는 숫자 카카오 ID이므로, kakaoId라는 이름으로 전송
                             productId: productInfo.id,
-                            amount: payData.amount, 
+                            amount: payData.amount,
                         }),
                     });
 
@@ -121,13 +121,20 @@ const ProductDetailPage = () => {
     // --- 여기까지 수정 ---
 
     const handleBuyNowClick = () => {
-        if (user) {
-            setPaymentOpen(true);
-        } else {
+        if (!user) {
             if (window.confirm("로그인이 필요한 서비스입니다. 로그인 하시겠습니까?")) {
                 router.push('/login');
             }
+            return;
         }
+
+        // 중복 구매 체크
+        if (isPurchased(productInfo.id)) {
+            alert("이미 구매하신 상품입니다.");
+            return;
+        }
+
+        setPaymentOpen(true);
     };
 
     const handleLikeClick = () => {

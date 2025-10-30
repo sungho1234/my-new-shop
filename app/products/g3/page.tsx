@@ -29,29 +29,29 @@ const faqItems = [
     },
 ];
 
-// [ 2. 수정 ] 결제 정보를 새 상품에 맞게 변경 (가격 50,000원 임시 설정)
+// [ 2. 수정 ] 결제 정보를 새 상품에 맞게 변경
 const itemForPay: PaymentItem = {
     title: "일반인의 성장책: 스캠필터와 챌린지",
     subtitle: "데이터 기반 훈련법",
-    priceLabel: "50,000원", // (원하시는 가격으로 수정)
-    priceValue: 50000,      // (원하시는 가격으로 수정)
-    thumbnail: "/로고.png", // (상품 썸네일 이미지 경로)
+    priceLabel: "60,000원",
+    priceValue: 60000,
+    thumbnail: "/로고.png",
 };
 
 const ProductDetailPage = () => {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [paymentOpen, setPaymentOpen] = useState(false);
     
-    const { user, addToWishlist, removeFromWishlist, isLiked } = useAuth();
+    const { user, addToWishlist, removeFromWishlist, isLiked, isPurchased } = useAuth();
     const router = useRouter();
 
     // [ 3. 수정 ] 찜하기 정보를 새 상품에 맞게 변경
     const productInfo = {
-        id: 'growth-book', // 고유 ID (폴더명과 일치 권장)
+        id: 'growth-book',
         title: '일반인의 성장책: 스캠필터와 챌린지',
         author: 'kobba',
-        price: '50,000',     // (원하시는 가격으로 수정)
-        thumbnail: "/로고.png", // (상품 썸네일 이미지 경로)
+        price: '60,000',
+        thumbnail: "/로고.png",
     };
     
     const liked = isLiked(productInfo.id);
@@ -69,7 +69,6 @@ const ProductDetailPage = () => {
         setActiveIndex(activeIndex === index ? null : index);
     };
 
-    // (결제, 구매, 찜하기, 공유 핸들러 함수들은 기존과 모두 동일)
     const handlePayRequest = (item: PaymentItem, method: "KAKAOPAY" | "NAVERPAY") => {
         // @ts-ignore
         const { IMP } = window;
@@ -81,16 +80,41 @@ const ProductDetailPage = () => {
         const payData = {
             pg: method === 'KAKAOPAY' ? 'kakaopay' : 'html5_inicis.INIpayTest',
             pay_method: method === 'NAVERPAY' ? 'naverpay' : 'card',
-            merchant_uid: `GROWTH-${new Date().getTime()}`, // (상품 고유 Prefix)
+            merchant_uid: `GROWTH-${new Date().getTime()}`,
             name: item.title,
-            amount: 100, // 테스트 금액 (실제 결제 시 item.priceValue 사용)
-            buyer_email: "test@example.com", 
+            amount: 100, // 테스트 금액
+            buyer_email: "test@example.com",
             buyer_name: user?.nickname || "테스터",
             buyer_tel: "010-1234-5678",
         };
-        IMP.request_pay(payData, (rsp: any) => {
+
+        IMP.request_pay(payData, async (rsp: any) => {
             if (rsp.success) {
-                alert("결제가 완료되었습니다. 주문번호: " + rsp.merchant_uid);
+                try {
+                    const response = await fetch('/api/purchases', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            kakaoId: user?.id,
+                            productId: productInfo.id,
+                            amount: payData.amount,
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || '구매 기록 저장에 실패했습니다.');
+                    }
+
+                    alert("결제가 완료되었습니다. 구매내역 페이지에서 확인하실 수 있습니다.");
+
+                } catch (error) {
+                    console.error(error);
+                    const errorMessage = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
+                    alert(`결제는 성공했으나 구매 기록 저장 중 오류가 발생했습니다: ${errorMessage}. 관리자에게 문의해주세요.`);
+                }
             } else {
                 alert("결제에 실패하였습니다. 에러: " + rsp.error_msg);
             }
@@ -98,13 +122,20 @@ const ProductDetailPage = () => {
     };
 
     const handleBuyNowClick = () => {
-        if (user) {
-            setPaymentOpen(true);
-        } else {
+        if (!user) {
             if (window.confirm("로그인이 필요한 서비스입니다. 로그인 하시겠습니까?")) {
                 router.push('/login');
             }
+            return;
         }
+
+        // 중복 구매 체크
+        if (isPurchased(productInfo.id)) {
+            alert("이미 구매하신 상품입니다.");
+            return;
+        }
+
+        setPaymentOpen(true);
     };
 
     const handleLikeClick = () => {

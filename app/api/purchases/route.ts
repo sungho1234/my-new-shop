@@ -41,19 +41,35 @@ export async function POST(request: Request) {
   }
 }
 
-// GET 함수는 기존과 동일하게 유지합니다.
+// GET 함수: userId 또는 kakaoId로 구매내역 조회
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
+    const kakaoId = searchParams.get('kakaoId');
 
-    if (!userId) {
-      return NextResponse.json({ message: 'User ID is required' }, { status: 400 });
+    // kakaoId가 있으면 먼저 User를 찾아서 userId를 얻음
+    let actualUserId = userId;
+
+    if (kakaoId) {
+      const user = await prisma.user.findUnique({
+        where: { kakaoId: String(kakaoId) }
+      });
+
+      if (!user) {
+        return NextResponse.json({ message: `User with Kakao ID ${kakaoId} not found` }, { status: 404 });
+      }
+
+      actualUserId = user.id;
+    }
+
+    if (!actualUserId) {
+      return NextResponse.json({ message: 'User ID or Kakao ID is required' }, { status: 400 });
     }
 
     const purchases = await prisma.purchase.findMany({
       where: {
-        userId: userId,
+        userId: actualUserId,
       },
       orderBy: {
         createdAt: 'desc',

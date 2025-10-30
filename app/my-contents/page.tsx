@@ -91,17 +91,68 @@ const MyWishlistContent = () => {
 
 const MyPurchasesContent = () => {
     const router = useRouter();
+    const { purchases } = useAuth();
+
+    // DB에서 가져온 구매내역을 상품 정보와 병합
+    const mergedPurchases = useMemo(() => {
+      console.log("🔍 구매내역 병합 시작: DB IDs =", purchases.map(item => item.productId));
+      const merged = purchases.map(item => {
+        const product = ALL_PRODUCTS.find(p => p.id === item.productId);
+        if (product) {
+          console.log("✅ 매치 성공: '", item.productId, "' → '", product.title, "'");
+          return { ...item, ...product };
+        }
+        console.warn("⚠️ 매치 실패: ", item.productId);
+        return { ...item, title: 'Unknown Product', author: 'Unknown', price: '0', thumbnail: '/placeholder.png' };
+      });
+      console.log("✅ 병합 완료: 최종 ", merged.length, "개");
+      return merged;
+    }, [purchases]);
+
+    if (mergedPurchases.length === 0) {
+      return (
+        <div className="mt-8">
+          <div className="flex justify-between items-center mb-4">
+            <span className="font-semibold">구매내역</span>
+          </div>
+          <div className="text-center py-24 border rounded-lg bg-gray-50">
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            </svg>
+            <p className="mt-4 text-gray-500">구매내역이 없습니다.</p>
+            <button onClick={() => router.push('/')} className="mt-6 bg-blue-800 text-white px-6 py-2.5 rounded-md font-semibold hover:bg-blue-900">상품 구매하기</button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="mt-8">
         <div className="flex justify-between items-center mb-4">
-          <span className="font-semibold">구매내역</span>
+          <span className="font-semibold">{mergedPurchases.length}개</span>
         </div>
-        <div className="text-center py-24 border rounded-lg bg-gray-50">
-          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-          </svg>
-          <p className="mt-4 text-gray-500">구매내역이 없습니다.</p>
-          <button onClick={() => router.push('/')} className="mt-6 bg-blue-800 text-white px-6 py-2.5 rounded-md font-semibold hover:bg-blue-900">상품 구매하기</button>
+        <div className="space-y-4">
+          {mergedPurchases.map((item) => (
+            <div key={item.id} className="border rounded-lg p-6 flex items-start gap-8 shadow-sm bg-white">
+              <div className="w-40 h-auto flex-shrink-0 bg-gray-100 flex items-center justify-center">
+                <img
+                  src={item.thumbnail || '/placeholder.png'}
+                  alt={item.title}
+                  className="w-full h-full object-cover rounded-md"
+                />
+              </div>
+              <div className="flex-grow">
+                <h3 className="text-xl font-bold text-gray-800">{item.title}</h3>
+                <p className="text-base text-gray-600 mt-2">{item.author}</p>
+                <p className="text-lg text-gray-500 mt-2">
+                  구매일: {new Date(item.createdAt).toLocaleDateString('ko-KR')}
+                </p>
+                <p className="text-2xl font-bold mt-4">
+                  {Number(item.amount).toLocaleString()}원
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -163,7 +214,7 @@ const MyInquiriesContent = ({ onOpenModal }: { onOpenModal: () => void }) => {
 
 const MyContentsPage = () => {
     const { user } = useAuth();
-    const [activeTab, setActiveTab] = useState<'my-contents' | 'wishlist' | 'my-info' | 'inquiry'>('wishlist');
+    const [activeTab, setActiveTab] = useState<'my-contents' | 'wishlist' | 'my-info' | 'inquiry'>('my-contents');
     const [isModalOpen, setIsModalOpen] = useState(false);
     
     if (!user) {

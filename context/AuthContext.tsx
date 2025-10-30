@@ -18,6 +18,14 @@ export interface WishlistItem {
   createdAt?: Date; // 옵션
 }
 
+export interface Purchase {
+  id: string; // DB의 CUID
+  productId: string; // 상품 ID
+  amount: number; // 구매 금액
+  userId: string; // DB의 User CUID
+  createdAt: Date; // 구매 날짜
+}
+
 interface User {
   id: number; // 카카오 ID
   nickname: string;
@@ -33,6 +41,9 @@ interface AuthContextType {
   addToWishlist: (product: Product) => Promise<void>;
   removeFromWishlist: (productId: string) => Promise<void>;
   isLiked: (productId: string) => boolean;
+  purchases: Purchase[];
+  fetchPurchases: () => Promise<void>;
+  isPurchased: (productId: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -40,6 +51,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+  const [purchases, setPurchases] = useState<Purchase[]>([]);
   const router = useRouter();
 
   // 1. 찜 목록 로드 헬퍼 (useCallback으로 안정화 – Hooks 규칙 준수)
@@ -57,6 +69,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []); // 의존성 없음 – 안정적
 
+  // 1-1. 구매내역 로드 헬퍼
+  const fetchPurchasesInternal = useCallback(async (kakaoId: number) => {
+    console.log("🛒 fetchPurchases 호출: kakaoId =", kakaoId);
+    try {
+      // 먼저 kakaoId로 userId를 찾아야 함
+      const res = await fetch(`/api/purchases?kakaoId=${kakaoId}`);
+      if (!res.ok) throw new Error(`Failed to fetch purchases: ${res.status}`);
+      const data: Purchase[] = await res.json();
+      setPurchases(data);
+      console.log("✅ DB 구매내역 로드 성공:", data.length, "개");
+    } catch (err) {
+      console.error("❌ DB 구매내역 로드 실패:", err);
+      setPurchases([]);
+    }
+  }, []);
+
   // 2. 초기 로드: localStorage에서 user 복원 (로그인 상태 유지)
   useEffect(() => {
     try {
@@ -73,14 +101,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // 3. user 변경 시 wishlist 자동 로드 (로그인 후 동기화 – Hooks 안전)
+  // 3. user 변경 시 wishlist와 purchases 자동 로드 (로그인 후 동기화 – Hooks 안전)
   useEffect(() => {
     if (user) {
       fetchWishlist(user.id);
+      fetchPurchasesInternal(user.id);
     } else {
       setWishlist([]); // 로그아웃 시 초기화
+      setPurchases([]);
     }
-  }, [user, fetchWishlist]); // user 의존성 추가
+  }, [user, fetchWishlist, fetchPurchasesInternal]); // user 의존성 추가
 
   // 4. login 함수 (async 호출 제거 – setUser만, useEffect가 처리)
   const login = (kakaoUser: any): boolean => {
@@ -123,17 +153,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     console.log("🚪 logout 호출");
     localStorage.removeItem('user');
-    setUser(null); // useEffect가 wishlist 초기화
+    setUser(null); // useEffect가 wishlist와 purchases 초기화
     router.push('/');
   };
 
-  // 6. addToWishlist (DB 후 재로드)
+  // 5-1. 구매내역 새로고침용 함수 (외부에서 호출 가능)
+  const fetchPurchases = async () => {
+    if (user) {
+      await fetchPurchasesInternal(user.id);
+    }
+  };
+
+  // 6. addToWishlist (낙관적 업데이트 적용)
   const addToWishlist = async (product: Product) => {
     if (!user) {
       console.warn("⚠️ addToWishlist: 로그인 필요");
       return;
     }
     console.log("❤️ addToWishlist: ", product.id);
+
+    // 낙관적 업데이트: 즉시 UI 업데이트
+    const tempItem: WishlistItem = {
+      id: 'temp-' + Date.now(),
+      productId: product.id,
+      userId: user.id.toString(),
+    };
+    setWishlist(prev => [...prev, tempItem]);
+
     try {
       const response = await fetch('/api/wishlist', {
         method: 'POST',
@@ -141,30 +187,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ kakaoId: user.id, product }),
       });
       if (!response.ok) throw new Error(`Add failed: ${response.status}`);
-      await fetchWishlist(user.id); // 재로드
+      await fetchWishlist(user.id); // DB에서 정확한 데이터로 재로드
       console.log("✅ 찜 추가 성공");
     } catch (error) {
       console.error("❌ 찜 추가 실패:", error);
-      throw error; // 상위 (e.g., ProductDetail)로 에러 전파
+      // 실패 시 롤백
+      setWishlist(prev => prev.filter(item => item.id !== tempItem.id));
+      throw error;
     }
   };
 
-  // 7. removeFromWishlist (DB 후 재로드)
+  // 7. removeFromWishlist (낙관적 업데이트 적용)
   const removeFromWishlist = async (productId: string) => {
     if (!user) {
       console.warn("⚠️ removeFromWishlist: 로그인 필요");
       return;
     }
     console.log("🗑️ removeFromWishlist: ", productId);
+
+    // 낙관적 업데이트: 즉시 UI 업데이트
+    const previousWishlist = [...wishlist];
+    setWishlist(prev => prev.filter(item => item.productId !== productId));
+
     try {
       const response = await fetch(`/api/wishlist?kakaoId=${user.id}&productId=${productId}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error(`Remove failed: ${response.status}`);
-      await fetchWishlist(user.id); // 재로드
       console.log("✅ 찜 제거 성공");
     } catch (error) {
       console.error("❌ 찜 제거 실패:", error);
+      // 실패 시 롤백
+      setWishlist(previousWishlist);
       throw error;
     }
   };
@@ -172,6 +226,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // 8. isLiked
   const isLiked = (productId: string) => {
     return wishlist.some((item) => item.productId === productId);
+  };
+
+  // 9. isPurchased - 이미 구매한 상품인지 확인
+  const isPurchased = (productId: string) => {
+    return purchases.some((item) => item.productId === productId);
   };
 
   const value: AuthContextType = {
@@ -182,6 +241,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     addToWishlist,
     removeFromWishlist,
     isLiked,
+    purchases,
+    fetchPurchases,
+    isPurchased,
   };
 
   return (
