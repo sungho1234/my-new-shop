@@ -22,7 +22,7 @@ const UserIcon = () => (
 const Header = () => {
     // --- 모든 훅과 함수는 원본 그대로 유지 ---
     const [isScrolled, setIsScrolled] = useState(false);
-    const { user, logout } = useAuth();
+    const { user, logout, purchases, wishlist } = useAuth();
     const router = useRouter();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -70,49 +70,61 @@ const Header = () => {
                         <Link href="/">MAXX Systems</Link>
                     </h1>
 
-                    {/* ===== 버튼 그룹 (위치 조절을 위해 클래스 추가) ===== */}
-                    <div className="hidden items-center md:flex"> {/* <-- 1. space-x-6, text-sm 등 불필요한 클래스 제거 */}
+                    {/* ===== 버튼 그룹 ===== */}
+                    <div className="hidden items-center md:flex">
                         {user ? (
-                            // =============================================================
-                            // 2. 이 div에 ml-auto와 mr-*를 추가하여 위치를 제어합니다.
-                            // =============================================================
-                            <div className="flex items-center gap-2 ml-auto mr-40"> 
-                                {/* 
-                                    [위치 조절 포인트!]
-                                    mr-20의 숫자를 바꾸면 버튼 그룹이 왼쪽으로 움직입니다.
-                                    - 더 왼쪽으로: mr-24, mr-32 ...
-                                    - 더 오른쪽으로: mr-16, mr-12 ...
-                                */}
-                                <Link href="/my-contents" className="bg-white text-black px-4 py-2 rounded-full text-base font-semibold border border-gray-300 hover:bg-gray-100 transition-colors">
+                            <div className="flex items-center gap-3 ml-auto mr-40">
+                                <Link href="/my-contents" className="bg-white text-black px-5 py-2.5 rounded-full text-sm font-medium border border-gray-300 hover:bg-gray-50 transition-colors">
                                     My콘텐츠
                                 </Link>
                                 <div ref={menuRef} className="relative">
                                     <button
                                         onClick={() => setIsMenuOpen(prev => !prev)}
-                                        className="flex items-center gap-2 rounded-full border border-gray-300 bg-white text-black px-3 py-2 hover:bg-gray-100 transition-colors"
+                                        className="flex items-center gap-2 px-3 py-2 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
                                     >
                                         <MenuIcon />
                                         <UserIcon />
                                     </button>
                                     {isMenuOpen && (
-                                        <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg border z-10">
-                                            {/* 드롭다운 메뉴 내용은 모두 원본 유지 */}
-                                            <div className="p-4 border-b">
-                                                <p className="text-sm text-gray-500 truncate">{user.email}</p>
-                                                <div className="flex justify-between items-center mt-1">
-                                                    <p className="font-bold">{user.nickname}님</p>
-                                                    <Link href="/profile/edit" className="text-xs border rounded px-2 py-1 text-gray-500 hover:bg-gray-100">
-                                                        정보 수정
+                                        <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-xl border border-gray-200 z-10 overflow-hidden">
+                                            {/* 사용자 정보 섹션 */}
+                                            <div className="px-6 py-5 border-b border-gray-100">
+                                                <p className="text-xs text-gray-500 mb-1">{user.email}</p>
+                                                <div className="flex justify-between items-center">
+                                                    <p className="text-lg font-bold text-gray-900">{user.nickname}</p>
+                                                    <Link href="/profile/edit" className="text-xs border border-gray-300 rounded-md px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition-colors">
+                                                        정보수정하기
                                                     </Link>
                                                 </div>
                                             </div>
-                                            <ul className="py-1 text-sm">
-                                                <li><Link href="/wishlist" className="block px-4 py-2 hover:bg-gray-100">찜목록</Link></li>
-                                                <li><Link href="/faq" className="block px-4 py-2 hover:bg-gray-100">자주묻는질문</Link></li>
-                                                <li><Link href="/coupon" className="block px-4 py-2 hover:bg-gray-100">쿠폰 등록</Link></li>
+                                            {/* 메뉴 리스트 */}
+                                            <ul className="py-2">
+                                                <li>
+                                                    <Link href="/my-contents?tab=my-contents" className="flex items-center justify-between px-6 py-3.5 hover:bg-gray-50 transition-colors">
+                                                        <span className="text-base font-medium text-gray-800">My콘텐츠</span>
+                                                        <span className="text-sm text-gray-500">{purchases.length}개</span>
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link href="/my-contents?tab=wishlist" className="flex items-center justify-between px-6 py-3.5 hover:bg-gray-50 transition-colors">
+                                                        <span className="text-base font-medium text-gray-800">찜목록</span>
+                                                        <span className="text-sm text-gray-500">{wishlist.length}개</span>
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link href="/my-contents?tab=inquiry" className="block px-6 py-3.5 hover:bg-gray-50 transition-colors">
+                                                        <span className="text-base font-medium text-gray-800">자주묻는질문</span>
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link href="/coupon" className="block px-6 py-3.5 hover:bg-gray-50 transition-colors">
+                                                        <span className="text-base font-medium text-gray-800">쿠폰 등록</span>
+                                                    </Link>
+                                                </li>
                                             </ul>
-                                            <div className="border-t p-2">
-                                                <button onClick={handleLogoutClick} className="w-full text-left text-sm text-red-500 rounded px-4 py-2 hover:bg-red-50">
+                                            {/* 로그아웃 */}
+                                            <div className="border-t border-gray-100 px-6 py-3">
+                                                <button onClick={handleLogoutClick} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
                                                     로그아웃
                                                 </button>
                                             </div>
@@ -121,7 +133,6 @@ const Header = () => {
                                 </div>
                             </div>
                         ) : (
-                            // --- 로그아웃 상태 (원본 유지) ---
                             <Link href="/login" className="rounded-md border px-4 py-2 hover:bg-gray-100">
                                 로그인
                             </Link>
