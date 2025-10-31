@@ -93,6 +93,18 @@ const MyPurchasesContent = () => {
     const router = useRouter();
     const { purchases, isLoadingPurchases } = useAuth();
 
+    // 상품별 학습 페이지 매핑
+    const getLearnPageUrl = (productId: string) => {
+        const learnPageMap: { [key: string]: string } = {
+            'system-builder': '/learn/system-builder',
+            'first-guide': '/learn/first-guide',
+            'growth-book': '/learn/growth-book',
+            'strategy-vol1': '/learn/strategy-vol1',
+            'strategy-source': '/learn/strategy-source',
+        };
+        return learnPageMap[productId] || '/my-contents';
+    };
+
     // DB에서 가져온 구매내역을 상품 정보와 병합
     const mergedPurchases = useMemo(() => {
       console.log("🔍 구매내역 병합 시작: DB IDs =", purchases.map(item => item.productId));
@@ -168,7 +180,10 @@ const MyPurchasesContent = () => {
                   <p className="text-xl font-bold text-gray-900">
                     {Number(item.amount).toLocaleString()}원
                   </p>
-                  <button className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                  <button
+                    onClick={() => router.push(getLearnPageUrl(item.productId))}
+                    className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                  >
                     학습하기
                   </button>
                 </div>
