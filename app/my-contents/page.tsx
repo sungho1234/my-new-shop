@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
@@ -234,7 +234,8 @@ const MyInquiriesContent = ({ onOpenModal }: { onOpenModal: () => void }) => {
     );
 };
 
-const MyContentsPage = () => {
+// useSearchParams를 사용하는 컴포넌트를 분리
+const MyContentsPageContent = () => {
     const { user } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -317,6 +318,24 @@ const MyContentsPage = () => {
             {isModalOpen && <InquiryModal onClose={() => setIsModalOpen(false)} />}
             <Footer />
         </>
+    );
+};
+
+// Suspense로 감싸는 메인 컴포넌트
+const MyContentsPage = () => {
+    return (
+        <Suspense fallback={
+            <>
+                <Header />
+                <div className="w-full bg-white pb-20 text-center py-40">
+                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+                    <p className="mt-4 text-gray-500">로딩 중...</p>
+                </div>
+                <Footer />
+            </>
+        }>
+            <MyContentsPageContent />
+        </Suspense>
     );
 };
 
