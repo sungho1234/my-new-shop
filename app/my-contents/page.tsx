@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import InquiryModal from '@/components/my-contents/InquiryModal';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 // [수정 1] 기존의 불완전한 ALL_PRODUCTS 배열을 삭제하고,
 // data/products.ts에 있는 전체 상품 목록을 import 합니다.
@@ -91,7 +91,7 @@ const MyWishlistContent = () => {
 
 const MyPurchasesContent = () => {
     const router = useRouter();
-    const { purchases } = useAuth();
+    const { purchases, isLoadingPurchases } = useAuth();
 
     // DB에서 가져온 구매내역을 상품 정보와 병합
     const mergedPurchases = useMemo(() => {
@@ -108,6 +108,21 @@ const MyPurchasesContent = () => {
       console.log("✅ 병합 완료: 최종 ", merged.length, "개");
       return merged;
     }, [purchases]);
+
+    // 로딩 중일 때
+    if (isLoadingPurchases) {
+      return (
+        <div className="mt-8">
+          <div className="flex justify-between items-center mb-4">
+            <span className="font-semibold">구매내역</span>
+          </div>
+          <div className="text-center py-24">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+            <p className="mt-4 text-gray-500">구매내역을 불러오는 중...</p>
+          </div>
+        </div>
+      );
+    }
 
     if (mergedPurchases.length === 0) {
       return (
@@ -128,28 +143,35 @@ const MyPurchasesContent = () => {
 
     return (
       <div className="mt-8">
-        <div className="flex justify-between items-center mb-4">
-          <span className="font-semibold">{mergedPurchases.length}개</span>
+        <div className="flex justify-between items-center mb-6">
+          <span className="font-semibold text-lg">총 {mergedPurchases.length}개</span>
         </div>
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {mergedPurchases.map((item) => (
-            <div key={item.id} className="border rounded-lg p-6 flex items-start gap-8 shadow-sm bg-white">
-              <div className="w-40 h-auto flex-shrink-0 bg-gray-100 flex items-center justify-center">
+            <div key={item.id} className="border rounded-lg overflow-hidden shadow-sm bg-white hover:shadow-md transition-shadow flex">
+              <div className="w-40 h-40 flex-shrink-0 bg-gray-100 flex items-center justify-center">
                 <img
                   src={item.thumbnail || '/placeholder.png'}
                   alt={item.title}
-                  className="w-full h-full object-cover rounded-md"
+                  className="w-full h-full object-cover"
                 />
               </div>
-              <div className="flex-grow">
-                <h3 className="text-xl font-bold text-gray-800">{item.title}</h3>
-                <p className="text-base text-gray-600 mt-2">{item.author}</p>
-                <p className="text-lg text-gray-500 mt-2">
-                  구매일: {new Date(item.createdAt).toLocaleDateString('ko-KR')}
-                </p>
-                <p className="text-2xl font-bold mt-4">
-                  {Number(item.amount).toLocaleString()}원
-                </p>
+              <div className="p-4 flex-grow flex flex-col justify-between">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-800 line-clamp-2 mb-2">{item.title}</h3>
+                  <p className="text-sm text-gray-600 mb-2">{item.author}</p>
+                  <p className="text-xs text-gray-500">
+                    구매일: {new Date(item.createdAt).toLocaleDateString('ko-KR')}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-xl font-bold text-gray-900">
+                    {Number(item.amount).toLocaleString()}원
+                  </p>
+                  <button className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                    학습하기
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -214,9 +236,25 @@ const MyInquiriesContent = ({ onOpenModal }: { onOpenModal: () => void }) => {
 
 const MyContentsPage = () => {
     const { user } = useAuth();
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState<'my-contents' | 'wishlist' | 'my-info' | 'inquiry'>('my-contents');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    
+
+    // URL 쿼리 파라미터에서 탭 정보 가져오기
+    useEffect(() => {
+        const tab = searchParams.get('tab') as 'my-contents' | 'wishlist' | 'my-info' | 'inquiry';
+        if (tab && ['my-contents', 'wishlist', 'my-info', 'inquiry'].includes(tab)) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
+
+    // 탭 변경 시 URL 업데이트
+    const handleTabChange = (tab: 'my-contents' | 'wishlist' | 'my-info' | 'inquiry') => {
+        setActiveTab(tab);
+        router.push(`/my-contents?tab=${tab}`, { scroll: false });
+    };
+
     if (!user) {
         return (
             <>
@@ -240,7 +278,7 @@ const MyContentsPage = () => {
     };
 
     const tabs = [
-        { id: 'my-contents' as const, label: 'My 구매내역' },
+        { id: 'my-contents' as const, label: 'My 콘텐츠' },
         { id: 'wishlist' as const, label: '찜목록' },
         { id: 'my-info' as const, label: 'My 정보' },
         { id: 'inquiry' as const, label: '문의하기' },
@@ -259,7 +297,7 @@ const MyContentsPage = () => {
                             {tabs.map(tab => (
                                 <button
                                     key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
+                                    onClick={() => handleTabChange(tab.id)}
                                     className={`pb-4 font-bold text-xl transition-colors duration-200 ${
                                         activeTab === tab.id
                                             ? 'border-b-2 border-black text-black'

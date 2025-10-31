@@ -44,6 +44,7 @@ interface AuthContextType {
   purchases: Purchase[];
   fetchPurchases: () => Promise<void>;
   isPurchased: (productId: string) => boolean;
+  isLoadingPurchases: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -52,6 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [isLoadingPurchases, setIsLoadingPurchases] = useState<boolean>(false);
   const router = useRouter();
 
   // 1. 찜 목록 로드 헬퍼 (useCallback으로 안정화 – Hooks 규칙 준수)
@@ -72,6 +74,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // 1-1. 구매내역 로드 헬퍼
   const fetchPurchasesInternal = useCallback(async (kakaoId: number) => {
     console.log("🛒 fetchPurchases 호출: kakaoId =", kakaoId);
+    setIsLoadingPurchases(true);
     try {
       // 먼저 kakaoId로 userId를 찾아야 함
       const res = await fetch(`/api/purchases?kakaoId=${kakaoId}`);
@@ -82,6 +85,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (err) {
       console.error("❌ DB 구매내역 로드 실패:", err);
       setPurchases([]);
+    } finally {
+      setIsLoadingPurchases(false);
     }
   }, []);
 
@@ -244,6 +249,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     purchases,
     fetchPurchases,
     isPurchased,
+    isLoadingPurchases,
   };
 
   return (
