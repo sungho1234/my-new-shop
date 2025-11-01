@@ -1,10 +1,65 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+// API 호출 함수들
+const fetchUserChecklists = async (kakaoId: number, productId: string) => {
+    const res = await fetch(`/api/learning/checklist?kakaoId=${kakaoId}&productId=${productId}`);
+    if (!res.ok) throw new Error('Failed to fetch checklists');
+    return res.json();
+};
+
+const saveChecklistItem = async (
+    kakaoId: number,
+    productId: string,
+    checklistId: number,
+    completed: boolean,
+    completedAt: string | null
+) => {
+    const res = await fetch('/api/learning/checklist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kakaoId, productId, checklistId, completed, completedAt })
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    return data.success;
+};
+
+const fetchUserNotes = async (kakaoId: number, productId: string) => {
+    const res = await fetch(`/api/learning/notes?kakaoId=${kakaoId}&productId=${productId}`);
+    if (!res.ok) throw new Error('Failed to fetch notes');
+    return res.json();
+};
+
+const createNote = async (
+    kakaoId: number,
+    productId: string,
+    noteType: string,
+    title: string,
+    content: string,
+    module: string
+) => {
+    const res = await fetch('/api/learning/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kakaoId, productId, noteType, title, content, module })
+    });
+    if (!res.ok) return null;
+    return res.json();
+};
+
+const deleteNote = async (kakaoId: number, noteId: string) => {
+    const res = await fetch(`/api/learning/notes?kakaoId=${kakaoId}&noteId=${noteId}`, {
+        method: 'DELETE'
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    return data.success;
+};
 
 const SystemBuilderLearnPage = () => {
     const { user, purchases } = useAuth();
@@ -16,44 +71,84 @@ const SystemBuilderLearnPage = () => {
     const [noteTitle, setNoteTitle] = useState('');
     const [noteContent, setNoteContent] = useState('');
     const [activeFilter, setActiveFilter] = useState<'all' | 'question' | 'insight' | 'todo' | 'reference'>('all');
+    const [isLoadingData, setIsLoadingData] = useState(true);
+
+    // Refs for learning resource cards
+    const resourceRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+
+    const PRODUCT_ID = 'system-builder';
 
     const [checklist, setChecklist] = useState([
-        { id: 1, title: '거래소 선택 가이드 PDF 다운로드', completed: true, completedAt: '2025. 10. 30. 14:20' },
-        { id: 2, title: '차트 셋업 철학 문서 읽기', completed: true, completedAt: '2025. 10. 30. 15:10' },
+        { id: 1, title: '거래소 선택 가이드 PDF 다운로드', completed: false, completedAt: null },
+        { id: 2, title: '차트 셋업 철학 문서 읽기', completed: false, completedAt: null },
         { id: 3, title: '트레이딩뷰 레이아웃 실제 적용해보기', completed: false, completedAt: null },
         { id: 4, title: '거래소 3곳 체크리스트로 비교 분석', completed: false, completedAt: null },
         { id: 5, title: '핵심 용어 15개 복습 및 암기', completed: false, completedAt: null },
     ]);
 
-    const [notes, setNotes] = useState([
-        {
-            id: 1,
-            type: 'question' as const,
-            title: 'API 안정성 99.9%의 실제 의미는?',
-            content: '거래소 선택 가이드에서 API 안정성 99.9% 이상을 권장한다고 나와있는데, 실제로 이게 어느 정도 수준인지 감이 안 온다. 다운타임이 연간 며칠 정도인지, 실전 트레이딩할 때 체감이 어떤지 궁금함.',
-            createdAt: '2025. 10. 30. 15:30',
-            module: 'MODULE 01'
-        },
-        {
-            id: 2,
-            type: 'insight' as const,
-            title: '차트 지표를 3개 이하로 유지하는 이유',
-            content: '많은 지표를 쓰면 정보 과부하로 판단력이 흐려진다는 점이 인상 깊었다. 실제로 프로 트레이더들은 이평선, 볼린저밴드, RSI 정도만 사용한다고 함. "버리는 기준"이 "더하는 기준"보다 중요하다는 철학이 마음에 든다.',
-            createdAt: '2025. 10. 30. 16:15',
-            module: 'MODULE 01'
-        },
-        {
-            id: 3,
-            type: 'todo' as const,
-            title: '거래소 비교 분석 진행하기',
-            content: '바이낸스, 업비트, OKX 3곳을 체크리스트 기준으로 비교 분석해야 함. 보안 감사 이력, 수수료 구조, API 안정성, 거래량 등을 스프레드시트로 정리할 것. 이번 주말까지 완료 목표.',
-            createdAt: '2025. 10. 30. 17:00',
-            module: 'MODULE 01'
-        }
-    ]);
+    const [notes, setNotes] = useState<Array<{
+        id: string;
+        type: 'question' | 'insight' | 'todo' | 'reference';
+        title: string;
+        content: string;
+        createdAt: string;
+        module: string;
+    }>>([]);
 
     // 구매 여부 확인
     const hasPurchased = purchases.some(p => p.productId === 'system-builder');
+
+    // 컴포넌트 마운트 시 데이터 불러오기
+    useEffect(() => {
+        if (!user) return;
+
+        const loadData = async () => {
+            try {
+                setIsLoadingData(true);
+
+                // 체크리스트 불러오기
+                const dbChecklists = await fetchUserChecklists(user.id, PRODUCT_ID);
+
+                // DB 데이터를 로컬 state와 병합
+                setChecklist(prev => prev.map(item => {
+                    const dbItem = dbChecklists.find(db => db.checklistId === item.id);
+                    if (dbItem) {
+                        return {
+                            ...item,
+                            completed: dbItem.completed,
+                            completedAt: dbItem.completedAt
+                        };
+                    }
+                    return item;
+                }));
+
+                // 노트 불러오기
+                const dbNotes = await fetchUserNotes(user.id, PRODUCT_ID);
+                const formattedNotes = dbNotes.map(note => ({
+                    id: note.id,
+                    type: note.noteType as 'question' | 'insight' | 'todo' | 'reference',
+                    title: note.title,
+                    content: note.content,
+                    createdAt: new Date(note.createdAt).toLocaleString('ko-KR', {
+                        year: 'numeric',
+                        month: 'numeric',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }).replace(/\. /g, '. '),
+                    module: note.module
+                }));
+                setNotes(formattedNotes);
+
+            } catch (error) {
+                console.error('Error loading learning data:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+
+        loadData();
+    }, [user]);
 
     if (!user) {
         return (
@@ -91,10 +186,24 @@ const SystemBuilderLearnPage = () => {
         );
     }
 
+    // 데이터 로딩 중
+    if (isLoadingData) {
+        return (
+            <>
+                <Header />
+                <div className="w-full bg-white pb-20 text-center py-40">
+                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+                    <p className="mt-4 text-gray-500">학습 데이터를 불러오는 중...</p>
+                </div>
+                <Footer />
+            </>
+        );
+    }
+
     const modules = [
-        { id: 1, number: 'MODULE 01', name: '원론집: 거래소 & 차트 셋업', completed: true },
-        { id: 2, number: 'MODULE 02', name: '지식 심화: 퀀트 투자 용어집', completed: false },
-        { id: 3, number: 'MODULE 03', name: '도구 세팅: 트레이딩뷰 레이아웃', completed: false },
+        { id: 1, number: 'MODULE 01', name: '원론집: 거래소 & 차트 셋업', completed: true, resourceIds: [1, 2] },
+        { id: 2, number: 'MODULE 02', name: '지식 심화: 퀀트 투자 용어집', completed: false, resourceIds: [3] },
+        { id: 3, number: 'MODULE 03', name: '도구 세팅: 트레이딩뷰 레이아웃', completed: false, resourceIds: [4] },
     ];
 
     const learningResources = [
@@ -133,49 +242,126 @@ const SystemBuilderLearnPage = () => {
         },
     ];
 
-    const completedModules = modules.filter(m => m.completed).length;
-    const progressPercent = (completedModules / modules.length) * 100;
+    // 체크리스트 완료 개수로 학습 진행률 계산
+    const completedChecklistCount = checklist.filter(item => item.completed).length;
+    const checklistProgressPercent = (completedChecklistCount / checklist.length) * 100;
 
-    const handleChecklistToggle = (id: number) => {
-        setChecklist(checklist.map(item => {
-            if (item.id === id && !item.completed) {
-                const now = new Date();
-                return {
-                    ...item,
-                    completed: true,
-                    completedAt: `${now.getFullYear()}. ${now.getMonth() + 1}. ${now.getDate()}. ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
-                };
-            }
-            return item;
-        }));
+    // 모듈 클릭 시 해당 학습 자료로 스크롤
+    const handleModuleClick = (moduleId: number) => {
+        setActiveModule(moduleId);
+        setActiveTab('materials'); // 학습 자료 탭으로 전환
+
+        const module = modules.find(m => m.id === moduleId);
+        if (module && module.resourceIds.length > 0) {
+            const firstResourceId = module.resourceIds[0];
+            // 약간의 딜레이를 주어 탭 전환 후 스크롤
+            setTimeout(() => {
+                resourceRefs.current[firstResourceId]?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                    inline: 'nearest'
+                });
+            }, 100);
+        }
     };
 
-    const handleSaveNote = () => {
+    const handleChecklistToggle = async (id: number) => {
+        if (!user) return;
+
+        const updatedChecklist = checklist.map(item => {
+            if (item.id === id) {
+                if (!item.completed) {
+                    // 체크하기
+                    const now = new Date();
+                    const completedAt = `${now.getFullYear()}. ${now.getMonth() + 1}. ${now.getDate()}. ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                    return {
+                        ...item,
+                        completed: true,
+                        completedAt: completedAt
+                    };
+                } else {
+                    // 체크 해제하기
+                    return {
+                        ...item,
+                        completed: false,
+                        completedAt: null
+                    };
+                }
+            }
+            return item;
+        });
+
+        setChecklist(updatedChecklist);
+
+        // DB에 저장
+        const updatedItem = updatedChecklist.find(item => item.id === id);
+        if (updatedItem) {
+            await saveChecklistItem(
+                user.id,
+                PRODUCT_ID,
+                updatedItem.id,
+                updatedItem.completed,
+                updatedItem.completedAt
+            );
+        }
+    };
+
+    const handleSaveNote = async () => {
+        if (!user) return;
+
         if (!noteTitle.trim() || !noteContent.trim()) {
             alert('제목과 내용을 모두 입력해주세요.');
             return;
         }
 
-        const now = new Date();
-        const newNote = {
-            id: Date.now(),
-            type: selectedNoteType,
-            title: noteTitle,
-            content: noteContent,
-            createdAt: `${now.getFullYear()}. ${now.getMonth() + 1}. ${now.getDate()}. ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`,
-            module: 'MODULE 01'
-        };
+        // DB에 저장
+        const dbNote = await createNote(
+            user.id,
+            PRODUCT_ID,
+            selectedNoteType,
+            noteTitle,
+            noteContent,
+            'MODULE 01'
+        );
 
-        setNotes([newNote, ...notes]);
-        setNoteTitle('');
-        setNoteContent('');
-        setShowNoteEditor(false);
-        setSelectedNoteType('question');
+        if (dbNote) {
+            const newNote = {
+                id: dbNote.id,
+                type: dbNote.noteType as 'question' | 'insight' | 'todo' | 'reference',
+                title: dbNote.title,
+                content: dbNote.content,
+                createdAt: new Date(dbNote.createdAt).toLocaleString('ko-KR', {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }).replace(/\. /g, '. '),
+                module: dbNote.module
+            };
+
+            setNotes([newNote, ...notes]);
+            setNoteTitle('');
+            setNoteContent('');
+            setShowNoteEditor(false);
+            setSelectedNoteType('question');
+        } else {
+            alert('노트 저장에 실패했습니다.');
+        }
     };
 
-    const handleDeleteNote = (id: number) => {
+    const handleDeleteNote = async (id: string) => {
+        if (!user) return;
+
         if (confirm('이 노트를 삭제하시겠습니까?')) {
-            setNotes(notes.filter(note => note.id !== id));
+            // DB에서 삭제
+            const success = await deleteNote(user.id, id);
+
+            if (success) {
+                setNotes(notes.filter(note => note.id !== id));
+            } else {
+                alert('노트 삭제에 실패했습니다.');
+            }
         }
     };
 
@@ -242,6 +428,9 @@ const SystemBuilderLearnPage = () => {
             {learningResources.map((resource) => (
                 <div
                     key={resource.id}
+                    ref={(el) => {
+                        resourceRefs.current[resource.id] = el;
+                    }}
                     className={`rounded-xl p-7 border transition-all duration-300 cursor-pointer ${
                         resource.special
                             ? 'bg-green-50 border-green-200 hover:border-green-300 hover:shadow-lg'
@@ -309,7 +498,7 @@ const SystemBuilderLearnPage = () => {
             <div className="space-y-10">
                 {/* 섹션 1: 학습 체크리스트 */}
                 <div>
-                    <h2 className="text-xl font-bold text-gray-900 mb-6">MODULE 01 학습 체크리스트</h2>
+                    <h2 className="text-xl font-bold text-gray-900 mb-6">학습 체크리스트</h2>
                     <div className="space-y-3">
                         {checklist.map((item) => (
                             <div
@@ -636,9 +825,9 @@ const SystemBuilderLearnPage = () => {
                             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                                 <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">학습 진행률</div>
                                 <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-                                    <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${progressPercent}%` }}></div>
+                                    <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${checklistProgressPercent}%` }}></div>
                                 </div>
-                                <div className="text-sm font-semibold text-gray-900">{completedModules} / {modules.length} 모듈 완료</div>
+                                <div className="text-sm font-semibold text-gray-900">{Math.round(checklistProgressPercent)}% 완료</div>
                             </div>
 
                             {/* Module Navigation */}
@@ -648,7 +837,7 @@ const SystemBuilderLearnPage = () => {
                                     {modules.map((module) => (
                                         <button
                                             key={module.id}
-                                            onClick={() => setActiveModule(module.id)}
+                                            onClick={() => handleModuleClick(module.id)}
                                             className={`w-full text-left px-4 py-3.5 rounded-lg border transition-all ${
                                                 activeModule === module.id
                                                     ? 'bg-blue-50 border-blue-200'

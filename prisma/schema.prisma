@@ -19,10 +19,12 @@ model User {
   email     String?   @unique
   image     String?   // 프로필 이미지 저장용
   createdAt DateTime  @default(now())
-  
-  // 관계 설정: User는 여러개의 찜 목록과 구매 내역을 가질 수 있습니다.
-  wishlist  WishlistItem[]
-  purchases Purchase[]
+
+  // 관계 설정: User는 여러개의 찜 목록, 구매 내역, 체크리스트, 노트를 가질 수 있습니다.
+  wishlist    WishlistItem[]
+  purchases   Purchase[]
+  checklists  UserChecklist[]
+  notes       UserNote[]
 }
 
 // 4. WishlistItem (찜 목록) 테이블 설계도 (기존 정의 유지)
@@ -45,11 +47,49 @@ model Purchase {
   productId String
   amount    Int      // 결제 금액 (기존 파일의 amount 필드 유지)
   createdAt DateTime @default(now())
-  
+
   // User 모델과 연결
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   // 특정 유저의 구매내역을 빠르게 찾기 위한 인덱스
   @@index([userId])
+}
+
+// 6. UserChecklist (사용자 학습 체크리스트) 테이블
+model UserChecklist {
+  id           String    @id @default(cuid())
+  userId       String
+  productId    String    // 어떤 강의의 체크리스트인지
+  checklistId  Int       // 체크리스트 항목 번호 (1, 2, 3, 4, 5)
+  completed    Boolean   @default(false)
+  completedAt  String?   // 완료 시각 (문자열 형태로 저장)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // User 모델과 연결
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 한 유저가 같은 강의의 같은 체크리스트를 중복으로 가질 수 없음
+  @@unique([userId, productId, checklistId])
+  @@index([userId, productId])
+}
+
+// 7. UserNote (사용자 학습 노트) 테이블
+model UserNote {
+  id          String   @id @default(cuid())
+  userId      String
+  productId   String   // 어떤 강의의 노트인지
+  noteType    String   // 'question', 'insight', 'todo', 'reference'
+  title       String
+  content     String   @db.Text
+  module      String   // 'MODULE 01' 등
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // User 모델과 연결
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 특정 유저의 특정 강의 노트를 빠르게 찾기 위한 인덱스
+  @@index([userId, productId])
 }

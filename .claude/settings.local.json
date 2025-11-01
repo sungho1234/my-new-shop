@@ -6,7 +6,9 @@
       "Bash(for file in app/products/*/page.tsx)",
       "Bash(do echo \"=== $file ===\")",
       "Bash(done)",
-      "Read(//c/Users/FAMILY/Downloads/**)"
+      "Read(//c/Users/FAMILY/Downloads/**)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npx prisma db push)"
     ],
     "deny": [],
     "ask": []
