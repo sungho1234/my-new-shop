@@ -137,6 +137,10 @@ const ProductDetailPage = () => {
         setPaymentOpen(true);
     };
 
+    const handleLearnClick = () => {
+        router.push('/learn/system-builder');
+    };
+
     const handleLikeClick = () => {
         if (!user) {
             if (window.confirm("로그인이 필요한 서비스입니다. 로그인 하시겠습니까?")) {
@@ -345,9 +349,15 @@ const ProductDetailPage = () => {
                                     <span className={styles.price}>70,000원</span>
                                     <span className={styles.priceSecondary}>($50)</span>
                                 </div>
-                                <button className={styles.buyButton} onClick={handleBuyNowClick}>
-                                    Buy now
-                                </button>
+                                {isPurchased(productInfo.id) ? (
+                                    <button className={styles.buyButton} onClick={handleLearnClick} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
+                                        학습하기 →
+                                    </button>
+                                ) : (
+                                    <button className={styles.buyButton} onClick={handleBuyNowClick}>
+                                        Buy now
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </aside>

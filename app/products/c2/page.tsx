@@ -33,9 +33,9 @@ const faqItems = [
 const itemForPay: PaymentItem = {
     title: "프로의 전략 원본",
     subtitle: "시스템 설계도와 데이터 분석",
-    priceLabel: "90,000원",
-    priceValue: 90000,
-    thumbnail: "/로고.png", 
+    priceLabel: "100원",
+    priceValue: 100,
+    thumbnail: "/로고.png",
 };
 
 const ProductDetailPage = () => {
@@ -137,6 +137,10 @@ const ProductDetailPage = () => {
         }
 
         setPaymentOpen(true);
+    };
+
+    const handleLearnClick = () => {
+        router.push('/learn/strategy-source');
     };
 
     // 찜하기 핸들러
@@ -336,9 +340,15 @@ const ProductDetailPage = () => {
                                     <span className={styles.price}>90,000원</span>
                                     <span className={styles.priceSecondary}>($75)</span>
                                 </div>
-                                <button className={styles.buyButton} onClick={handleBuyNowClick}>
-                                    Buy now
-                                </button>
+                                {isPurchased(productInfo.id) ? (
+                                    <button className={styles.buyButton} onClick={handleLearnClick} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
+                                        학습하기 →
+                                    </button>
+                                ) : (
+                                    <button className={styles.buyButton} onClick={handleBuyNowClick}>
+                                        Buy now
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </aside>

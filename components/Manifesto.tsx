@@ -41,7 +41,7 @@ export default function Manifesto() {
 
   return (
     // Link 컴포넌트로 전체를 감싸 클릭 가능한 영역으로 만듭니다.
-    <Link href="/getting-started" className="block my-12">
+    <Link href="/about" className="block my-12">
       {/* 2. 전체 레이아웃 및 크기 */}
       <div
         className="relative max-w-7xl mx-auto h-auto md:h-[240px] rounded-2xl overflow-hidden group"

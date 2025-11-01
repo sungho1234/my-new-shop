@@ -33,8 +33,8 @@ const faqItems = [
 const itemForPay: PaymentItem = {
     title: "일반인의 성장책: 스캠필터와 챌린지",
     subtitle: "데이터 기반 훈련법",
-    priceLabel: "60,000원",
-    priceValue: 60000,
+    priceLabel: "100원",
+    priceValue: 100,
     thumbnail: "/로고.png",
 };
 
@@ -136,6 +136,10 @@ const ProductDetailPage = () => {
         }
 
         setPaymentOpen(true);
+    };
+
+    const handleLearnClick = () => {
+        router.push('/learn/growth-book');
     };
 
     const handleLikeClick = () => {
@@ -349,9 +353,15 @@ const ProductDetailPage = () => {
                                     <span className={styles.priceSecondary}>($35)</span>
                                     {/* (달러 가격은 제거) */}
                                 </div>
-                                <button className={styles.buyButton} onClick={handleBuyNowClick}>
-                                    Buy now
-                                </button>
+                                {isPurchased(productInfo.id) ? (
+                                    <button className={styles.buyButton} onClick={handleLearnClick} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
+                                        학습하기 →
+                                    </button>
+                                ) : (
+                                    <button className={styles.buyButton} onClick={handleBuyNowClick}>
+                                        Buy now
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </aside>

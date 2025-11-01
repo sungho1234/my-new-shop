@@ -33,8 +33,8 @@ const faqItems = [
 const itemForPay: PaymentItem = {
     title: "시스템 빌더 풀 패키지",
     subtitle: "프리미엄 전략 컬렉션",
-    priceLabel: "450,000원",
-    priceValue: 450000,
+    priceLabel: "100원",
+    priceValue: 100,
     thumbnail: "/로고.png",
 };
 
@@ -136,6 +136,10 @@ const ProductDetailPage = () => {
         }
 
         setPaymentOpen(true);
+    };
+
+    const handleLearnClick = () => {
+        router.push('/learn/strategy-vol1');
     };
 
     const handleLikeClick = () => {
@@ -375,9 +379,15 @@ const ProductDetailPage = () => {
                                     <span className={styles.price}>210,000원</span>
                                     <span className={styles.priceSecondary}>($150)</span>
                                 </div>
-                                <button className={styles.buyButton} onClick={handleBuyNowClick}>
-                                    Buy now
-                                </button>
+                                {isPurchased(productInfo.id) ? (
+                                    <button className={styles.buyButton} onClick={handleLearnClick} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
+                                        학습하기 →
+                                    </button>
+                                ) : (
+                                    <button className={styles.buyButton} onClick={handleBuyNowClick}>
+                                        Buy now
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </aside>
