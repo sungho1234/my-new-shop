@@ -77,7 +77,7 @@ const StrategySourceLearnPage = () => {
 
     const PRODUCT_ID = 'strategy-source';
 
-    const [checklist, setChecklist] = useState([
+    const [checklist, setChecklist] = useState<Array<{ id: number; title: string; completed: boolean; completedAt: string | null }>>([
         { id: 1, title: '전략 설계도 PDF 다운로드', completed: false, completedAt: null },
         { id: 2, title: '전략 로직 핵심 부분 분석', completed: false, completedAt: null },
         { id: 3, title: '실증 사례집 데이터 해석', completed: false, completedAt: null },
@@ -104,7 +104,7 @@ const StrategySourceLearnPage = () => {
                 setIsLoadingData(true);
                 const dbChecklists = await fetchUserChecklists(user.id, PRODUCT_ID);
                 setChecklist(prev => prev.map(item => {
-                    const dbItem = dbChecklists.find(db => db.checklistId === item.id);
+                    const dbItem = dbChecklists.find((db: any) => db.checklistId === item.id);
                     if (dbItem) {
                         return {
                             ...item,
@@ -116,7 +116,7 @@ const StrategySourceLearnPage = () => {
                 }));
 
                 const dbNotes = await fetchUserNotes(user.id, PRODUCT_ID);
-                const formattedNotes = dbNotes.map(note => ({
+                const formattedNotes = dbNotes.map((note: any) => ({
                     id: note.id,
                     type: note.noteType as 'question' | 'insight' | 'todo' | 'reference',
                     title: note.title,
@@ -312,6 +312,7 @@ const StrategySourceLearnPage = () => {
             name: '전략 설계도 (Strategy Blueprint)',
             meta: 'PDF · 5.2MB · 45페이지',
             description: '현역 트레이더가 실제 사용하는 전략의 핵심 로직과 진입/청산 기준을 상세히 담은 설계도입니다.',
+            special: false,
         },
         {
             id: 2,
@@ -319,6 +320,7 @@ const StrategySourceLearnPage = () => {
             name: '실증 사례집 (Backtesting Results)',
             meta: 'PDF · 3.8MB · 32페이지',
             description: '과거 데이터 기반의 전략 검증 결과와 실전 적용 사례를 분석한 자료입니다.',
+            special: false,
         },
     ];
 

@@ -78,7 +78,7 @@ const FirstGuideLearnPage = () => {
 
     const PRODUCT_ID = 'first-guide';
 
-    const [checklist, setChecklist] = useState([
+    const [checklist, setChecklist] = useState<Array<{ id: number; title: string; completed: boolean; completedAt: string | null }>>([
         { id: 1, title: '6개 핵심 모듈 오리엔테이션 영상 시청', completed: false, completedAt: null },
         { id: 2, title: 'MODULE 1: 거래소 선택 & 차트 셋업 완료', completed: false, completedAt: null },
         { id: 3, title: 'MODULE 2: 퀀트 투자 용어 핵심 15개 암기', completed: false, completedAt: null },
@@ -112,7 +112,7 @@ const FirstGuideLearnPage = () => {
 
                 // DB 데이터를 로컬 state와 병합
                 setChecklist(prev => prev.map(item => {
-                    const dbItem = dbChecklists.find(db => db.checklistId === item.id);
+                    const dbItem = dbChecklists.find((db: any) => db.checklistId === item.id);
                     if (dbItem) {
                         return {
                             ...item,
@@ -125,7 +125,7 @@ const FirstGuideLearnPage = () => {
 
                 // 노트 불러오기
                 const dbNotes = await fetchUserNotes(user.id, PRODUCT_ID);
-                const formattedNotes = dbNotes.map(note => ({
+                const formattedNotes = dbNotes.map((note: any) => ({
                     id: note.id,
                     type: note.noteType as 'question' | 'insight' | 'todo' | 'reference',
                     title: note.title,

@@ -78,7 +78,7 @@ const GrowthBookLearnPage = () => {
 
     const PRODUCT_ID = 'growth-book';
 
-    const [checklist, setChecklist] = useState([
+    const [checklist, setChecklist] = useState<Array<{ id: number; title: string; completed: boolean; completedAt: string | null }>>([
         { id: 1, title: 'Week 1: 자기진단 워크시트 작성 및 목표 설정', completed: false, completedAt: null },
         { id: 2, title: 'Week 2: 학습 습관 형성 챌린지 1단계 완료', completed: false, completedAt: null },
         { id: 3, title: 'Week 3: 투자 심리 자기점검 및 패턴 분석', completed: false, completedAt: null },
@@ -111,7 +111,7 @@ const GrowthBookLearnPage = () => {
 
                 // DB 데이터를 로컬 state와 병합
                 setChecklist(prev => prev.map(item => {
-                    const dbItem = dbChecklists.find(db => db.checklistId === item.id);
+                    const dbItem = dbChecklists.find((db: any) => db.checklistId === item.id);
                     if (dbItem) {
                         return {
                             ...item,
@@ -124,7 +124,7 @@ const GrowthBookLearnPage = () => {
 
                 // 노트 불러오기
                 const dbNotes = await fetchUserNotes(user.id, PRODUCT_ID);
-                const formattedNotes = dbNotes.map(note => ({
+                const formattedNotes = dbNotes.map((note: any) => ({
                     id: note.id,
                     type: note.noteType as 'question' | 'insight' | 'todo' | 'reference',
                     title: note.title,

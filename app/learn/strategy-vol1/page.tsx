@@ -77,7 +77,7 @@ const StrategyVol1LearnPage = () => {
 
     const PRODUCT_ID = 'strategy-vol1';
 
-    const [checklist, setChecklist] = useState([
+    const [checklist, setChecklist] = useState<Array<{ id: number; title: string; completed: boolean; completedAt: string | null }>>([
         { id: 1, title: '전략 설계도 PDF 다운로드 및 1차 읽기', completed: false, completedAt: null },
         { id: 2, title: '실증 사례집 분석 - 데이터 해석 연습', completed: false, completedAt: null },
         { id: 3, title: '실행 엔진(지표) 트레이딩뷰 설치', completed: false, completedAt: null },
@@ -104,7 +104,7 @@ const StrategyVol1LearnPage = () => {
                 setIsLoadingData(true);
                 const dbChecklists = await fetchUserChecklists(user.id, PRODUCT_ID);
                 setChecklist(prev => prev.map(item => {
-                    const dbItem = dbChecklists.find(db => db.checklistId === item.id);
+                    const dbItem = dbChecklists.find((db: any) => db.checklistId === item.id);
                     if (dbItem) {
                         return {
                             ...item,
@@ -116,7 +116,7 @@ const StrategyVol1LearnPage = () => {
                 }));
 
                 const dbNotes = await fetchUserNotes(user.id, PRODUCT_ID);
-                const formattedNotes = dbNotes.map(note => ({
+                const formattedNotes = dbNotes.map((note: any) => ({
                     id: note.id,
                     type: note.noteType as 'question' | 'insight' | 'todo' | 'reference',
                     title: note.title,

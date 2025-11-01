@@ -78,7 +78,7 @@ const SystemBuilderLearnPage = () => {
 
     const PRODUCT_ID = 'system-builder';
 
-    const [checklist, setChecklist] = useState([
+    const [checklist, setChecklist] = useState<Array<{ id: number; title: string; completed: boolean; completedAt: string | null }>>([
         { id: 1, title: '거래소 선택 가이드 PDF 다운로드', completed: false, completedAt: null },
         { id: 2, title: '차트 셋업 철학 문서 읽기', completed: false, completedAt: null },
         { id: 3, title: '트레이딩뷰 레이아웃 실제 적용해보기', completed: false, completedAt: null },
@@ -111,7 +111,7 @@ const SystemBuilderLearnPage = () => {
 
                 // DB 데이터를 로컬 state와 병합
                 setChecklist(prev => prev.map(item => {
-                    const dbItem = dbChecklists.find(db => db.checklistId === item.id);
+                    const dbItem = dbChecklists.find((db: any) => db.checklistId === item.id);
                     if (dbItem) {
                         return {
                             ...item,
@@ -124,7 +124,7 @@ const SystemBuilderLearnPage = () => {
 
                 // 노트 불러오기
                 const dbNotes = await fetchUserNotes(user.id, PRODUCT_ID);
-                const formattedNotes = dbNotes.map(note => ({
+                const formattedNotes = dbNotes.map((note: any) => ({
                     id: note.id,
                     type: note.noteType as 'question' | 'insight' | 'todo' | 'reference',
                     title: note.title,
