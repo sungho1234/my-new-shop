@@ -5,7 +5,8 @@
       "Bash(dir:*)",
       "Bash(for file in app/products/*/page.tsx)",
       "Bash(do echo \"=== $file ===\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Read(//c/Users/FAMILY/Downloads/**)"
     ],
     "deny": [],
     "ask": []

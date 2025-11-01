@@ -9,14 +9,46 @@ import { useRouter } from 'next/navigation';
 const SystemBuilderLearnPage = () => {
     const { user, purchases } = useAuth();
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'materials' | 'notes' | 'support'>('materials');
+    const [activeTab, setActiveTab] = useState<'materials' | 'action-plan' | 'support'>('materials');
     const [activeModule, setActiveModule] = useState<number>(1);
-    const [userNote, setUserNote] = useState('');
-    const [savedNotes, setSavedNotes] = useState([
+    const [showNoteEditor, setShowNoteEditor] = useState(false);
+    const [selectedNoteType, setSelectedNoteType] = useState<'question' | 'insight' | 'todo' | 'reference'>('question');
+    const [noteTitle, setNoteTitle] = useState('');
+    const [noteContent, setNoteContent] = useState('');
+    const [activeFilter, setActiveFilter] = useState<'all' | 'question' | 'insight' | 'todo' | 'reference'>('all');
+
+    const [checklist, setChecklist] = useState([
+        { id: 1, title: '거래소 선택 가이드 PDF 다운로드', completed: true, completedAt: '2025. 10. 30. 14:20' },
+        { id: 2, title: '차트 셋업 철학 문서 읽기', completed: true, completedAt: '2025. 10. 30. 15:10' },
+        { id: 3, title: '트레이딩뷰 레이아웃 실제 적용해보기', completed: false, completedAt: null },
+        { id: 4, title: '거래소 3곳 체크리스트로 비교 분석', completed: false, completedAt: null },
+        { id: 5, title: '핵심 용어 15개 복습 및 암기', completed: false, completedAt: null },
+    ]);
+
+    const [notes, setNotes] = useState([
         {
             id: 1,
-            content: 'MODULE 01 학습 완료. 거래소 선택 시 수수료뿐만 아니라 API 안정성과 보안 감사 이력을 확인하는 것이 중요하다는 것을 배웠다. 다음에는 실제로 3-4개 거래소를 체크리스트로 비교 분석해봐야겠다.',
-            createdAt: '2025. 10. 30. 14:23'
+            type: 'question' as const,
+            title: 'API 안정성 99.9%의 실제 의미는?',
+            content: '거래소 선택 가이드에서 API 안정성 99.9% 이상을 권장한다고 나와있는데, 실제로 이게 어느 정도 수준인지 감이 안 온다. 다운타임이 연간 며칠 정도인지, 실전 트레이딩할 때 체감이 어떤지 궁금함.',
+            createdAt: '2025. 10. 30. 15:30',
+            module: 'MODULE 01'
+        },
+        {
+            id: 2,
+            type: 'insight' as const,
+            title: '차트 지표를 3개 이하로 유지하는 이유',
+            content: '많은 지표를 쓰면 정보 과부하로 판단력이 흐려진다는 점이 인상 깊었다. 실제로 프로 트레이더들은 이평선, 볼린저밴드, RSI 정도만 사용한다고 함. "버리는 기준"이 "더하는 기준"보다 중요하다는 철학이 마음에 든다.',
+            createdAt: '2025. 10. 30. 16:15',
+            module: 'MODULE 01'
+        },
+        {
+            id: 3,
+            type: 'todo' as const,
+            title: '거래소 비교 분석 진행하기',
+            content: '바이낸스, 업비트, OKX 3곳을 체크리스트 기준으로 비교 분석해야 함. 보안 감사 이력, 수수료 구조, API 안정성, 거래량 등을 스프레드시트로 정리할 것. 이번 주말까지 완료 목표.',
+            createdAt: '2025. 10. 30. 17:00',
+            module: 'MODULE 01'
         }
     ]);
 
@@ -104,29 +136,72 @@ const SystemBuilderLearnPage = () => {
     const completedModules = modules.filter(m => m.completed).length;
     const progressPercent = (completedModules / modules.length) * 100;
 
+    const handleChecklistToggle = (id: number) => {
+        setChecklist(checklist.map(item => {
+            if (item.id === id && !item.completed) {
+                const now = new Date();
+                return {
+                    ...item,
+                    completed: true,
+                    completedAt: `${now.getFullYear()}. ${now.getMonth() + 1}. ${now.getDate()}. ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+                };
+            }
+            return item;
+        }));
+    };
+
     const handleSaveNote = () => {
-        if (userNote.trim()) {
-            const newNote = {
-                id: Date.now(),
-                content: userNote,
-                createdAt: new Date().toLocaleString('ko-KR', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }).replace(/\. /g, '. ')
-            };
-            setSavedNotes([newNote, ...savedNotes]);
-            setUserNote('');
-            alert('노트가 저장되었습니다.');
+        if (!noteTitle.trim() || !noteContent.trim()) {
+            alert('제목과 내용을 모두 입력해주세요.');
+            return;
         }
+
+        const now = new Date();
+        const newNote = {
+            id: Date.now(),
+            type: selectedNoteType,
+            title: noteTitle,
+            content: noteContent,
+            createdAt: `${now.getFullYear()}. ${now.getMonth() + 1}. ${now.getDate()}. ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`,
+            module: 'MODULE 01'
+        };
+
+        setNotes([newNote, ...notes]);
+        setNoteTitle('');
+        setNoteContent('');
+        setShowNoteEditor(false);
+        setSelectedNoteType('question');
     };
 
     const handleDeleteNote = (id: number) => {
         if (confirm('이 노트를 삭제하시겠습니까?')) {
-            setSavedNotes(savedNotes.filter(note => note.id !== id));
+            setNotes(notes.filter(note => note.id !== id));
         }
+    };
+
+    const getFilteredNotes = () => {
+        if (activeFilter === 'all') return notes;
+        return notes.filter(note => note.type === activeFilter);
+    };
+
+    const getNoteTypeInfo = (type: string) => {
+        const types = {
+            question: { name: '궁금한 점', bgColor: 'bg-yellow-100', textColor: 'text-yellow-700', icon: '?' },
+            insight: { name: '인사이트', bgColor: 'bg-blue-100', textColor: 'text-blue-700', icon: '💡' },
+            todo: { name: '해야할 일', bgColor: 'bg-green-100', textColor: 'text-green-700', icon: '✓' },
+            reference: { name: '참고', bgColor: 'bg-purple-100', textColor: 'text-purple-700', icon: '📄' }
+        };
+        return types[type as keyof typeof types] || types.question;
+    };
+
+    const getNoteCounts = () => {
+        return {
+            all: notes.length,
+            question: notes.filter(n => n.type === 'question').length,
+            insight: notes.filter(n => n.type === 'insight').length,
+            todo: notes.filter(n => n.type === 'todo').length,
+            reference: notes.filter(n => n.type === 'reference').length
+        };
     };
 
     const renderIcon = (iconName: string, special: boolean = false) => {
@@ -226,53 +301,226 @@ const SystemBuilderLearnPage = () => {
         </div>
     );
 
-    const renderNotesTab = () => (
-        <div className="space-y-8">
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">학습 노트 작성</h3>
-                <textarea
-                    value={userNote}
-                    onChange={(e) => setUserNote(e.target.value)}
-                    placeholder="학습 중 중요한 내용이나 인사이트를 기록해보세요...
+    const renderActionPlanTab = () => {
+        const counts = getNoteCounts();
+        const filteredNotes = getFilteredNotes();
 
-예시:
-- 거래소 선택 시 유동성 지표가 생각보다 중요하다는 것을 알게 됨
-- 보조지표를 3개 이하로 유지하는 것이 집중력에 도움이 됨
-- 다음에 실전 적용 시 리스크 관리 부분을 먼저 체크해야겠음"
-                    className="w-full min-h-[120px] bg-white border border-gray-300 rounded-lg p-4 text-gray-900 text-base resize-y focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                />
-                <button
-                    onClick={handleSaveNote}
-                    className="mt-4 inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all"
-                >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                    </svg>
-                    노트 저장
-                </button>
-            </div>
+        return (
+            <div className="space-y-10">
+                {/* 섹션 1: 학습 체크리스트 */}
+                <div>
+                    <h2 className="text-xl font-bold text-gray-900 mb-6">MODULE 01 학습 체크리스트</h2>
+                    <div className="space-y-3">
+                        {checklist.map((item) => (
+                            <div
+                                key={item.id}
+                                onClick={() => handleChecklistToggle(item.id)}
+                                className={`flex items-start gap-4 p-4 rounded-lg border transition-all cursor-pointer ${
+                                    item.completed
+                                        ? 'bg-green-50 border-green-200'
+                                        : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                                }`}
+                            >
+                                <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                                    item.completed
+                                        ? 'bg-green-600 border-green-600'
+                                        : 'border-gray-300'
+                                }`}>
+                                    {item.completed && (
+                                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    )}
+                                </div>
+                                <div className="flex-grow">
+                                    <p className={`text-base font-medium mb-1 ${item.completed ? 'text-green-700' : 'text-gray-900'}`}>
+                                        {item.title}
+                                    </p>
+                                    <p className="text-sm text-gray-600">
+                                        {item.completed ? `완료 · ${item.completedAt}` : '미완료'}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <button className="mt-6 inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all">
+                        다음 모듈로 이동
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
 
-            <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">저장된 노트</h3>
-                <div className="space-y-4">
-                    {savedNotes.map((note) => (
-                        <div key={note.id} className="bg-white border border-gray-200 rounded-lg p-5">
-                            <div className="flex justify-between items-start mb-3">
-                                <span className="text-sm text-gray-500">{note.createdAt}</span>
+                {/* 섹션 2: 노션 스타일 노트 시스템 */}
+                <div className="pt-8 border-t border-gray-200">
+                    {/* 노트 헤더 */}
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-bold text-gray-900">학습 노트</h2>
+                        <button
+                            onClick={() => setShowNoteEditor(!showNoteEditor)}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all"
+                        >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                            새 노트
+                        </button>
+                    </div>
+
+                    {/* 노트 에디터 */}
+                    {showNoteEditor && (
+                        <div className="bg-white border-2 border-blue-600 rounded-xl overflow-hidden mb-6 shadow-lg">
+                            {/* 툴바 */}
+                            <div className="bg-gray-50 border-b border-gray-200 p-3 flex gap-2">
+                                {['question', 'insight', 'todo', 'reference'].map((type) => {
+                                    const typeInfo = getNoteTypeInfo(type);
+                                    return (
+                                        <button
+                                            key={type}
+                                            onClick={() => setSelectedNoteType(type as any)}
+                                            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                                                selectedNoteType === type
+                                                    ? 'bg-blue-50 text-blue-700 border border-blue-600'
+                                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100'
+                                            }`}
+                                        >
+                                            <span>{typeInfo.icon}</span>
+                                            <span>{typeInfo.name}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                            {/* 제목 입력 */}
+                            <input
+                                type="text"
+                                value={noteTitle}
+                                onChange={(e) => setNoteTitle(e.target.value)}
+                                placeholder="제목을 입력하세요..."
+                                className="w-full px-6 pt-5 pb-3 text-2xl font-bold text-gray-900 border-none focus:outline-none"
+                            />
+                            {/* 내용 입력 */}
+                            <textarea
+                                value={noteContent}
+                                onChange={(e) => setNoteContent(e.target.value)}
+                                placeholder="내용을 입력하세요...
+
+팁:
+• 이해가 안 되는 부분을 질문으로 정리해보세요
+• 중요한 인사이트는 나중에 다시 보기 쉽게 기록하세요
+• 실천할 내용은 구체적으로 작성하세요"
+                                className="w-full px-6 pb-6 text-base text-gray-700 leading-relaxed resize-y min-h-[150px] border-none focus:outline-none"
+                            />
+                            {/* 푸터 */}
+                            <div className="bg-gray-50 border-t border-gray-200 px-4 py-3 flex justify-end gap-3">
                                 <button
-                                    onClick={() => handleDeleteNote(note.id)}
-                                    className="text-xs px-3 py-1.5 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition-colors"
+                                    onClick={() => {
+                                        setShowNoteEditor(false);
+                                        setNoteTitle('');
+                                        setNoteContent('');
+                                    }}
+                                    className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-all"
                                 >
-                                    삭제
+                                    취소
+                                </button>
+                                <button
+                                    onClick={handleSaveNote}
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all"
+                                >
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    저장
                                 </button>
                             </div>
-                            <p className="text-gray-700 text-base leading-relaxed">{note.content}</p>
                         </div>
-                    ))}
+                    )}
+
+                    {/* 필터 탭 */}
+                    <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+                        <button
+                            onClick={() => setActiveFilter('all')}
+                            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                                activeFilter === 'all'
+                                    ? 'bg-gray-900 text-white'
+                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                            }`}
+                        >
+                            <span>전체</span>
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                                activeFilter === 'all' ? 'bg-white/20' : 'bg-gray-100'
+                            }`}>{counts.all}</span>
+                        </button>
+                        {(['question', 'insight', 'todo'] as const).map((type) => {
+                            const typeInfo = getNoteTypeInfo(type);
+                            const count = counts[type];
+                            return (
+                                <button
+                                    key={type}
+                                    onClick={() => setActiveFilter(type)}
+                                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                                        activeFilter === type
+                                            ? 'bg-gray-900 text-white'
+                                            : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                                    }`}
+                                >
+                                    <span>{typeInfo.icon}</span>
+                                    <span>{typeInfo.name}</span>
+                                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                                        activeFilter === type ? 'bg-white/20' : 'bg-gray-100'
+                                    }`}>{count}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* 노트 카드 목록 */}
+                    <div className="space-y-4">
+                        {filteredNotes.map((note) => {
+                            const typeInfo = getNoteTypeInfo(note.type);
+                            return (
+                                <div
+                                    key={note.id}
+                                    className="bg-white border border-gray-200 rounded-xl p-6 transition-all hover:border-gray-300 hover:shadow-md hover:-translate-y-0.5 cursor-pointer group"
+                                >
+                                    {/* 카드 헤더 */}
+                                    <div className="flex justify-between items-start mb-3">
+                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold ${typeInfo.bgColor} ${typeInfo.textColor}`}>
+                                            <span>{typeInfo.icon}</span>
+                                            <span>{typeInfo.name}</span>
+                                        </span>
+                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button className="p-2 bg-gray-50 border border-gray-200 rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all">
+                                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteNote(note.id)}
+                                                className="p-2 bg-gray-50 border border-gray-200 rounded-md text-gray-600 hover:bg-gray-100 hover:text-red-600 transition-all"
+                                            >
+                                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {/* 제목 */}
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-3 leading-snug">{note.title}</h3>
+                                    {/* 내용 */}
+                                    <p className="text-gray-600 text-sm leading-relaxed mb-4">{note.content}</p>
+                                    {/* 푸터 */}
+                                    <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                                        <span className="text-xs text-gray-500">{note.createdAt}</span>
+                                        <span className="text-xs font-medium text-gray-600 bg-gray-50 px-2.5 py-1 rounded">{note.module}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     const renderSupportTab = () => (
         <div className="space-y-8">
@@ -433,15 +681,15 @@ const SystemBuilderLearnPage = () => {
                                     )}
                                 </button>
                                 <button
-                                    onClick={() => setActiveTab('notes')}
+                                    onClick={() => setActiveTab('action-plan')}
                                     className={`flex-1 px-8 py-5 text-base font-semibold transition-all relative ${
-                                        activeTab === 'notes'
+                                        activeTab === 'action-plan'
                                             ? 'text-gray-900 bg-white'
                                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                                     }`}
                                 >
-                                    내 노트
-                                    {activeTab === 'notes' && (
+                                    실행 계획
+                                    {activeTab === 'action-plan' && (
                                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
                                     )}
                                 </button>
@@ -463,7 +711,7 @@ const SystemBuilderLearnPage = () => {
                             {/* Tab Content */}
                             <div className="p-10">
                                 {activeTab === 'materials' && renderMaterialsTab()}
-                                {activeTab === 'notes' && renderNotesTab()}
+                                {activeTab === 'action-plan' && renderActionPlanTab()}
                                 {activeTab === 'support' && renderSupportTab()}
                             </div>
                         </main>
