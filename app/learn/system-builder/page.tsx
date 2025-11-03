@@ -251,9 +251,9 @@ const SystemBuilderLearnPage = () => {
         setActiveModule(moduleId);
         setActiveTab('materials'); // 학습 자료 탭으로 전환
 
-        const module = modules.find(m => m.id === moduleId);
-        if (module && module.resourceIds.length > 0) {
-            const firstResourceId = module.resourceIds[0];
+        const targetModule = modules.find(m => m.id === moduleId);
+        if (targetModule && targetModule.resourceIds.length > 0) {
+            const firstResourceId = targetModule.resourceIds[0];
             // 약간의 딜레이를 주어 탭 전환 후 스크롤
             setTimeout(() => {
                 resourceRefs.current[firstResourceId]?.scrollIntoView({
