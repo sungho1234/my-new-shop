@@ -78,25 +78,19 @@ const YoutubeBanner = () => {
 
       {/* 2. 콘텐츠 영역 */}
       <div className="container mx-auto max-w-7xl px-4 -mt-24">
-        {/* 첫 번째 줄 (영상 카드) - 사용자님의 mb-36 설정을 그대로 유지합니다. */}
+        {/* 첫 번째 줄 (영상 카드) - 유튜브 임베드 플레이어 */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 mb-36">
           {stories.slice(0, 3).map((story, index) => (
-            <a key={index} href={story.youtubeLink} target="_blank" rel="noopener noreferrer" className="group relative block w-full overflow-hidden rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300" style={{ paddingTop: '56.25%' }}>
-              <img src={`https://img.youtube.com/vi/${story.videoId}/hqdefault.jpg`} alt={story.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-              <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-3 bg-gradient-to-b from-black/50 to-transparent">
-                <div className="flex min-w-0 items-center gap-2">
-                  <img src={story.channelAvatar} alt={story.channelName} className="h-8 w-8 flex-shrink-0 rounded-full bg-gray-700" />
-                  <p className="truncate text-base font-semibold text-white">{story.title}</p>
-                </div>
-                <div className="flex-shrink-0 text-white">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 transition-opacity group-hover:opacity-100"></div>
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 group-hover:scale-110">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/e/ee/YouTube_social_white_squircle_%282017%29.svg" alt="YouTube Play Button" className="h-16 w-16" />
-              </div>
-            </a>
+            <div key={index} className="relative block w-full overflow-hidden rounded-lg shadow-xl" style={{ paddingTop: '56.25%' }}>
+              <iframe
+                className="absolute inset-0 h-full w-full"
+                src={`https://www.youtube.com/embed/${story.videoId}`}
+                title={story.title || 'YouTube video'}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
           ))}
         </div>
 
