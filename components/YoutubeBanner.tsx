@@ -14,17 +14,17 @@ const stories = [
   },
   {
     type: 'video',
-    videoId: 'BLNTvBMPG8k',
+    videoId: 'C4TlMBWhjNM',
     title: '',
-    youtubeLink: 'https://www.youtube.com/watch?v=BLNTvBMPG8k',
+    youtubeLink: 'https://www.youtube.com/watch?v=C4TlMBWhjNM&t=647s',
     channelName: '메신저가 되자',
     channelAvatar: 'https://yt3.ggpht.com/ytc/AIdro_kvhx-22299t_s3GT26i_MQy-f2d-2_Hvu2g1_g=s88-c-k-c0x00ffffff-no-rj',
   },
   {
     type: 'video',
-    videoId: 'BLNTvBMPG8k',
+    videoId: '2oTv94Pa12A',
     title: '',
-    youtubeLink: 'https://www.youtube.com/watch?v=BLNTvBMPG8k',
+    youtubeLink: 'https://www.youtube.com/watch?v=2oTv94Pa12A&t=1s',
     channelName: '메신저가 되자',
     channelAvatar: 'https://yt3.ggpht.com/ytc/AIdro_kvhx-22299t_s3GT26i_MQy-f2d-2_Hvu2g1_g=s88-c-k-c0x00ffffff-no-rj',
   },
@@ -53,68 +53,70 @@ const stories = [
 
 const YoutubeBanner = () => {
   return (
-    <section className="mt-16">
+    <section className="mt-12 mb-16">
       {/* 1. 배경 영역 */}
-      <div 
-        className="w-full pt-20 pb-32 -mt-20"
-        style={{
-          backgroundImage: "url('/youtube-banner-bg.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        <div className="container mx-auto max-w-7xl px-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-3xl font-bold text-white">맴버 리포트 및 실전 인사이트</h2>
-              <p className="mt-2 text-gray-400">"이론을 넘어, 실제 증명된 멤버들의 기록과 전략 활용법을 심도 있게 다룹니다."</p>
+      <div className="relative w-full pt-16 pb-32 overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        {/* 배경 패턴 */}
+        <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-gray-900/50"></div>
+
+        <div className="container mx-auto max-w-7xl px-4 relative z-10">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-4 border border-white/20">
+              <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+              </svg>
+              <span className="text-sm font-medium text-white">실전 인사이트</span>
             </div>
-            <a href="#" className="rounded-md border border-gray-600 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800">
-              전체보기
-            </a>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">맴버 리포트 및 실전 전략</h2>
+            <p className="text-lg text-gray-300 leading-relaxed">이론을 넘어, 실제 증명된 멤버들의 기록과 전략 활용법을 심도 있게 다룹니다.</p>
           </div>
         </div>
       </div>
 
       {/* 2. 콘텐츠 영역 */}
-      <div className="container mx-auto max-w-7xl px-4 -mt-24">
+      <div className="container mx-auto max-w-7xl px-4 -mt-20">
         {/* 첫 번째 줄 (영상 카드) - 유튜브 임베드 플레이어 */}
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 mb-36">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mb-32">
           {stories.slice(0, 3).map((story, index) => (
-            <div key={index} className="relative block w-full overflow-hidden rounded-lg shadow-xl" style={{ paddingTop: '56.25%' }}>
-              <iframe
-                className="absolute inset-0 h-full w-full"
-                src={`https://www.youtube.com/embed/${story.videoId}`}
-                title={story.title || 'YouTube video'}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
+            <div key={index} className="group relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-red-600 to-pink-600 rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-500"></div>
+              <div className="relative block w-full overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300" style={{ paddingTop: '56.25%' }}>
+                <iframe
+                  className="absolute inset-0 h-full w-full"
+                  src={`https://www.youtube.com/embed/${story.videoId}`}
+                  title={story.title || 'YouTube video'}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* --- 두 번째 줄 (이미지 카드) - 레퍼런스 디자인과 동일하게 수정된 부분 --- */}
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {/* --- 두 번째 줄 (이미지 카드) --- */}
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 mb-16">
             {stories.slice(3, 6).map((story, index) => (
-                <div key={index}>
-                    <a href="#" className="block group">
-                        {/* 1. 이미지 영역 (카드 안의 텍스트 오버레이 제거) */}
-                        <div className="overflow-hidden rounded-lg shadow-lg">
+                <div key={index} className="group">
+                    <a href="#" className="block">
+                        <div className="relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300">
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             <img
                                 src={story.thumbnail}
                                 alt={story.title}
-                                className="aspect-video w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                className="aspect-video w-full object-cover transition-transform duration-500 group-hover:scale-110"
                             />
-                        </div>
-                        {/* 2. 텍스트 영역 (카드 아래의 텍스트는 그대로 유지) */}
-                        <div className="p-4">
-                            <p className="text-xs text-gray-500">
-                                {story.author} 
-                            </p>
-                            <p className="mt-1 text-sm font-semibold text-gray-900">
-                                {story.description}
-                            </p>
+                            <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                                <div className="text-white transform transition-all duration-300">
+                                    <p className="text-xs font-medium opacity-90 mb-1">
+                                        {story.author}
+                                    </p>
+                                    <p className="text-sm font-bold">
+                                        {story.description}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </a>
                 </div>
@@ -122,9 +124,12 @@ const YoutubeBanner = () => {
         </div>
 
         {/* 버튼 */}
-        <div className="mt-12 flex justify-center">
-          <button className="rounded-md bg-indigo-600 px-6 py-3 text-lg font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-            시스템 및 실제 데이터 확인하기 →
+        <div className="mt-16 flex justify-center">
+          <button className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <span>시스템 및 실제 데이터 확인하기</span>
+            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
           </button>
         </div>
       </div>
