@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
+    "postinstall": "prisma generate",
     "db:push": "set \"DATABASE_URL=postgresql://neondb_owner:npg_atiXYyxO2Pq0@ep-polished-bush-a1irdwzs-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" && set \"DATABASE_URL_UNPOOLED=postgresql://neondb_owner:npg_atiXYyxO2Pq0@ep-polished-bush-a1irdwzs.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" && npx prisma db push",
     "studio": "set \"DATABASE_URL=postgresql://neondb_owner:npg_atiXYyxO2Pq0@ep-polished-bush-a1irdwzs-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" && set \"DATABASE_URL_UNPOOLED=postgresql://neondb_owner:npg_atiXYyxO2Pq0@ep-polished-bush-a1irdwzs.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" && npx prisma studio"
   },
