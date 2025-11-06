@@ -99,6 +99,12 @@ const FirstGuideLearnPage = () => {
     // 구매 여부 확인
     const hasPurchased = purchases.some(p => p.productId === 'first-guide');
 
+    // 구매 날짜 가져오기
+    const purchaseDate = purchases.find(p => p.productId === 'first-guide')?.purchasedAt;
+    const formattedPurchaseDate = purchaseDate
+        ? new Date(purchaseDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric' }).replace(/\. /g, '. ')
+        : '2025. 10. 30.';
+
     // 컴포넌트 마운트 시 데이터 불러오기
     useEffect(() => {
         if (!user) return;
@@ -205,9 +211,7 @@ const FirstGuideLearnPage = () => {
         { id: 1, number: 'MODULE 01', name: '거래소 선택 & 차트 셋업', completed: true, resourceIds: [1, 2] },
         { id: 2, number: 'MODULE 02', name: '퀀트 투자 핵심 용어집', completed: false, resourceIds: [3] },
         { id: 3, number: 'MODULE 03', name: '트레이딩뷰 레이아웃 세팅', completed: false, resourceIds: [4] },
-        { id: 4, number: 'MODULE 04', name: '전략 설계 원리와 실전 적용', completed: false, resourceIds: [5] },
-        { id: 5, number: 'MODULE 05', name: '백테스팅 결과 분석 실습', completed: false, resourceIds: [6] },
-        { id: 6, number: 'MODULE 06', name: '포트폴리오 구성과 리스크 관리', completed: false, resourceIds: [7, 8] },
+        { id: 4, number: 'MODULE 04', name: '스캠 필터링 체크리스트', completed: false, resourceIds: [5] },
     ];
 
     const learningResources = [
@@ -248,34 +252,9 @@ const FirstGuideLearnPage = () => {
             id: 5,
             type: 'pdf',
             icon: 'DocumentText',
-            name: '전략 설계 원리 완전 가이드',
-            meta: 'PDF · 4.2MB · 35페이지',
-            description: '성공적인 퀀트 전략이 갖춰야 할 핵심 요소와 설계 원리를 체계적으로 정리한 가이드입니다. 진입/청산 로직부터 리스크 관리까지 실전 설계법을 다룹니다.',
-        },
-        {
-            id: 6,
-            type: 'pdf',
-            icon: 'ChartBar',
-            name: '백테스팅 결과 해석 실전 워크북',
-            meta: 'PDF · 3.5MB · 28페이지',
-            description: '백테스팅 결과를 읽고 해석하는 방법을 실습 중심으로 배웁니다. MDD, 샤프지수, 승률 등 핵심 지표의 의미와 개선 방법을 다룹니다.',
-        },
-        {
-            id: 7,
-            type: 'pdf',
-            icon: 'BookOpen',
-            name: '포트폴리오 구성 전략서',
-            meta: 'PDF · 2.8MB · 22페이지',
-            description: '다양한 전략을 조합하여 안정적인 포트폴리오를 구성하는 방법을 설명합니다. 상관관계 분석, 비중 조절, 리밸런싱 전략을 포함합니다.',
-        },
-        {
-            id: 8,
-            type: 'video',
-            icon: 'DocumentText',
-            name: '올인원 패키지 종합 해설 영상',
-            meta: 'VIDEO · 85분 · Full HD',
-            description: '6개 모듈의 핵심 내용을 강사가 직접 설명하는 종합 해설 영상입니다. 각 모듈의 학습 포인트와 실전 적용 팁을 상세히 다룹니다.',
-            special: true,
+            name: '스캠 필터링 체크리스트',
+            meta: 'PDF · 2.1MB · 12페이지',
+            description: '"절대 손실 없음", "75% 수익률 보장" 같은 문구들이 왜 논리적으로 불가능한지 명확히 설명합니다. 스스로 위험을 걸러내는 기준을 제공합니다.',
         },
     ];
 
@@ -569,7 +548,10 @@ const FirstGuideLearnPage = () => {
                             </div>
                         ))}
                     </div>
-                    <button className="mt-6 inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all">
+                    <button
+                        onClick={() => router.push('/mycontents')}
+                        className="mt-6 inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all"
+                    >
                         다음 모듈로 이동
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -581,20 +563,11 @@ const FirstGuideLearnPage = () => {
                 <div className="pt-8 border-t border-gray-200">
                     {/* 노트 헤더 */}
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-bold text-gray-900">학습 노트</h2>
-                        <button
-                            onClick={() => setShowNoteEditor(!showNoteEditor)}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all"
-                        >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                            </svg>
-                            새 노트
-                        </button>
+                        <h2 className="text-xl font-bold text-gray-900">기록사항 및 Q&A</h2>
                     </div>
 
                     {/* 노트 에디터 */}
-                    {showNoteEditor && (
+                    {(
                         <div className="bg-white border-2 border-blue-600 rounded-xl overflow-hidden mb-6 shadow-lg">
                             {/* 툴바 */}
                             <div className="bg-gray-50 border-b border-gray-200 p-3 flex gap-2">
@@ -836,19 +809,13 @@ const FirstGuideLearnPage = () => {
                                 <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <span>구매일: 2025. 10. 30.</span>
+                                <span>구매일: {formattedPurchaseDate}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                <span>총 6개 모듈 + 1:1 멘토링</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span>예상 학습 시간: 12-15시간</span>
+                                <span>총 {learningResources.length}개 자료</span>
                             </div>
                         </div>
                     </div>

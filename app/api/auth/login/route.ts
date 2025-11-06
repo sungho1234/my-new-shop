@@ -32,6 +32,8 @@ export async function POST(request: Request) {
     const { nickname, profile_image_url } = kakaoUser.kakao_account.profile;
     const email = kakaoUser.kakao_account.email;
 
+    console.log('🔑 Login attempt - kakaoId:', kakaoIdString, ', nickname:', nickname, ', email:', email);
+
     const dbUser = await prisma.user.upsert({
       where: { kakaoId: kakaoIdString },
       // [업데이트] 유저가 이미 있다면 (로그인)
@@ -49,11 +51,14 @@ export async function POST(request: Request) {
       },
     });
 
+    console.log('✅ User upserted successfully - DB userId:', dbUser.id, ', kakaoId:', dbUser.kakaoId);
+
     // 5. [중요] DB에 저장된 정보가 아닌,
     // 프론트엔드(AuthContext)가 사용하는 '원본' 포맷으로 다시 맞춰서 보내줍니다.
     // (이렇게 해야 Header.tsx 등 다른 UI가 깨지지 않습니다.)
+    // [수정] id를 숫자가 아닌 문자열로 변환하여 전송 (API에서 String()으로 받기 때문)
     const frontendUserFormat = {
-      id: kakaoUser.id,
+      id: Number(kakaoUser.id), // AuthContext의 User 타입이 number이므로 숫자로 유지
       nickname: nickname,
       profileImage: profile_image_url,
       email: email,

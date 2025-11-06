@@ -3,13 +3,28 @@ import prisma from '@/lib/prisma'; // Prisma 클라이언트 (prisma.ts)
 
 // 'kakaoId'를 기반으로 DB User의 '내부 ID'를 찾는 '보안 헬퍼'
 async function getDbUserId(kakaoId: string): Promise<string | null> {
-  if (!kakaoId) return null;
+  if (!kakaoId) {
+    console.warn("⚠️ getDbUserId: kakaoId가 비어있음");
+    return null;
+  }
   try {
+    const kakaoIdStr = String(kakaoId);
+    console.log("🔍 getDbUserId: 검색 시작 - kakaoId (타입:", typeof kakaoId, ", 값:", kakaoId, ", 변환 후:", kakaoIdStr, ")");
+
     const user = await prisma.user.findUnique({
-      where: { kakaoId: String(kakaoId) },
-      select: { id: true }, // DB의 '내부 ID' (cuid)만 가져옵니다.
+      where: { kakaoId: kakaoIdStr },
+      select: { id: true, kakaoId: true, name: true }, // 디버깅을 위해 추가 정보도 가져옴
     });
-    console.log("🔍 getDbUserId: kakaoId =", kakaoId, ", found userId =", user?.id || 'null');
+
+    if (user) {
+      console.log("✅ getDbUserId: 사용자 찾음 - userId:", user.id, ", DB kakaoId:", user.kakaoId, ", name:", user.name);
+    } else {
+      console.warn("❌ getDbUserId: 사용자 없음 - kakaoId:", kakaoIdStr);
+      // 모든 사용자 출력 (디버깅용)
+      const allUsers = await prisma.user.findMany({ select: { kakaoId: true, name: true } });
+      console.log("📋 DB에 존재하는 모든 사용자 kakaoId:", allUsers.map(u => ({ kakaoId: u.kakaoId, name: u.name })));
+    }
+
     return user?.id || null;
   } catch (error) {
     console.error("❌ getDbUserId 에러 (Prisma 쿼리 실패):", error);

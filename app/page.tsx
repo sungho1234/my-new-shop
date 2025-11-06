@@ -10,12 +10,12 @@ import HeroSection from "@/components/HeroSection"; // 새로 만든 HeroSection
 const systemsData = [
   { imgSrc: "/g1.png", title: "2025 일반인을 위한 시스템 투자 올인원", desc: "⭐4.8 ㅣ 구매 280명", price: "210,000원", href: '/products/g1' },
   { imgSrc: "/g2.png", title: "일반인을 위한 첫번째 안내서: 거래소 선택부터 차트 셋업까지", desc: "⭐4.8 ㅣ 구매 280명", price: "70,000원", href: '/products/g2' },
-  { imgSrc: "https://via.placeholder.com/300x400/F3F4F6/9CA3AF?text=%ED%80%88%ED%8A%B8+%EC%8B%9C%EC%8A%A4%ED%85%9C+Pro", title: "일반인의 성장책: 스캠필터와 챌린지", desc: "⭐4.8 ㅣ 구매 280명", price: "60,000원", href: '/products/g3'  },
+  { imgSrc: "/g3.png", title: "일반인의 성장책: 스캠필터와 챌린지", desc: "⭐4.8 ㅣ 구매 280명", price: "60,000원", href: '/products/g3'  },
 ];
 
 const strategiesData = [
   { imgSrc: "/c1.png", title: "시스템 빌더 풀 패키지: 실행 엔진, 1:1 지원, 멤버십 키 ", desc: "⭐4.8 ㅣ 구매 280명", price: "₩210,000", href: '/products/c1' },
-  { imgSrc: "https://via.placeholder.com/300x400/CA8A04/FFFFFF?text=Risk+Mgmt", title: "프로의 전략 원본: 시스템 설계도와 데이터 분석 ", desc: "⭐4.8 ㅣ 구매 280명", price: "₩90,000", href: '/products/c2' },
+  { imgSrc: "/c2.png", title: "프로의 전략 원본: 시스템 설계도와 데이터 분석 ", desc: "⭐4.8 ㅣ 구매 280명", price: "₩90,000", href: '/products/c2' },
   { imgSrc: "https://via.placeholder.com/300x400/CA8A04/FFFFFF?text=Risk+Mgmt", title: "리스크 관리 전략", desc: "계좌를 지키는 기술", price: "₩350,000" },
 ];
 
@@ -41,7 +41,7 @@ export default function Home() {
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
               <div className="relative bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 h-full border border-gray-100">
                 <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mb-6 shadow-lg">
-                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class  Name="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </div>

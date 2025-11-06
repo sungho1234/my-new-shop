@@ -98,6 +98,12 @@ const SystemBuilderLearnPage = () => {
     // 구매 여부 확인
     const hasPurchased = purchases.some(p => p.productId === 'system-builder');
 
+    // 구매 날짜 가져오기
+    const purchaseDate = purchases.find(p => p.productId === 'system-builder')?.purchasedAt;
+    const formattedPurchaseDate = purchaseDate
+        ? new Date(purchaseDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric' }).replace(/\. /g, '. ')
+        : '2025. 10. 30.';
+
     // 컴포넌트 마운트 시 데이터 불러오기
     useEffect(() => {
         if (!user) return;
@@ -544,20 +550,11 @@ const SystemBuilderLearnPage = () => {
                 <div className="pt-8 border-t border-gray-200">
                     {/* 노트 헤더 */}
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-bold text-gray-900">학습 노트</h2>
-                        <button
-                            onClick={() => setShowNoteEditor(!showNoteEditor)}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all"
-                        >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                            </svg>
-                            새 노트
-                        </button>
+                        <h2 className="text-xl font-bold text-gray-900">기록사항 및 Q&A</h2>
                     </div>
 
                     {/* 노트 에디터 */}
-                    {showNoteEditor && (
+                    {(
                         <div className="bg-white border-2 border-blue-600 rounded-xl overflow-hidden mb-6 shadow-lg">
                             {/* 툴바 */}
                             <div className="bg-gray-50 border-b border-gray-200 p-3 flex gap-2">
@@ -800,19 +797,13 @@ const SystemBuilderLearnPage = () => {
                                 <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <span>구매일: 2025. 10. 30.</span>
+                                <span>구매일: {formattedPurchaseDate}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                <span>총 3개 모듈</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span>예상 학습 시간: 3-4시간</span>
+                                <span>총 {learningResources.length}개 자료</span>
                             </div>
                         </div>
                     </div>
