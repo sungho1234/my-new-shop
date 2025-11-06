@@ -10,10 +10,7 @@ declare global {
 
 const prisma =
   global.prisma ||
-  new PrismaClient({
-    // (선택) DB 쿼리를 로그로 보고 싶다면 아래 주석을 해제하세요
-    // log: ['query', 'info', 'warn', 'error'],
-  });
+  new PrismaClient();
 
 if (process.env.NODE_ENV !== 'production') {
   global.prisma = prisma;
