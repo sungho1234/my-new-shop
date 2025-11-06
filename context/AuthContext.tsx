@@ -35,7 +35,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (kakaoUser: any) => boolean; // 로그인 성공 여부 반환
+  login: (kakaoUser: any, accessToken?: string) => boolean; // 로그인 성공 여부 반환
   logout: () => void;
   wishlist: WishlistItem[];
   addToWishlist: (product: Product) => Promise<void>;
@@ -118,7 +118,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [user, fetchWishlist, fetchPurchasesInternal]); // user 의존성 추가
 
   // 4. login 함수 (async 호출 제거 – setUser만, useEffect가 처리)
-  const login = (kakaoUser: any): boolean => {
+  const login = (kakaoUser: any, accessToken?: string): boolean => {
     console.log("🔑 login 호출: kakaoUser =", kakaoUser);
     if (!kakaoUser || !kakaoUser.id) {
       console.error("❌ 카카오 ID 누락");
@@ -141,14 +141,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(newUser); // 이게 useEffect([user]) 트리거 → wishlist 로드
 
     // DB 동기화 (async – login 성공 여부에 영향 안 줌)
-    fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newUser),
-    })
-      .then((res) => res.json())
-      .then((dbUser) => console.log("✅ DB 로그인/회원가입 성공:", dbUser?.name || '새 사용자 생성'))
-      .catch((err) => console.error("❌ DB 로그인 실패:", err));
+    // accessToken이 있으면 사용, 없으면 로컬 저장만
+    if (accessToken) {
+      fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accessToken }),
+      })
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`DB 로그인 실패: ${res.status}`);
+          }
+          return res.json();
+        })
+        .then((dbUser) => console.log("✅ DB 로그인/회원가입 성공:", dbUser?.nickname || '새 사용자 생성'))
+        .catch((err) => console.error("❌ DB 로그인 실패:", err));
+    } else {
+      console.warn("⚠️ accessToken 없음 - DB 동기화 생략");
+    }
 
     console.log("✅ login 성공: ", newUser.nickname);
     return true;

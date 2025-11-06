@@ -41,13 +41,15 @@ const LoginPage = () => {
         // @ts-ignore
         window.Kakao.Auth.login({
             success: function (authObj: any) {
+                console.log("🔑 카카오 로그인 성공 - accessToken:", authObj.access_token);
+
                 // @ts-ignore
                 // [유지] 사용자 정보를 요청합니다.
                 window.Kakao.API.request({
                     url: '/v2/user/me',
                     success: function (res: any) {
-                        // 1. [변경] AuthContext의 login 함수를 호출하고, 결과(성공 여부)를 받습니다.
-                        const loginSuccess = login(res);
+                        // 1. [변경] AuthContext의 login 함수를 호출하고, accessToken도 함께 전달합니다.
+                        const loginSuccess = login(res, authObj.access_token);
 
                         // 2. [변경] login 함수가 true를 반환했을 때만 메인 페이지로 이동합니다.
                         if (loginSuccess) {
