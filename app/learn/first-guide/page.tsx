@@ -100,7 +100,7 @@ const FirstGuideLearnPage = () => {
     const hasPurchased = purchases.some(p => p.productId === 'first-guide');
 
     // 구매 날짜 가져오기
-    const purchaseDate = purchases.find(p => p.productId === 'first-guide')?.purchasedAt;
+    const purchaseDate = purchases.find(p => p.productId === 'first-guide')?.createdAt;
     const formattedPurchaseDate = purchaseDate
         ? new Date(purchaseDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric' }).replace(/\. /g, '. ')
         : '2025. 10. 30.';

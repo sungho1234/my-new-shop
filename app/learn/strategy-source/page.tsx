@@ -97,7 +97,7 @@ const StrategySourceLearnPage = () => {
     const hasPurchased = purchases.some(p => p.productId === 'strategy-source');
 
     // 구매 날짜 가져오기
-    const purchaseDate = purchases.find(p => p.productId === 'strategy-source')?.purchasedAt;
+    const purchaseDate = purchases.find(p => p.productId === 'strategy-source')?.createdAt;
     const formattedPurchaseDate = purchaseDate
         ? new Date(purchaseDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric' }).replace(/\. /g, '. ')
         : '2025. 10. 30.';

@@ -99,7 +99,7 @@ const GrowthBookLearnPage = () => {
     const hasPurchased = purchases.some(p => p.productId === 'growth-book');
 
     // 구매 날짜 가져오기
-    const purchaseDate = purchases.find(p => p.productId === 'growth-book')?.purchasedAt;
+    const purchaseDate = purchases.find(p => p.productId === 'growth-book')?.createdAt;
     const formattedPurchaseDate = purchaseDate
         ? new Date(purchaseDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric' }).replace(/\. /g, '. ')
         : '2025. 10. 30.';
