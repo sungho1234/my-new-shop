@@ -207,10 +207,8 @@ const GrowthBookLearnPage = () => {
     }
 
     const modules = [
-        { id: 1, number: 'WEEK 01', name: '자기진단과 목표 설정', completed: true, resourceIds: [1, 2] },
-        { id: 2, number: 'WEEK 02', name: '학습 습관 형성 챌린지', completed: false, resourceIds: [3] },
-        { id: 3, number: 'WEEK 03', name: '투자 심리 자기점검', completed: false, resourceIds: [4] },
-        { id: 4, number: 'WEEK 04', name: '실전 트레이딩 일지 작성', completed: false, resourceIds: [5] },
+        { id: 1, number: 'PART 1', name: '스캠 필터링 체크리스트', completed: true, resourceIds: [1] },
+        { id: 2, number: 'PART 2', name: '데이터 기반 과제집', completed: false, resourceIds: [2, 3, 4] },
     ];
 
     const learningResources = [
@@ -218,42 +216,34 @@ const GrowthBookLearnPage = () => {
             id: 1,
             type: 'pdf',
             icon: 'DocumentText',
-            name: '자기진단 워크시트 (Week 1)',
-            meta: 'PDF · 1.2MB · 8페이지',
-            description: '현재 나의 투자 수준, 학습 스타일, 강점과 약점을 객관적으로 진단하는 워크시트입니다. 명확한 현재 위치 파악이 성장의 첫걸음입니다.',
+            name: '🛡️ 스캠 필터링 체크리스트 (PART 1)',
+            meta: 'PDF · 2.5MB · 18페이지',
+            description: '사기성 정보 판별법, 해킹 방지 가이드, 디파이 사기 링크 구별법을 담은 완벽한 위험 회피 가이드입니다. "절대 손실 없음", "월 75% 수익 보장" 같은 시장의 흔한 사기 문구들이 왜 논리적으로 불가능한지 현역 트레이딩 팀이 직접 설명합니다.',
         },
         {
             id: 2,
             type: 'pdf',
-            icon: 'ChartBar',
-            name: 'SMART 목표 설정 가이드',
-            meta: 'PDF · 1.5MB · 10페이지',
-            description: '구체적이고 측정 가능한 학습 목표를 설정하는 방법을 안내합니다. 막연한 다짐이 아닌, 실행 가능한 계획을 세우는 프레임워크를 제공합니다.',
+            icon: 'BookOpen',
+            name: '30일 학습 습관 형성 챌린지북',
+            meta: 'PDF · 2.8MB · 35페이지',
+            description: '하루 15분씩 꾸준히 실천할 수 있는 학습 루틴을 만드는 30일 챌린지입니다. 매일의 작은 실천이 큰 변화를 만듭니다. 정교하게 설계된 명확한 미션을 수행하며 데이터 기반 사고방식을 체득하게 됩니다.',
+            special: true,
         },
         {
             id: 3,
             type: 'pdf',
-            icon: 'BookOpen',
-            name: '30일 학습 습관 형성 챌린지북',
-            meta: 'PDF · 2.8MB · 35페이지',
-            description: '하루 15분씩 꾸준히 실천할 수 있는 학습 루틴을 만드는 30일 챌린지입니다. 매일의 작은 실천이 큰 변화를 만듭니다.',
-            special: true,
+            icon: 'ChartBar',
+            name: '📊 데이터 기반 과제집 (PART 2)',
+            meta: 'PDF · 3.2MB · 42페이지',
+            description: '감(感)으로 하던 매매를 멈추고, 데이터로 판단하도록 훈련하는 실전 트레이닝북입니다. 당신의 매매 습관을 데이터 기반으로 교정하는 실전 훈련 과제가 포함되어 있으며, 올인원 패키지 이용 시 이 기록을 바탕으로 현역 트레이더의 1:1 피드백을 받을 수 있습니다.',
         },
         {
             id: 4,
             type: 'pdf',
             icon: 'DocumentText',
-            name: '투자 심리 자기점검 도구',
+            name: '실전 매매일지 템플릿',
             meta: 'PDF · 1.8MB · 12페이지',
-            description: '두려움, 욕심, 조급함 등 투자를 방해하는 심리적 패턴을 인식하고 개선하는 자기점검 도구입니다. 감정 일지 양식이 포함되어 있습니다.',
-        },
-        {
-            id: 5,
-            type: 'pdf',
-            icon: 'ChartBar',
-            name: '실전 트레이딩 일지 템플릿',
-            meta: 'PDF · 2.2MB · 15페이지',
-            description: '매 거래마다 진입 이유, 감정 상태, 결과 분석을 기록하는 트레이딩 일지 템플릿입니다. 기록은 성장의 가장 강력한 도구입니다.',
+            description: '매 거래마다 진입 이유, 감정 상태, 결과 분석을 기록하는 실전 매매일지 템플릿입니다. 스스로의 실력을 데이터로 분석하고 체계적으로 성장하는 가장 확실한 방법입니다. 기록은 성장의 가장 강력한 도구입니다.',
         },
     ];
 
