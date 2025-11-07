@@ -140,14 +140,14 @@ const Header = () => {
                     </div>
                 </div>
                 
-                {/* --- 스크롤 시 사라지는 하단 메뉴 (원본 유지) --- */}
-                <div 
+                {/* --- 스크롤 시 사라지는 하단 메뉴 --- */}
+                <div
                     className={`overflow-hidden transition-all duration-300 ease-in-out ${isScrolled ? 'max-h-0 opacity-0' : 'max-h-20 opacity-100'}`}
                 >
                     <nav className="flex items-center space-x-6 pb-4 text-sm font-semibold text-gray-800">
-                        <Link href="#" className="hover:text-black">트레이딩 시스템</Link>
-                        <Link href="#" className="hover:text-black">퀀트 전략</Link>
-                        <Link href="#" className="hover:text-black">챌린지</Link>
+                        <Link href="/builder-start" className="hover:text-black">빌더의 시작</Link>
+                        <Link href="/system-strategy" className="hover:text-black">시스템&전략</Link>
+                        <Link href="/about" className="hover:text-black">팀소개</Link>
                     </nav>
                 </div>
             </div>
