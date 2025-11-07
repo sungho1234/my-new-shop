@@ -4,77 +4,82 @@ import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
-import { XMarkIcon } from '@heroicons/react/24/solid';
+import { XMarkIcon, BookOpenIcon, HeartIcon, PlayCircleIcon } from '@heroicons/react/24/outline';
 import InquiryModal from '@/components/my-contents/InquiryModal';
 import { useRouter, useSearchParams } from 'next/navigation';
-
-// [수정 1] 기존의 불완전한 ALL_PRODUCTS 배열을 삭제하고,
-// data/products.ts에 있는 전체 상품 목록을 import 합니다.
 import { ALL_PRODUCTS } from '@/data/products';
 
-// [수정 2] 이 페이지에 있던 mergeWishlistWithProducts 함수는 그대로 사용합니다.
-// 이제 이 함수는 위에서 import한 전체 상품 목록을 참조하게 됩니다.
 const mergeWishlistWithProducts = (wishlist: any[]) => {
-  console.log("🔍 병합 시작: DB IDs =", wishlist.map(item => item.productId));
   const merged = wishlist.map(item => {
-    // 이제 여기서 사용하는 ALL_PRODUCTS는 모든 상품 정보가 담긴 배열입니다.
     const product = ALL_PRODUCTS.find(p => p.id === item.productId);
     if (product) {
-      console.log("✅ 매치 성공: '", item.productId, "' → '", product.title, "'");
-      // DB에서 가져온 찜 정보와, 상품 상세 정보를 합칩니다.
       return { ...item, ...product };
     }
-    console.warn("⚠️ 매치 실패: ", item.productId, " – data/products.ts 파일을 확인하세요.");
-    // 매칭 실패 시 기본값을 반환합니다.
     return { ...item, title: 'Unknown Product', author: 'Unknown', price: '0', thumbnail: '/placeholder.png' };
   }).filter(Boolean);
-  
-  console.log("✅ 병합 완료: 최종 ", merged.length, "개");
   return merged;
 };
 
-// MyWishlistContent 컴포넌트 (데이터 표시 로직)
 const MyWishlistContent = () => {
+  const router = useRouter();
   const { wishlist, removeFromWishlist } = useAuth();
-  
   const mergedProducts = useMemo(() => mergeWishlistWithProducts(wishlist), [wishlist]);
 
   if (mergedProducts.length === 0) {
     return (
-      <div className="mt-8 text-center py-24 border rounded-lg bg-gray-50">
-        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-        </svg>
-        <p className="mt-4 text-gray-500">찜한 상품이 없습니다.</p>
+      <div className="mt-10 text-center py-32 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-gray-100 rounded-full">
+          <HeartIcon className="w-8 h-8 text-gray-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-1">찜한 상품이 없습니다</h3>
+        <p className="text-sm text-gray-500">마음에 드는 콘텐츠를 찜해보세요</p>
       </div>
     );
   }
 
   return (
-    <div className="mt-8">
-      <div className="flex justify-between items-center mb-4">
-        <span className="font-semibold">{mergedProducts.length}개</span>
+    <div className="mt-10">
+      <div className="mb-4">
+        <span className="text-sm font-medium text-gray-700">총 <span className="text-gray-900 font-semibold">{mergedProducts.length}</span>개</span>
       </div>
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {mergedProducts.map((item) => (
-          <div key={item.productId} className="border rounded-lg p-6 flex items-start gap-8 shadow-sm bg-white">
-            <div className="w-40 h-auto flex-shrink-0 bg-gray-100 flex items-center justify-center">
-              <img
-                src={item.thumbnail || '/placeholder.png'}
-                alt={item.title}
-                className="w-full h-full object-cover rounded-md"
-              />
+          <div key={item.productId} className="group bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all duration-200">
+            <div className="flex">
+              <div className="relative w-48 h-48 flex-shrink-0 bg-gray-50 overflow-hidden">
+                <img
+                  src={item.thumbnail || '/placeholder.png'}
+                  alt={item.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                />
+                <button
+                  onClick={() => removeFromWishlist(item.productId)}
+                  className="absolute top-2 right-2 p-1.5 bg-white/90 backdrop-blur-sm text-gray-600 hover:text-red-500 hover:bg-white rounded-md transition-colors shadow-sm"
+                  aria-label="찜 해제"
+                >
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="flex-1 p-5 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900 line-clamp-2 mb-1">{item.title}</h3>
+                  <p className="text-sm text-gray-600 mb-2">{item.author}</p>
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                    <BookOpenIcon className="w-4 h-4" />
+                    <span>학습 콘텐츠</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => router.push(`/products/${item.id}`)}
+                  className="mt-3 w-full inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  구매하기
+                </button>
+              </div>
             </div>
-            <div className="flex-grow">
-              <h3 className="text-xl font-bold text-gray-800">{item.title}</h3>
-              <p className="text-base text-gray-600 mt-2">{item.author}</p>
-            </div>
-            <button
-              onClick={() => removeFromWishlist(item.productId)}
-              className="text-gray-400 hover:text-red-500"
-            >
-              <XMarkIcon className="h-6 w-6" />
-            </button>
           </div>
         ))}
       </div>
@@ -82,14 +87,10 @@ const MyWishlistContent = () => {
   );
 };
 
-
-// --- 이하 코드는 제공해주신 원본과 동일하게 유지됩니다 ---
-
 const MyPurchasesContent = () => {
     const router = useRouter();
     const { purchases, isLoadingPurchases } = useAuth();
 
-    // 상품별 학습 페이지 매핑
     const getLearnPageUrl = (productId: string) => {
         const learnPageMap: { [key: string]: string } = {
             'system-builder': '/learn/system-builder',
@@ -101,82 +102,80 @@ const MyPurchasesContent = () => {
         return learnPageMap[productId] || '/my-contents';
     };
 
-    // DB에서 가져온 구매내역을 상품 정보와 병합
     const mergedPurchases = useMemo(() => {
-      console.log("🔍 구매내역 병합 시작: DB IDs =", purchases.map(item => item.productId));
       const merged = purchases.map(item => {
         const product = ALL_PRODUCTS.find(p => p.id === item.productId);
         if (product) {
-          console.log("✅ 매치 성공: '", item.productId, "' → '", product.title, "'");
           return { ...item, ...product };
         }
-        console.warn("⚠️ 매치 실패: ", item.productId);
         return { ...item, title: 'Unknown Product', author: 'Unknown', price: '0', thumbnail: '/placeholder.png' };
       });
-      console.log("✅ 병합 완료: 최종 ", merged.length, "개");
       return merged;
     }, [purchases]);
 
-    // 로딩 중일 때
     if (isLoadingPurchases) {
       return (
-        <div className="mt-8">
-          <div className="flex justify-between items-center mb-4">
-            <span className="font-semibold">구매내역</span>
-          </div>
-          <div className="text-center py-24">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-            <p className="mt-4 text-gray-500">구매내역을 불러오는 중...</p>
-          </div>
+        <div className="mt-10 text-center py-32">
+          <div className="inline-block h-10 w-10 animate-spin rounded-full border-3 border-solid border-gray-900 border-r-transparent"></div>
+          <p className="mt-4 text-sm text-gray-600">구매내역을 불러오는 중...</p>
         </div>
       );
     }
 
     if (mergedPurchases.length === 0) {
       return (
-        <div className="mt-8">
-          <div className="flex justify-between items-center mb-4">
-            <span className="font-semibold">구매내역</span>
+        <div className="mt-10 text-center py-32 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-gray-100 rounded-full">
+            <BookOpenIcon className="w-8 h-8 text-gray-400" />
           </div>
-          <div className="text-center py-24 border rounded-lg bg-gray-50">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-            </svg>
-            <p className="mt-4 text-gray-500">구매내역이 없습니다.</p>
-            <button onClick={() => router.push('/')} className="mt-6 bg-blue-800 text-white px-6 py-2.5 rounded-md font-semibold hover:bg-blue-900">상품 구매하기</button>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">구매내역이 없습니다</h3>
+          <p className="text-sm text-gray-500 mb-5">지금 바로 학습을 시작해보세요</p>
+          <button
+            onClick={() => router.push('/')}
+            className="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+          >
+            <PlayCircleIcon className="w-5 h-5" />
+            콘텐츠 둘러보기
+          </button>
         </div>
       );
     }
 
     return (
-      <div className="mt-8">
-        <div className="flex justify-between items-center mb-6">
-          <span className="font-semibold text-lg">총 {mergedPurchases.length}개</span>
+      <div className="mt-10">
+        <div className="mb-4">
+          <span className="text-sm font-medium text-gray-700">총 <span className="text-gray-900 font-semibold">{mergedPurchases.length}</span>개</span>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {mergedPurchases.map((item) => (
-            <div key={item.id} className="border rounded-lg overflow-hidden shadow-sm bg-white hover:shadow-md transition-shadow flex">
-              <div className="w-40 h-40 flex-shrink-0 bg-gray-100 flex items-center justify-center">
-                <img
-                  src={item.thumbnail || '/placeholder.png'}
-                  alt={item.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-4 flex-grow flex flex-col justify-between">
-                <div>
-                  <h3 className="text-lg font-bold text-gray-800 line-clamp-2 mb-2">{item.title}</h3>
-                  <p className="text-sm text-gray-600 mb-2">{item.author}</p>
-                  <p className="text-xs text-gray-500">
-                    구매일: {new Date(item.createdAt).toLocaleDateString('ko-KR')}
-                  </p>
+            <div key={item.id} className="group bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all duration-200">
+              <div className="flex">
+                <div className="relative w-48 h-48 flex-shrink-0 bg-gray-50 overflow-hidden">
+                  <img
+                    src={item.thumbnail || '/placeholder.png'}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  />
+                  <div className="absolute top-2 right-2 bg-white px-2.5 py-0.5 rounded-full border border-gray-200">
+                    <span className="text-xs font-medium text-gray-700">구매완료</span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-end mt-2">
+                <div className="flex-1 p-5 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-base font-semibold text-gray-900 line-clamp-2 mb-1">{item.title}</h3>
+                    <p className="text-sm text-gray-600 mb-2">{item.author}</p>
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span>{new Date(item.createdAt).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    </div>
+                  </div>
                   <button
                     onClick={() => router.push(getLearnPageUrl(item.productId))}
-                    className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                    className="mt-3 w-full inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
                   >
+                    <BookOpenIcon className="w-4 h-4" />
                     학습하기
                   </button>
                 </div>
@@ -188,61 +187,205 @@ const MyPurchasesContent = () => {
     );
 };
 
-const MyProfileContent = () => (
-    <div className="text-center py-20 border rounded-lg bg-gray-50">
-        <div>프로필 내용 (사용자 정보 표시 예정)</div>
-    </div>
-);
+const MyProfileContent = () => {
+    const { user } = useAuth();
+
+    return (
+        <div className="mt-10 max-w-3xl">
+            <div className="bg-white border border-gray-200 rounded-lg p-8">
+                <div className="mb-6 pb-6 border-b border-gray-200">
+                    <h2 className="text-xl font-bold text-gray-900">개인 정보</h2>
+                </div>
+
+                <div className="space-y-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            닉네임
+                        </label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={user?.nickname || ''}
+                                disabled
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm"
+                            />
+                        </div>
+                        <p className="mt-1.5 text-xs text-gray-500">※ 닉네임은 카카오 로그인 시 자동으로 변경됩니다.</p>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            아이디(이메일)
+                        </label>
+                        <div className="relative">
+                            <input
+                                type="email"
+                                value={user?.email || ''}
+                                disabled
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            *생년월일
+                        </label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value="20020608"
+                                disabled
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            *성별
+                        </label>
+                        <div className="relative">
+                            <select
+                                disabled
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm appearance-none cursor-not-allowed"
+                            >
+                                <option>남</option>
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            *휴대폰번호 인증
+                        </label>
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value="010-3334-7276"
+                                disabled
+                                className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm"
+                            />
+                            <button
+                                disabled
+                                className="px-6 py-3 bg-gray-200 text-gray-500 rounded-lg text-sm font-medium cursor-not-allowed"
+                            >
+                                번호 변경
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                    <button
+                        disabled
+                        className="w-full bg-gray-300 text-gray-500 px-6 py-3.5 rounded-lg text-sm font-semibold cursor-not-allowed"
+                    >
+                        저장
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const MyInquiriesContent = ({ onOpenModal }: { onOpenModal: () => void }) => {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const toggleAccordion = (index: number) => setActiveIndex(activeIndex === index ? null : index);
     const faqItems = [
-        { question: 'Q. 환불은 어떻게 하나요?', answer: 'A. 구매 후 24시간 이내 가능합니다.' },
-        { question: 'Q. PDF 다운로드는?', answer: 'A. My 페이지에서 다운로드.' },
-        { question: 'Q. 문의는?', answer: 'A. support@maxxsystems.com으로.' },
+        { question: '환불은 어떻게 하나요?', answer: '구매 후 24시간 이내에 환불 신청이 가능합니다. My 콘텐츠 페이지에서 환불 요청을 하시면 검토 후 처리해드립니다.' },
+        { question: 'PDF 다운로드는 어디서 하나요?', answer: 'My 콘텐츠 페이지에서 구매하신 상품의 "학습하기" 버튼을 클릭하시면 학습 자료 탭에서 다운로드하실 수 있습니다.' },
+        { question: '학습 진행 상황은 어떻게 확인하나요?', answer: '각 학습 페이지의 사이드바에서 학습 진행률과 체크리스트를 확인하실 수 있습니다.' },
+        { question: '1:1 문의는 어떻게 하나요?', answer: '아래 "문의하기" 버튼을 클릭하시거나 support@maxxsystems.com으로 이메일을 보내주세요.' },
     ];
+
     return (
-        <div className="mt-8 space-y-16">
-            <section>
-                <h3 className="text-2xl font-bold text-gray-900 border-b pb-4 mb-6">환불 정책</h3>
-                <p className="text-base text-gray-600 leading-relaxed mb-6">구매 후 24시간 이내 환불 가능합니다. 자세한 사항은 아래 FAQ를 확인하세요.</p>
-                <button 
-                  onClick={onOpenModal}
-                  className="bg-blue-800 text-white px-6 py-2.5 rounded-md font-semibold hover:bg-blue-900"
-                >
-                  문의하기
-                </button>
+        <div className="mt-10 space-y-10">
+            <section className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                <div className="flex items-start gap-5">
+                  <div className="flex-shrink-0 w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">궁금한 점이 있으신가요?</h3>
+                    <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                      학습 관련 문의사항이나 기술적인 질문이 있으시면 언제든지 문의해주세요.
+                      빠르고 정확하게 답변해드리겠습니다.
+                    </p>
+                    <button
+                      onClick={onOpenModal}
+                      className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      문의하기
+                    </button>
+                  </div>
+                </div>
             </section>
+
             <section>
-                <h3 className="text-2xl font-bold text-gray-900 border-b pb-4 mb-6">고객 지원</h3>
-                <p className="text-base text-gray-600 leading-relaxed mb-6">이메일: support@maxxsystems.com</p>
-                <div className="text-lg font-semibold text-blue-700 bg-gray-50 p-4 rounded-lg inline-block">support@maxxsystems.com</div>
-            </section>
-            <section>
-                <h3 className="text-2xl font-bold text-gray-900 border-b pb-4 mb-6">FAQ</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">자주 묻는 질문</h3>
                 <div className="space-y-2">
                   {faqItems.map((item, index) => (
-                    <div key={index} className="border-b">
+                    <div key={index} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-gray-300 transition-colors">
                       <button
-                        className="w-full flex justify-between items-center py-5 px-2 text-left"
+                        className="w-full flex justify-between items-center py-4 px-5 text-left hover:bg-gray-50 transition-colors"
                         onClick={() => toggleAccordion(index)}
                       >
-                        <span className="text-lg font-medium text-gray-800">{item.question}</span>
-                        <span className="text-2xl text-gray-400">{activeIndex === index ? '-' : '+'}</span>
+                        <span className="text-base font-semibold text-gray-900">Q. {item.question}</span>
+                        <div className={`flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center transition-all ${
+                          activeIndex === index ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          <svg className={`w-4 h-4 transition-transform ${activeIndex === index ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
                       </button>
-                      <div className={`overflow-hidden transition-max-height duration-300 ease-in-out ${activeIndex === index ? 'max-h-60' : 'max-h-0'}`}>
-                        <p className="p-4 pt-0 text-base text-gray-600 bg-gray-50 rounded-b-lg">{item.answer}</p>
+                      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${activeIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                        <div className="px-5 pb-4">
+                          <div className="bg-gray-50 rounded-md p-4 border-l-3 border-blue-600">
+                            <p className="text-sm text-gray-700 leading-relaxed">{item.answer}</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
             </section>
+
+            <section className="bg-white border border-gray-200 rounded-lg p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900">이메일 문의</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-3">직접 이메일로 문의하실 수도 있습니다</p>
+                <a
+                  href="mailto:support@maxxsystems.com"
+                  className="inline-flex items-center gap-2 text-base font-medium text-gray-900 hover:text-gray-700 bg-gray-50 px-5 py-2.5 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  support@maxxsystems.com
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+            </section>
         </div>
     );
 };
 
-// useSearchParams를 사용하는 컴포넌트를 분리
 const MyContentsPageContent = () => {
     const { user } = useAuth();
     const router = useRouter();
@@ -250,7 +393,6 @@ const MyContentsPageContent = () => {
     const [activeTab, setActiveTab] = useState<'my-contents' | 'wishlist' | 'my-info' | 'inquiry'>('my-contents');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // URL 쿼리 파라미터에서 탭 정보 가져오기
     useEffect(() => {
         const tab = searchParams.get('tab') as 'my-contents' | 'wishlist' | 'my-info' | 'inquiry';
         if (tab && ['my-contents', 'wishlist', 'my-info', 'inquiry'].includes(tab)) {
@@ -258,7 +400,6 @@ const MyContentsPageContent = () => {
         }
     }, [searchParams]);
 
-    // 탭 변경 시 URL 업데이트
     const handleTabChange = (tab: 'my-contents' | 'wishlist' | 'my-info' | 'inquiry') => {
         setActiveTab(tab);
         router.push(`/my-contents?tab=${tab}`, { scroll: false });
@@ -269,7 +410,7 @@ const MyContentsPageContent = () => {
             <>
                 <Header />
                 <div className="w-full bg-white pb-20 text-center py-40">
-                    <p>로그인 후 이용해주세요.</p>
+                    <p className="text-lg text-gray-600">로그인 후 이용해주세요.</p>
                 </div>
                 <Footer />
             </>
@@ -287,37 +428,64 @@ const MyContentsPageContent = () => {
     };
 
     const tabs = [
-        { id: 'my-contents' as const, label: 'My 콘텐츠' },
-        { id: 'wishlist' as const, label: '찜목록' },
-        { id: 'my-info' as const, label: 'My 정보' },
-        { id: 'inquiry' as const, label: '문의하기' },
+        { id: 'my-contents' as const, label: 'My콘텐츠', icon: (
+          <BookOpenIcon className="w-5 h-5" />
+        )},
+        { id: 'wishlist' as const, label: '찜목록', icon: (
+          <HeartIcon className="w-5 h-5" />
+        )},
+        { id: 'my-info' as const, label: 'My정보', icon: (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        )},
+        { id: 'inquiry' as const, label: '문의하기', icon: (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        )},
     ];
 
     return (
         <>
             <Header />
-            <div className="w-full bg-white pb-20">
-                <section style={{ backgroundColor: '#102450' }} className="text-white text-center py-10">
-                    <h1 className="text-2xl font-semibold">{user.nickname}님, 환영합니다!</h1>
+            <div className="w-full bg-white pb-20 min-h-screen">
+                <section className="relative bg-gray-50 border-b border-gray-200 py-12">
+                    <div className="container mx-auto px-4 max-w-7xl">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center">
+                            <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 font-medium">Welcome back</p>
+                            <h1 className="text-2xl font-bold text-gray-900">{user.nickname}님</h1>
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-600">학습을 계속해보세요</p>
+                    </div>
                 </section>
+
                 <div className="container mx-auto px-4 max-w-7xl">
-                    <section className="mt-12">
-                        <nav className="flex border-b space-x-12">
+                    <section className="mt-6">
+                        <nav className="flex gap-1 p-1 bg-gray-100 rounded-lg mb-6">
                             {tabs.map(tab => (
                                 <button
                                     key={tab.id}
                                     onClick={() => handleTabChange(tab.id)}
-                                    className={`pb-4 font-bold text-xl transition-colors duration-200 ${
+                                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all ${
                                         activeTab === tab.id
-                                            ? 'border-b-2 border-black text-black'
-                                            : 'text-gray-400 hover:text-gray-700 border-b-2 border-transparent'
+                                            ? 'bg-blue-600 text-white shadow-sm'
+                                            : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
                                     }`}
                                 >
-                                    {tab.label}
+                                    {tab.icon}
+                                    <span>{tab.label}</span>
                                 </button>
                             ))}
                         </nav>
-                        <section className="mt-4">
+                        <section>
                             <main>{renderContent()}</main>
                         </section>
                     </section>
@@ -329,15 +497,14 @@ const MyContentsPageContent = () => {
     );
 };
 
-// Suspense로 감싸는 메인 컴포넌트
 const MyContentsPage = () => {
     return (
         <Suspense fallback={
             <>
                 <Header />
                 <div className="w-full bg-white pb-20 text-center py-40">
-                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-                    <p className="mt-4 text-gray-500">로딩 중...</p>
+                    <div className="inline-block h-10 w-10 animate-spin rounded-full border-3 border-solid border-gray-900 border-r-transparent"></div>
+                    <p className="mt-4 text-sm text-gray-600">로딩 중...</p>
                 </div>
                 <Footer />
             </>
