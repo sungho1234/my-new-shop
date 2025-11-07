@@ -68,10 +68,6 @@ const MyWishlistContent = () => {
             <div className="flex-grow">
               <h3 className="text-xl font-bold text-gray-800">{item.title}</h3>
               <p className="text-base text-gray-600 mt-2">{item.author}</p>
-              <p className="text-2xl font-bold mt-4">
-                {/* 쉼표가 포함된 가격 문자열도 처리할 수 있도록 개선합니다. */}
-                {Number(String(item.price).replace(/,/g, '') || 0).toLocaleString()}원
-              </p>
             </div>
             <button
               onClick={() => removeFromWishlist(item.productId)}
@@ -176,10 +172,7 @@ const MyPurchasesContent = () => {
                     구매일: {new Date(item.createdAt).toLocaleDateString('ko-KR')}
                   </p>
                 </div>
-                <div className="flex items-center justify-between mt-2">
-                  <p className="text-xl font-bold text-gray-900">
-                    {Number(item.amount).toLocaleString()}원
-                  </p>
+                <div className="flex items-center justify-end mt-2">
                   <button
                     onClick={() => router.push(getLearnPageUrl(item.productId))}
                     className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"

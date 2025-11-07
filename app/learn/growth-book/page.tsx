@@ -79,11 +79,11 @@ const GrowthBookLearnPage = () => {
     const PRODUCT_ID = 'growth-book';
 
     const [checklist, setChecklist] = useState<Array<{ id: number; title: string; completed: boolean; completedAt: string | null }>>([
-        { id: 1, title: 'Week 1: 자기진단 워크시트 작성 및 목표 설정', completed: false, completedAt: null },
-        { id: 2, title: 'Week 2: 학습 습관 형성 챌린지 1단계 완료', completed: false, completedAt: null },
-        { id: 3, title: 'Week 3: 투자 심리 자기점검 및 패턴 분석', completed: false, completedAt: null },
-        { id: 4, title: 'Week 4: 실전 트레이딩 일지 작성 습관 정착', completed: false, completedAt: null },
-        { id: 5, title: '최종 성장 보고서 작성 및 다음 목표 수립', completed: false, completedAt: null },
+        { id: 1, title: 'PART 1: 스캠 필터링 체크리스트 학습 완료', completed: false, completedAt: null },
+        { id: 2, title: 'PART 2: 데이터 기반 과제집 1회차 실습', completed: false, completedAt: null },
+        { id: 3, title: '실전 매매일지 첫 기록 작성', completed: false, completedAt: null },
+        { id: 4, title: '30일 챌린지북 Day 1-7 완료', completed: false, completedAt: null },
+        { id: 5, title: '30일 챌린지북 전체 완료 및 회고', completed: false, completedAt: null },
     ]);
 
     const [notes, setNotes] = useState<Array<{
@@ -208,7 +208,9 @@ const GrowthBookLearnPage = () => {
 
     const modules = [
         { id: 1, number: 'PART 1', name: '스캠 필터링 체크리스트', completed: true, resourceIds: [1] },
-        { id: 2, number: 'PART 2', name: '데이터 기반 과제집', completed: false, resourceIds: [2, 3, 4] },
+        { id: 2, number: 'PART 2-1', name: '데이터 기반 과제집', completed: false, resourceIds: [2] },
+        { id: 3, number: 'PART 2-2', name: '실전 매매일지 템플릿', completed: false, resourceIds: [3] },
+        { id: 4, number: 'BONUS', name: '30일 챌린지북', completed: false, resourceIds: [4] },
     ];
 
     const learningResources = [
@@ -218,19 +220,10 @@ const GrowthBookLearnPage = () => {
             icon: 'DocumentText',
             name: '🛡️ 스캠 필터링 체크리스트 (PART 1)',
             meta: 'PDF · 2.5MB · 18페이지',
-            description: '사기성 정보 판별법, 해킹 방지 가이드, 디파이 사기 링크 구별법을 담은 완벽한 위험 회피 가이드입니다. "절대 손실 없음", "월 75% 수익 보장" 같은 시장의 흔한 사기 문구들이 왜 논리적으로 불가능한지 현역 트레이딩 팀이 직접 설명합니다.',
+            description: '위험한 사기 정보와 해킹으로부터 자산을 지키는 실전 가이드입니다. 사기성 정보 판별 기준, 해킹 방지법, 디파이 사기 링크 구별법을 체계적으로 정리했습니다.',
         },
         {
             id: 2,
-            type: 'pdf',
-            icon: 'BookOpen',
-            name: '30일 학습 습관 형성 챌린지북',
-            meta: 'PDF · 2.8MB · 35페이지',
-            description: '하루 15분씩 꾸준히 실천할 수 있는 학습 루틴을 만드는 30일 챌린지입니다. 매일의 작은 실천이 큰 변화를 만듭니다. 정교하게 설계된 명확한 미션을 수행하며 데이터 기반 사고방식을 체득하게 됩니다.',
-            special: true,
-        },
-        {
-            id: 3,
             type: 'pdf',
             icon: 'ChartBar',
             name: '📊 데이터 기반 과제집 (PART 2)',
@@ -238,12 +231,21 @@ const GrowthBookLearnPage = () => {
             description: '감(感)으로 하던 매매를 멈추고, 데이터로 판단하도록 훈련하는 실전 트레이닝북입니다. 당신의 매매 습관을 데이터 기반으로 교정하는 실전 훈련 과제가 포함되어 있으며, 올인원 패키지 이용 시 이 기록을 바탕으로 현역 트레이더의 1:1 피드백을 받을 수 있습니다.',
         },
         {
-            id: 4,
+            id: 3,
             type: 'pdf',
             icon: 'DocumentText',
             name: '실전 매매일지 템플릿',
             meta: 'PDF · 1.8MB · 12페이지',
             description: '매 거래마다 진입 이유, 감정 상태, 결과 분석을 기록하는 실전 매매일지 템플릿입니다. 스스로의 실력을 데이터로 분석하고 체계적으로 성장하는 가장 확실한 방법입니다. 기록은 성장의 가장 강력한 도구입니다.',
+        },
+        {
+            id: 4,
+            type: 'pdf',
+            icon: 'BookOpen',
+            name: '30일 학습 습관 형성 챌린지북',
+            meta: 'PDF · 2.8MB · 35페이지',
+            description: '하루 15분씩 꾸준히 실천할 수 있는 학습 루틴을 만드는 30일 챌린지입니다. 매일의 작은 실천이 큰 변화를 만듭니다. 정교하게 설계된 명확한 미션을 수행하며 데이터 기반 사고방식을 체득하게 됩니다.',
+            special: true,
         },
     ];
 
@@ -263,7 +265,7 @@ const GrowthBookLearnPage = () => {
             setTimeout(() => {
                 resourceRefs.current[firstResourceId]?.scrollIntoView({
                     behavior: 'smooth',
-                    block: 'start',
+                    block: 'center',
                     inline: 'nearest'
                 });
             }, 100);

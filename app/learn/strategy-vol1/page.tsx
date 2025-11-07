@@ -66,6 +66,7 @@ const StrategyVol1LearnPage = () => {
     const { user, purchases } = useAuth();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<'materials' | 'action-plan' | 'support'>('materials');
+    const [activeModule, setActiveModule] = useState<number>(1);
     const [showNoteEditor, setShowNoteEditor] = useState(false);
     const [selectedNoteType, setSelectedNoteType] = useState<'question' | 'insight' | 'todo' | 'reference'>('question');
     const [noteTitle, setNoteTitle] = useState('');
@@ -311,6 +312,13 @@ const StrategyVol1LearnPage = () => {
         };
     };
 
+    const modules = [
+        { id: 1, number: 'MODULE 01', name: '전략 설계도', completed: true, resourceIds: [1] },
+        { id: 2, number: 'MODULE 02', name: '실증 사례집', completed: false, resourceIds: [2] },
+        { id: 3, number: 'MODULE 03', name: '전략 해설 영상', completed: false, resourceIds: [3] },
+        { id: 4, number: 'BONUS', name: '실행 엔진', completed: false, resourceIds: [4] },
+    ];
+
     const learningResources = [
         {
             id: 1,
@@ -328,20 +336,38 @@ const StrategyVol1LearnPage = () => {
         },
         {
             id: 3,
+            type: 'video',
+            name: '전략 해설 영상',
+            meta: '동영상 · 약 2시간',
+            description: '전략의 배경과 실전 활용법을 현역 트레이더가 직접 설명하는 해설 영상입니다.',
+        },
+        {
+            id: 4,
             type: 'link',
             name: '실행 엔진 (TradingView Indicator)',
             meta: '트레이딩뷰 지표 · 즉시 적용',
             description: '전략을 시각화하여 진입/청산 시그널을 차트에 표시해주는 트레이딩뷰 전용 지표입니다.',
             special: true,
         },
-        {
-            id: 4,
-            type: 'video',
-            name: '전략 해설 영상',
-            meta: '동영상 · 약 2시간',
-            description: '전략의 배경과 실전 활용법을 현역 트레이더가 직접 설명하는 해설 영상입니다.',
-        },
     ];
+
+    // 모듈 클릭 시 해당 학습 자료로 스크롤
+    const handleModuleClick = (moduleId: number) => {
+        setActiveModule(moduleId);
+        setActiveTab('materials');
+
+        const targetModule = modules.find(m => m.id === moduleId);
+        if (targetModule && targetModule.resourceIds.length > 0) {
+            const firstResourceId = targetModule.resourceIds[0];
+            setTimeout(() => {
+                resourceRefs.current[firstResourceId]?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest'
+                });
+            }, 100);
+        }
+    };
 
     const renderIcon = (iconName: string, special: boolean = false) => {
         const colorClass = special ? 'text-green-600' : 'text-blue-600';
@@ -699,6 +725,27 @@ const StrategyVol1LearnPage = () => {
                                     <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${checklistProgressPercent}%` }}></div>
                                 </div>
                                 <div className="text-sm font-semibold text-gray-900">{Math.round(checklistProgressPercent)}% 완료</div>
+                            </div>
+
+                            {/* Module Navigation */}
+                            <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 mb-4">모듈 목록</div>
+                                <div className="space-y-2">
+                                    {modules.map((module) => (
+                                        <button
+                                            key={module.id}
+                                            onClick={() => handleModuleClick(module.id)}
+                                            className={`w-full text-left px-4 py-3.5 rounded-lg border transition-all ${
+                                                activeModule === module.id
+                                                    ? 'bg-blue-50 border-blue-200'
+                                                    : 'border-transparent hover:bg-gray-100 hover:border-gray-200'
+                                            }`}
+                                        >
+                                            <div className="text-xs text-gray-500 mb-1">{module.number}</div>
+                                            <div className="text-sm font-medium text-gray-900">{module.name}</div>
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </aside>
 

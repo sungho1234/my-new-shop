@@ -207,9 +207,10 @@ const SystemBuilderLearnPage = () => {
     }
 
     const modules = [
-        { id: 1, number: 'MODULE 01', name: '원론집: 거래소 & 차트 셋업', completed: true, resourceIds: [1, 2] },
-        { id: 2, number: 'MODULE 02', name: '지식 심화: 퀀트 투자 용어집', completed: false, resourceIds: [3] },
-        { id: 3, number: 'MODULE 03', name: '도구 세팅: 트레이딩뷰 레이아웃', completed: false, resourceIds: [4] },
+        { id: 1, number: 'MODULE 01', name: '거래소 선택 가이드', completed: true, resourceIds: [1] },
+        { id: 2, number: 'MODULE 02', name: '차트 셋업 철학', completed: false, resourceIds: [2] },
+        { id: 3, number: 'MODULE 03', name: '퀀트 투자 용어집', completed: false, resourceIds: [3] },
+        { id: 4, number: 'BONUS', name: '트레이딩뷰 레이아웃', completed: false, resourceIds: [4] },
     ];
 
     const learningResources = [
@@ -264,7 +265,7 @@ const SystemBuilderLearnPage = () => {
             setTimeout(() => {
                 resourceRefs.current[firstResourceId]?.scrollIntoView({
                     behavior: 'smooth',
-                    block: 'start',
+                    block: 'center',
                     inline: 'nearest'
                 });
             }, 100);

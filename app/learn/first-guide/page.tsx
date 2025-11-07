@@ -208,10 +208,14 @@ const FirstGuideLearnPage = () => {
     }
 
     const modules = [
-        { id: 1, number: 'MODULE 01', name: '거래소 선택 & 차트 셋업', completed: true, resourceIds: [1, 2] },
-        { id: 2, number: 'MODULE 02', name: '퀀트 투자 핵심 용어집', completed: false, resourceIds: [3] },
-        { id: 3, number: 'MODULE 03', name: '트레이딩뷰 레이아웃 세팅', completed: false, resourceIds: [4] },
-        { id: 4, number: 'MODULE 04', name: '스캠 필터링 체크리스트', completed: false, resourceIds: [5] },
+        { id: 1, number: 'MODULE 01', name: '거래소 선택 가이드', completed: true, resourceIds: [1] },
+        { id: 2, number: 'MODULE 02', name: '차트 셋업 철학', completed: false, resourceIds: [2] },
+        { id: 3, number: 'MODULE 03', name: '퀀트 투자 용어집', completed: false, resourceIds: [3] },
+        { id: 4, number: 'MODULE 04', name: '스캠 필터링 체크리스트', completed: false, resourceIds: [4] },
+        { id: 5, number: 'MODULE 05', name: '데이터 기반 과제집', completed: false, resourceIds: [5] },
+        { id: 6, number: 'MODULE 06', name: '실전 매매일지', completed: false, resourceIds: [6] },
+        { id: 7, number: 'BONUS 1', name: '트레이딩뷰 레이아웃', completed: false, resourceIds: [7] },
+        { id: 8, number: 'BONUS 2', name: '30일 챌린지북', completed: false, resourceIds: [8] },
     ];
 
     const learningResources = [
@@ -241,6 +245,30 @@ const FirstGuideLearnPage = () => {
         },
         {
             id: 4,
+            type: 'pdf',
+            icon: 'DocumentText',
+            name: '🛡️ 스캠 필터링 체크리스트',
+            meta: 'PDF · 2.5MB · 18페이지',
+            description: '위험한 사기 정보와 해킹으로부터 자산을 지키는 실전 가이드입니다. 사기성 정보 판별 기준, 해킹 방지법, 디파이 사기 링크 구별법을 체계적으로 정리했습니다.',
+        },
+        {
+            id: 5,
+            type: 'pdf',
+            icon: 'ChartBar',
+            name: '📊 데이터 기반 과제집',
+            meta: 'PDF · 3.2MB · 42페이지',
+            description: '감(感)으로 하던 매매를 멈추고, 데이터로 판단하도록 훈련하는 실전 트레이닝북입니다. 당신의 매매 습관을 데이터 기반으로 교정하는 실전 훈련 과제가 포함되어 있으며, 올인원 패키지 이용 시 이 기록을 바탕으로 현역 트레이더의 1:1 피드백을 받을 수 있습니다.',
+        },
+        {
+            id: 6,
+            type: 'pdf',
+            icon: 'DocumentText',
+            name: '실전 매매일지 템플릿',
+            meta: 'PDF · 1.8MB · 12페이지',
+            description: '매 거래마다 진입 이유, 감정 상태, 결과 분석을 기록하는 실전 매매일지 템플릿입니다. 스스로의 실력을 데이터로 분석하고 체계적으로 성장하는 가장 확실한 방법입니다. 기록은 성장의 가장 강력한 도구입니다.',
+        },
+        {
+            id: 7,
             type: 'link',
             icon: 'Link',
             name: '트레이딩뷰 레이아웃 즉시 적용',
@@ -249,12 +277,13 @@ const FirstGuideLearnPage = () => {
             special: true,
         },
         {
-            id: 5,
+            id: 8,
             type: 'pdf',
-            icon: 'DocumentText',
-            name: '스캠 필터링 체크리스트',
-            meta: 'PDF · 2.1MB · 12페이지',
-            description: '"절대 손실 없음", "75% 수익률 보장" 같은 문구들이 왜 논리적으로 불가능한지 명확히 설명합니다. 스스로 위험을 걸러내는 기준을 제공합니다.',
+            icon: 'BookOpen',
+            name: '30일 학습 습관 형성 챌린지북',
+            meta: 'PDF · 2.8MB · 35페이지',
+            description: '하루 15분씩 꾸준히 실천할 수 있는 학습 루틴을 만드는 30일 챌린지입니다. 매일의 작은 실천이 큰 변화를 만듭니다. 정교하게 설계된 명확한 미션을 수행하며 데이터 기반 사고방식을 체득하게 됩니다.',
+            special: true,
         },
     ];
 
@@ -274,7 +303,7 @@ const FirstGuideLearnPage = () => {
             setTimeout(() => {
                 resourceRefs.current[firstResourceId]?.scrollIntoView({
                     behavior: 'smooth',
-                    block: 'start',
+                    block: 'center',
                     inline: 'nearest'
                 });
             }, 100);
