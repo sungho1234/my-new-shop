@@ -61,10 +61,10 @@ const deleteNote = async (kakaoId: number, noteId: string) => {
     return data.success;
 };
 
-const FirstGuideLearnPage = () => {
+const SystemBuilderLearnPage = () => {
     const { user, purchases } = useAuth();
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'materials' | 'action-plan' | 'support'>('materials');
+    const [activeTab, setActiveTab] = useState<'materials' | 'support'>('materials');
     const [activeModule, setActiveModule] = useState<number>(1);
     const [showNoteEditor, setShowNoteEditor] = useState(false);
     const [selectedNoteType, setSelectedNoteType] = useState<'question' | 'insight' | 'todo' | 'reference'>('question');
@@ -78,14 +78,6 @@ const FirstGuideLearnPage = () => {
 
     const PRODUCT_ID = 'first-guide';
 
-    const [checklist, setChecklist] = useState<Array<{ id: number; title: string; completed: boolean; completedAt: string | null }>>([
-        { id: 1, title: '6개 핵심 모듈 오리엔테이션 영상 시청', completed: false, completedAt: null },
-        { id: 2, title: 'MODULE 1: 거래소 선택 & 차트 셋업 완료', completed: false, completedAt: null },
-        { id: 3, title: 'MODULE 2: 퀀트 투자 용어 핵심 15개 암기', completed: false, completedAt: null },
-        { id: 4, title: 'MODULE 3: 트레이딩뷰 레이아웃 실전 적용', completed: false, completedAt: null },
-        { id: 5, title: 'MODULE 4~6: 전략 이해 및 백테스팅 실습', completed: false, completedAt: null },
-        { id: 6, title: '1:1 멘토링 채널 접속 및 첫 질문 남기기', completed: false, completedAt: null },
-    ]);
 
     const [notes, setNotes] = useState<Array<{
         id: string;
@@ -112,22 +104,6 @@ const FirstGuideLearnPage = () => {
         const loadData = async () => {
             try {
                 setIsLoadingData(true);
-
-                // 체크리스트 불러오기
-                const dbChecklists = await fetchUserChecklists(user.id, PRODUCT_ID);
-
-                // DB 데이터를 로컬 state와 병합
-                setChecklist(prev => prev.map(item => {
-                    const dbItem = dbChecklists.find((db: any) => db.checklistId === item.id);
-                    if (dbItem) {
-                        return {
-                            ...item,
-                            completed: dbItem.completed,
-                            completedAt: dbItem.completedAt
-                        };
-                    }
-                    return item;
-                }));
 
                 // 노트 불러오기
                 const dbNotes = await fetchUserNotes(user.id, PRODUCT_ID);
@@ -182,7 +158,7 @@ const FirstGuideLearnPage = () => {
                 <div className="w-full bg-white pb-20 text-center py-40">
                     <p className="text-lg text-gray-700">구매한 콘텐츠만 학습하실 수 있습니다.</p>
                     <button
-                        onClick={() => router.push('/products/g1')}
+                        onClick={() => router.push('/products/g2')}
                         className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
                     >
                         상품 페이지로 이동
@@ -211,11 +187,7 @@ const FirstGuideLearnPage = () => {
         { id: 1, number: 'MODULE 01', name: '거래소 선택 가이드', completed: true, resourceIds: [1] },
         { id: 2, number: 'MODULE 02', name: '차트 셋업 철학', completed: false, resourceIds: [2] },
         { id: 3, number: 'MODULE 03', name: '퀀트 투자 용어집', completed: false, resourceIds: [3] },
-        { id: 4, number: 'MODULE 04', name: '스캠 필터링 체크리스트', completed: false, resourceIds: [4] },
-        { id: 5, number: 'MODULE 05', name: '데이터 기반 과제집', completed: false, resourceIds: [5] },
-        { id: 6, number: 'MODULE 06', name: '실전 매매일지', completed: false, resourceIds: [6] },
-        { id: 7, number: 'BONUS 1', name: '트레이딩뷰 레이아웃', completed: false, resourceIds: [7] },
-        { id: 8, number: 'BONUS 2', name: '30일 챌린지북', completed: false, resourceIds: [8] },
+        { id: 4, number: 'BONUS', name: '트레이딩뷰 레이아웃', completed: false, resourceIds: [4] },
     ];
 
     const learningResources = [
@@ -245,30 +217,6 @@ const FirstGuideLearnPage = () => {
         },
         {
             id: 4,
-            type: 'pdf',
-            icon: 'DocumentText',
-            name: '🛡️ 스캠 필터링 체크리스트',
-            meta: 'PDF · 2.5MB · 18페이지',
-            description: '위험한 사기 정보와 해킹으로부터 자산을 지키는 실전 가이드입니다. 사기성 정보 판별 기준, 해킹 방지법, 디파이 사기 링크 구별법을 체계적으로 정리했습니다.',
-        },
-        {
-            id: 5,
-            type: 'pdf',
-            icon: 'ChartBar',
-            name: '📊 데이터 기반 과제집',
-            meta: 'PDF · 3.2MB · 42페이지',
-            description: '감(感)으로 하던 매매를 멈추고, 데이터로 판단하도록 훈련하는 실전 트레이닝북입니다. 당신의 매매 습관을 데이터 기반으로 교정하는 실전 훈련 과제가 포함되어 있으며, 올인원 패키지 이용 시 이 기록을 바탕으로 현역 트레이더의 1:1 피드백을 받을 수 있습니다.',
-        },
-        {
-            id: 6,
-            type: 'pdf',
-            icon: 'DocumentText',
-            name: '실전 매매일지 템플릿',
-            meta: 'PDF · 1.8MB · 12페이지',
-            description: '매 거래마다 진입 이유, 감정 상태, 결과 분석을 기록하는 실전 매매일지 템플릿입니다. 스스로의 실력을 데이터로 분석하고 체계적으로 성장하는 가장 확실한 방법입니다. 기록은 성장의 가장 강력한 도구입니다.',
-        },
-        {
-            id: 7,
             type: 'link',
             icon: 'Link',
             name: '트레이딩뷰 레이아웃 즉시 적용',
@@ -276,20 +224,7 @@ const FirstGuideLearnPage = () => {
             description: '클릭 한 번으로 당신의 트레이딩뷰 차트가 프로 트레이더의 표준 레이아웃(이평선, 지표 등)으로 즉시 변경됩니다.',
             special: true,
         },
-        {
-            id: 8,
-            type: 'pdf',
-            icon: 'BookOpen',
-            name: '30일 학습 습관 형성 챌린지북',
-            meta: 'PDF · 2.8MB · 35페이지',
-            description: '하루 15분씩 꾸준히 실천할 수 있는 학습 루틴을 만드는 30일 챌린지입니다. 매일의 작은 실천이 큰 변화를 만듭니다. 정교하게 설계된 명확한 미션을 수행하며 데이터 기반 사고방식을 체득하게 됩니다.',
-            special: true,
-        },
     ];
-
-    // 체크리스트 완료 개수로 학습 진행률 계산
-    const completedChecklistCount = checklist.filter(item => item.completed).length;
-    const checklistProgressPercent = (completedChecklistCount / checklist.length) * 100;
 
     // 모듈 클릭 시 해당 학습 자료로 스크롤
     const handleModuleClick = (moduleId: number) => {
@@ -307,47 +242,6 @@ const FirstGuideLearnPage = () => {
                     inline: 'nearest'
                 });
             }, 100);
-        }
-    };
-
-    const handleChecklistToggle = async (id: number) => {
-        if (!user) return;
-
-        const updatedChecklist = checklist.map(item => {
-            if (item.id === id) {
-                if (!item.completed) {
-                    // 체크하기
-                    const now = new Date();
-                    const completedAt = `${now.getFullYear()}. ${now.getMonth() + 1}. ${now.getDate()}. ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-                    return {
-                        ...item,
-                        completed: true,
-                        completedAt: completedAt
-                    };
-                } else {
-                    // 체크 해제하기
-                    return {
-                        ...item,
-                        completed: false,
-                        completedAt: null
-                    };
-                }
-            }
-            return item;
-        });
-
-        setChecklist(updatedChecklist);
-
-        // DB에 저장
-        const updatedItem = updatedChecklist.find(item => item.id === id);
-        if (updatedItem) {
-            await saveChecklistItem(
-                user.id,
-                PRODUCT_ID,
-                updatedItem.id,
-                updatedItem.completed,
-                updatedItem.completedAt
-            );
         }
     };
 
@@ -535,60 +429,63 @@ const FirstGuideLearnPage = () => {
         </div>
     );
 
-    const renderActionPlanTab = () => {
+
+    const renderSupportTab = () => {
         const counts = getNoteCounts();
         const filteredNotes = getFilteredNotes();
 
         return (
-            <div className="space-y-10">
-                {/* 섹션 1: 학습 체크리스트 */}
-                <div>
-                    <h2 className="text-xl font-bold text-gray-900 mb-6">학습 체크리스트</h2>
-                    <div className="space-y-3">
-                        {checklist.map((item) => (
-                            <div
-                                key={item.id}
-                                onClick={() => handleChecklistToggle(item.id)}
-                                className={`flex items-start gap-4 p-4 rounded-lg border transition-all cursor-pointer ${
-                                    item.completed
-                                        ? 'bg-green-50 border-green-200'
-                                        : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
-                                }`}
-                            >
-                                <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                                    item.completed
-                                        ? 'bg-green-600 border-green-600'
-                                        : 'border-gray-300'
-                                }`}>
-                                    {item.completed && (
-                                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    )}
-                                </div>
-                                <div className="flex-grow">
-                                    <p className={`text-base font-medium mb-1 ${item.completed ? 'text-green-700' : 'text-gray-900'}`}>
-                                        {item.title}
-                                    </p>
-                                    <p className="text-sm text-gray-600">
-                                        {item.completed ? `완료 · ${item.completedAt}` : '미완료'}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
+            <div className="space-y-8">
+                <div className="bg-green-50 border border-green-200 rounded-xl p-8">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">현역 트레이더 1:1 기술 지원</h3>
+                    <p className="text-gray-700 text-base leading-relaxed mb-6">
+                        이 상품은 1:1 지원이 포함되어 있지 않습니다. 학습 중 궁금한 점이나 기술적 질문이 있으시다면,{' '}
+                        <span className="font-bold text-green-700">"2025 일반인을 위한 시스템 투자 올인원"</span> 패키지를 이용하시면
+                        담당 팀원과의 1:1 프라이빗 채널을 통해 직접 피드백을 받으실 수 있습니다.
+                    </p>
+
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6 space-y-3">
+                        <div className="flex justify-between items-center pb-3 border-b border-gray-100">
+                            <span className="text-sm text-gray-600">1:1 지원 포함 여부</span>
+                            <span className="text-sm font-semibold text-red-500">미포함</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-3 border-b border-gray-100">
+                            <span className="text-sm text-gray-600">지원 기간</span>
+                            <span className="text-sm font-semibold text-gray-900">-</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">담당 팀원</span>
+                            <span className="text-sm font-semibold text-gray-900">-</span>
+                        </div>
                     </div>
-                    <button
-                        onClick={() => router.push('/mycontents')}
-                        className="mt-6 inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all"
-                    >
-                        다음 모듈로 이동
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+
+                    <button className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
+                        올인원 패키지 업그레이드
                     </button>
                 </div>
 
-                {/* 섹션 2: 노션 스타일 노트 시스템 */}
+                <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-5">자주 묻는 질문</h3>
+                    <div className="space-y-4">
+                        <div className="bg-gray-50 border border-gray-200 rounded-xl p-7">
+                            <h4 className="text-base font-semibold text-gray-900 mb-3">Q. PDF 자료는 몇 번까지 다운로드할 수 있나요?</h4>
+                            <p className="text-gray-600 text-base leading-relaxed">구매하신 자료는 제한 없이 다운로드하실 수 있습니다. 다만, 저작권 보호를 위해 재배포는 금지되어 있습니다.</p>
+                        </div>
+                        <div className="bg-gray-50 border border-gray-200 rounded-xl p-7">
+                            <h4 className="text-base font-semibold text-gray-900 mb-3">Q. 트레이딩뷰 레이아웃은 어떻게 적용하나요?</h4>
+                            <p className="text-gray-600 text-base leading-relaxed">"레이아웃 적용하기" 버튼을 클릭하시면 트레이딩뷰 웹사이트로 이동하며, 로그인 후 자동으로 레이아웃이 적용됩니다.</p>
+                        </div>
+                        <div className="bg-gray-50 border border-gray-200 rounded-xl p-7">
+                            <h4 className="text-base font-semibold text-gray-900 mb-3">Q. 환불 정책은 어떻게 되나요?</h4>
+                            <p className="text-gray-600 text-base leading-relaxed">디지털 콘텐츠 특성상 다운로드 또는 열람 후에는 환불이 불가능합니다. 구매 전 상품 설명을 꼼꼼히 확인해주세요.</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 노트 시스템 추가 */}
                 <div className="pt-8 border-t border-gray-200">
                     {/* 노트 헤더 */}
                     <div className="flex justify-between items-center mb-6">
@@ -596,72 +493,69 @@ const FirstGuideLearnPage = () => {
                     </div>
 
                     {/* 노트 에디터 */}
-                    {(
-                        <div className="bg-white border-2 border-blue-600 rounded-xl overflow-hidden mb-6 shadow-lg">
-                            {/* 툴바 */}
-                            <div className="bg-gray-50 border-b border-gray-200 p-3 flex gap-2">
-                                {['question', 'insight', 'todo', 'reference'].map((type) => {
-                                    const typeInfo = getNoteTypeInfo(type);
-                                    return (
-                                        <button
-                                            key={type}
-                                            onClick={() => setSelectedNoteType(type as any)}
-                                            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                                                selectedNoteType === type
-                                                    ? 'bg-blue-50 text-blue-700 border border-blue-600'
-                                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100'
-                                            }`}
-                                        >
-                                            <span>{typeInfo.icon}</span>
-                                            <span>{typeInfo.name}</span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                            {/* 제목 입력 */}
-                            <input
-                                type="text"
-                                value={noteTitle}
-                                onChange={(e) => setNoteTitle(e.target.value)}
-                                placeholder="제목을 입력하세요..."
-                                className="w-full px-6 pt-5 pb-3 text-2xl font-bold text-gray-900 border-none focus:outline-none"
-                            />
-                            {/* 내용 입력 */}
-                            <textarea
-                                value={noteContent}
-                                onChange={(e) => setNoteContent(e.target.value)}
-                                placeholder="내용을 입력하세요...
+                    <div className="bg-white border-2 border-blue-600 rounded-xl overflow-hidden mb-6 shadow-lg">
+                        {/* 툴바 */}
+                        <div className="bg-gray-50 border-b border-gray-200 p-3 flex gap-2">
+                            {['question', 'insight', 'todo', 'reference'].map((type) => {
+                                const typeInfo = getNoteTypeInfo(type);
+                                return (
+                                    <button
+                                        key={type}
+                                        onClick={() => setSelectedNoteType(type as any)}
+                                        className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                                            selectedNoteType === type
+                                                ? 'bg-blue-50 text-blue-700 border border-blue-600'
+                                                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100'
+                                        }`}
+                                    >
+                                        <span>{typeInfo.icon}</span>
+                                        <span>{typeInfo.name}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        {/* 제목 입력 */}
+                        <input
+                            type="text"
+                            value={noteTitle}
+                            onChange={(e) => setNoteTitle(e.target.value)}
+                            placeholder="제목을 입력하세요..."
+                            className="w-full px-6 pt-5 pb-3 text-2xl font-bold text-gray-900 border-none focus:outline-none"
+                        />
+                        {/* 내용 입력 */}
+                        <textarea
+                            value={noteContent}
+                            onChange={(e) => setNoteContent(e.target.value)}
+                            placeholder="내용을 입력하세요...
 
 팁:
 • 이해가 안 되는 부분을 질문으로 정리해보세요
 • 중요한 인사이트는 나중에 다시 보기 쉽게 기록하세요
 • 실천할 내용은 구체적으로 작성하세요"
-                                className="w-full px-6 pb-6 text-base text-gray-700 leading-relaxed resize-y min-h-[150px] border-none focus:outline-none"
-                            />
-                            {/* 푸터 */}
-                            <div className="bg-gray-50 border-t border-gray-200 px-4 py-3 flex justify-end gap-3">
-                                <button
-                                    onClick={() => {
-                                        setShowNoteEditor(false);
-                                        setNoteTitle('');
-                                        setNoteContent('');
-                                    }}
-                                    className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-all"
-                                >
-                                    취소
-                                </button>
-                                <button
-                                    onClick={handleSaveNote}
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all"
-                                >
-                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    저장
-                                </button>
-                            </div>
+                            className="w-full px-6 pb-6 text-base text-gray-700 leading-relaxed resize-y min-h-[150px] border-none focus:outline-none"
+                        />
+                        {/* 푸터 */}
+                        <div className="bg-gray-50 border-t border-gray-200 px-4 py-3 flex justify-end gap-3">
+                            <button
+                                onClick={() => {
+                                    setNoteTitle('');
+                                    setNoteContent('');
+                                }}
+                                className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-all"
+                            >
+                                취소
+                            </button>
+                            <button
+                                onClick={handleSaveNote}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all"
+                            >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                저장
+                            </button>
                         </div>
-                    )}
+                    </div>
 
                     {/* 필터 탭 */}
                     <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
@@ -750,58 +644,6 @@ const FirstGuideLearnPage = () => {
         );
     };
 
-    const renderSupportTab = () => (
-        <div className="space-y-8">
-            <div className="bg-green-50 border border-green-200 rounded-xl p-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">현역 트레이더 1:1 기술 지원</h3>
-                <p className="text-gray-700 text-base leading-relaxed mb-6">
-                    올인원 패키지 구매자에게는 <span className="font-bold text-green-700">90일간 무제한 1:1 멘토링</span>이 제공됩니다.
-                    학습 중 궁금한 점, 전략 구현 시 막히는 부분, 백테스팅 결과 해석 등 모든 질문에 대해 현역 퀀트 트레이더가 직접 답변해드립니다.
-                </p>
-
-                <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6 space-y-3">
-                    <div className="flex justify-between items-center pb-3 border-b border-gray-100">
-                        <span className="text-sm text-gray-600">1:1 지원 포함 여부</span>
-                        <span className="text-sm font-semibold text-green-600">포함 ✓</span>
-                    </div>
-                    <div className="flex justify-between items-center pb-3 border-b border-gray-100">
-                        <span className="text-sm text-gray-600">지원 기간</span>
-                        <span className="text-sm font-semibold text-gray-900">구매일로부터 90일</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">담당 팀원</span>
-                        <span className="text-sm font-semibold text-gray-900">현역 퀀트 트레이더 김OO</span>
-                    </div>
-                </div>
-
-                <button className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                    1:1 멘토링 채널 접속하기
-                </button>
-            </div>
-
-            <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-5">자주 묻는 질문</h3>
-                <div className="space-y-4">
-                    <div className="bg-gray-50 border border-gray-200 rounded-xl p-7">
-                        <h4 className="text-base font-semibold text-gray-900 mb-3">Q. PDF 자료는 몇 번까지 다운로드할 수 있나요?</h4>
-                        <p className="text-gray-600 text-base leading-relaxed">구매하신 자료는 제한 없이 다운로드하실 수 있습니다. 다만, 저작권 보호를 위해 재배포는 금지되어 있습니다.</p>
-                    </div>
-                    <div className="bg-gray-50 border border-gray-200 rounded-xl p-7">
-                        <h4 className="text-base font-semibold text-gray-900 mb-3">Q. 트레이딩뷰 레이아웃은 어떻게 적용하나요?</h4>
-                        <p className="text-gray-600 text-base leading-relaxed">"레이아웃 적용하기" 버튼을 클릭하시면 트레이딩뷰 웹사이트로 이동하며, 로그인 후 자동으로 레이아웃이 적용됩니다.</p>
-                    </div>
-                    <div className="bg-gray-50 border border-gray-200 rounded-xl p-7">
-                        <h4 className="text-base font-semibold text-gray-900 mb-3">Q. 환불 정책은 어떻게 되나요?</h4>
-                        <p className="text-gray-600 text-base leading-relaxed">디지털 콘텐츠 특성상 다운로드 또는 열람 후에는 환불이 불가능합니다. 구매 전 상품 설명을 꼼꼼히 확인해주세요.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-
     return (
         <>
             <Header />
@@ -820,7 +662,7 @@ const FirstGuideLearnPage = () => {
                             <span className="text-gray-400">›</span>
                             <span className="text-gray-600 cursor-pointer hover:text-gray-900">My 콘텐츠</span>
                             <span className="text-gray-400">›</span>
-                            <span className="text-gray-900 font-semibold">일반인을 위한 시스템 투자 올인원</span>
+                            <span className="text-gray-900 font-semibold">일반인을 위한 첫번째 안내서</span>
                         </div>
                     </div>
 
@@ -829,9 +671,9 @@ const FirstGuideLearnPage = () => {
                         <div className="inline-block px-4 py-2 bg-blue-50 text-blue-700 text-sm font-semibold rounded-full mb-4">
                             학습 진행 중
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-3">2025 일반인을 위한 시스템 투자 올인원</h1>
+                        <h1 className="text-3xl font-bold text-gray-900 mb-3">일반인을 위한 첫번째 안내서</h1>
                         <p className="text-lg text-gray-600 mb-6">
-                            거래소 선택부터 포트폴리오 구성까지 - 퀀트 투자의 A to Z를 현역 트레이더의 1:1 멘토링과 함께 배우는 완전 통합 패키지입니다.
+                            거래소 선택부터 차트 셋업까지 - 현역 트레이더의 '시작 세팅법'과 '관점'을 당신의 모니터에 복사해 드립니다.
                         </p>
                         <div className="flex items-center gap-8 text-sm text-gray-600">
                             <div className="flex items-center gap-2">
@@ -853,15 +695,6 @@ const FirstGuideLearnPage = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
                         {/* Sidebar */}
                         <aside className="space-y-4">
-                            {/* Progress Card */}
-                            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">학습 진행률</div>
-                                <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-                                    <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${checklistProgressPercent}%` }}></div>
-                                </div>
-                                <div className="text-sm font-semibold text-gray-900">{Math.round(checklistProgressPercent)}% 완료</div>
-                            </div>
-
                             {/* Module Navigation */}
                             <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
                                 <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 mb-4">모듈 목록</div>
@@ -902,19 +735,6 @@ const FirstGuideLearnPage = () => {
                                     )}
                                 </button>
                                 <button
-                                    onClick={() => setActiveTab('action-plan')}
-                                    className={`flex-1 px-8 py-5 text-base font-semibold transition-all relative ${
-                                        activeTab === 'action-plan'
-                                            ? 'text-gray-900 bg-white'
-                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                                    }`}
-                                >
-                                    실행 계획
-                                    {activeTab === 'action-plan' && (
-                                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
-                                    )}
-                                </button>
-                                <button
                                     onClick={() => setActiveTab('support')}
                                     className={`flex-1 px-8 py-5 text-base font-semibold transition-all relative ${
                                         activeTab === 'support'
@@ -932,7 +752,6 @@ const FirstGuideLearnPage = () => {
                             {/* Tab Content */}
                             <div className="p-10">
                                 {activeTab === 'materials' && renderMaterialsTab()}
-                                {activeTab === 'action-plan' && renderActionPlanTab()}
                                 {activeTab === 'support' && renderSupportTab()}
                             </div>
                         </main>
@@ -944,4 +763,4 @@ const FirstGuideLearnPage = () => {
     );
 };
 
-export default FirstGuideLearnPage;
+export default SystemBuilderLearnPage;
