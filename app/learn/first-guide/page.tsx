@@ -65,7 +65,7 @@ const FirstGuideLearnPage = () => {
     const { user, purchases } = useAuth();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<'materials' | 'support'>('materials');
-    const [activeModule, setActiveModule] = useState<number>(1);
+    const [activeModule, setActiveModule] = useState<number>(1); // resource ID를 추적
     const [showNoteEditor, setShowNoteEditor] = useState(false);
     const [selectedNoteType, setSelectedNoteType] = useState<'question' | 'insight' | 'todo' | 'reference'>('question');
     const [noteTitle, setNoteTitle] = useState('');
@@ -292,22 +292,18 @@ const FirstGuideLearnPage = () => {
     const checklistProgressPercent = (completedChecklistCount / checklist.length) * 100;
 
     // 모듈 클릭 시 해당 학습 자료로 스크롤
-    const handleModuleClick = (moduleId: number) => {
-        setActiveModule(moduleId);
+    const handleModuleClick = (resourceId: number) => {
+        setActiveModule(resourceId);
         setActiveTab('materials'); // 학습 자료 탭으로 전환
 
-        const targetModule = modules.find(m => m.id === moduleId);
-        if (targetModule && targetModule.resourceIds.length > 0) {
-            const firstResourceId = targetModule.resourceIds[0];
-            // 약간의 딜레이를 주어 탭 전환 후 스크롤
-            setTimeout(() => {
-                resourceRefs.current[firstResourceId]?.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center',
-                    inline: 'nearest'
-                });
-            }, 100);
-        }
+        // 약간의 딜레이를 주어 탭 전환 후 스크롤
+        setTimeout(() => {
+            resourceRefs.current[resourceId]?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'nearest'
+            });
+        }, 100);
     };
 
     const handleChecklistToggle = async (id: number) => {
@@ -469,43 +465,50 @@ const FirstGuideLearnPage = () => {
     };
 
     const renderMaterialsTab = () => (
-        <div className="space-y-6">
-            {learningResources.map((resource) => (
+        <div className="space-y-5 max-w-4xl">
+            {learningResources.map((resource, index) => (
                 <div
                     key={resource.id}
                     ref={(el) => {
                         resourceRefs.current[resource.id] = el;
                     }}
-                    className={`rounded-xl p-7 border transition-all duration-300 cursor-pointer ${
+                    className={`bg-white rounded-2xl p-7 border-l-4 border-y border-r transition-shadow hover:shadow-md ${
                         resource.special
-                            ? 'bg-green-50 border-green-200 hover:border-green-300 hover:shadow-lg'
-                            : 'bg-gray-50 border-gray-200 hover:border-blue-300 hover:bg-white hover:shadow-lg hover:-translate-y-0.5'
+                            ? 'border-l-green-500 border-green-300 bg-green-50/30'
+                            : 'border-l-gray-900 border-gray-200'
                     }`}
                 >
-                    <div className="flex gap-4 mb-4">
-                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 border ${
+                    {/* PART 라벨 */}
+                    <div className="mb-4">
+                        <span className="inline-block px-3 py-1 bg-gray-900 text-white text-xs font-bold rounded-md tracking-wide">
+                            PART {index + 1}
+                        </span>
+                    </div>
+
+                    <div className="flex gap-5 mb-4">
+                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
                             resource.special
-                                ? 'bg-green-100 border-green-200'
-                                : 'bg-blue-50 border-blue-200'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-gray-100 text-gray-700'
                         }`}>
                             {renderIcon(resource.icon, resource.special)}
                         </div>
                         <div className="flex-grow">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-1">{resource.name}</h3>
-                            <p className="text-sm text-gray-600">{resource.meta}</p>
+                            <h3 className="text-lg font-bold text-gray-900 mb-1">{resource.name}</h3>
+                            <p className="text-sm text-gray-500">{resource.meta}</p>
                         </div>
                     </div>
                     <p className="text-gray-600 text-base leading-relaxed mb-5">{resource.description}</p>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2">
                         {resource.special ? (
                             <>
-                                <button className="inline-flex items-center gap-2 px-6 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-all hover:-translate-y-0.5 hover:shadow-lg">
+                                <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                     </svg>
                                     레이아웃 적용하기
                                 </button>
-                                <button className="inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all">
+                                <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                     </svg>
@@ -514,14 +517,14 @@ const FirstGuideLearnPage = () => {
                             </>
                         ) : (
                             <>
-                                <button className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all hover:-translate-y-0.5 hover:shadow-lg">
+                                <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
                                     열람하기
                                 </button>
-                                <button className="inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all">
+                                <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                     </svg>
@@ -755,30 +758,40 @@ const FirstGuideLearnPage = () => {
         const filteredNotes = getFilteredNotes();
 
         return (
-            <div className="space-y-8">
-                <div className="bg-green-50 border border-green-200 rounded-xl p-8">
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">현역 트레이더 1:1 기술 지원</h3>
-                    <p className="text-gray-700 text-base leading-relaxed mb-6">
-                        올인원 패키지 구매자에게는 <span className="font-bold text-green-700">90일간 무제한 1:1 멘토링</span>이 제공됩니다.
-                        학습 중 궁금한 점, 전략 구현 시 막히는 부분, 백테스팅 결과 해석 등 모든 질문에 대해 현역 퀀트 트레이더가 직접 답변해드립니다.
-                    </p>
+            <div className="space-y-10 max-w-4xl">
+                {/* 1:1 지원 섹션 */}
+                <div className="bg-white rounded-2xl border border-gray-200 p-8">
+                    <div className="flex items-start gap-5 mb-6">
+                        <div className="flex-shrink-0 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <svg className="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">현역 트레이더 1:1 기술 지원</h3>
+                            <p className="text-gray-600 text-base leading-relaxed">
+                                올인원 패키지 구매자에게는 <span className="font-semibold text-green-700">90일간 무제한 1:1 멘토링</span>이 제공됩니다.
+                                학습 중 궁금한 점, 전략 구현 시 막히는 부분, 백테스팅 결과 해석 등 모든 질문에 대해 현역 퀀트 트레이더가 직접 답변해드립니다.
+                            </p>
+                        </div>
+                    </div>
 
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6 space-y-3">
-                        <div className="flex justify-between items-center pb-3 border-b border-gray-100">
-                            <span className="text-sm text-gray-600">1:1 지원 포함 여부</span>
+                    <div className="bg-gray-50 rounded-lg p-5 mb-5 space-y-3">
+                        <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+                            <span className="text-sm font-medium text-gray-600">1:1 지원 포함 여부</span>
                             <span className="text-sm font-semibold text-green-600">포함 ✓</span>
                         </div>
-                        <div className="flex justify-between items-center pb-3 border-b border-gray-100">
-                            <span className="text-sm text-gray-600">지원 기간</span>
+                        <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+                            <span className="text-sm font-medium text-gray-600">지원 기간</span>
                             <span className="text-sm font-semibold text-gray-900">구매일로부터 90일</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">담당 팀원</span>
+                            <span className="text-sm font-medium text-gray-600">담당 팀원</span>
                             <span className="text-sm font-semibold text-gray-900">현역 퀀트 트레이더 김OO</span>
                         </div>
                     </div>
 
-                    <button className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all">
+                    <button className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                         </svg>
@@ -787,7 +800,7 @@ const FirstGuideLearnPage = () => {
                 </div>
 
                 {/* 노트 시스템 */}
-                <div className="pt-8 border-t border-gray-200">
+                <div>
                     {/* 노트 헤더 */}
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl font-bold text-gray-900">기록사항 및 Q&A</h2>
@@ -795,9 +808,9 @@ const FirstGuideLearnPage = () => {
 
                     {/* 노트 에디터 */}
                     {(
-                        <div className="bg-white border-2 border-blue-600 rounded-xl overflow-hidden mb-6 shadow-lg">
+                        <div className="bg-white border border-gray-300 rounded-2xl overflow-hidden mb-6">
                             {/* 툴바 */}
-                            <div className="bg-gray-50 border-b border-gray-200 p-3 flex gap-2">
+                            <div className="bg-gray-50 border-b border-gray-200 p-4 flex gap-2">
                                 {['question', 'insight', 'todo', 'reference'].map((type) => {
                                     const typeInfo = getNoteTypeInfo(type);
                                     return (
@@ -969,124 +982,55 @@ const FirstGuideLearnPage = () => {
     return (
         <>
             <Header />
-            <div className="w-full bg-gray-50 min-h-screen">
-                {/* Hero Banner */}
-                <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)' }} className="text-white text-center py-12">
-                    <h1 className="text-3xl font-bold mb-2">{user.nickname}님, 환영합니다!</h1>
-                    <p className="text-base opacity-90">구매하신 콘텐츠의 학습 자료를 확인하세요</p>
-                </div>
-
-                <div className="container mx-auto px-4 max-w-7xl py-8">
-                    {/* Breadcrumb */}
-                    <div className="bg-white border border-gray-200 rounded-lg px-6 py-4 mb-8">
-                        <div className="flex items-center gap-2 text-sm">
-                            <span className="text-gray-600 cursor-pointer hover:text-gray-900">홈</span>
-                            <span className="text-gray-400">›</span>
-                            <span className="text-gray-600 cursor-pointer hover:text-gray-900">My 콘텐츠</span>
-                            <span className="text-gray-400">›</span>
-                            <span className="text-gray-900 font-semibold">일반인을 위한 시스템 투자 올인원</span>
-                        </div>
+            <div className="w-full bg-white pb-20 min-h-screen">
+                {/* Hero Banner - Slate Gradient */}
+                <section className="bg-gradient-to-r from-slate-700 to-slate-800 py-16">
+                    <div className="container mx-auto px-4 max-w-7xl text-center">
+                        <h1 className="text-3xl font-bold text-white mb-2">2025 일반인을 위한 시스템 투자 올인원</h1>
+                        <p className="text-base text-white/80">구매일: {formattedPurchaseDate} · 총 {learningResources.length}개 자료</p>
                     </div>
+                </section>
 
-                    {/* Course Header */}
-                    <div className="bg-white border border-gray-200 rounded-xl p-10 mb-8 shadow-sm">
-                        <div className="inline-block px-4 py-2 bg-blue-50 text-blue-700 text-sm font-semibold rounded-full mb-4">
-                            학습 진행 중
-                        </div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-3">2025 일반인을 위한 시스템 투자 올인원</h1>
-                        <p className="text-lg text-gray-600 mb-6">
-                            거래소 선택부터 포트폴리오 구성까지 - 퀀트 투자의 A to Z를 현역 트레이더의 1:1 멘토링과 함께 배우는 완전 통합 패키지입니다.
-                        </p>
-                        <div className="flex items-center gap-8 text-sm text-gray-600">
-                            <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <span>구매일: {formattedPurchaseDate}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                <span>총 {learningResources.length}개 자료</span>
-                            </div>
-                        </div>
-                    </div>
+                <div className="container mx-auto px-4 max-w-7xl">
+                    <section className="mt-8">
+                        {/* Tab Navigation - Underline Style */}
+                        <nav className="flex gap-12 border-b border-gray-200 mb-10">
+                            <button
+                                onClick={() => setActiveTab('materials')}
+                                className={`pb-4 text-base font-semibold transition-all relative ${
+                                    activeTab === 'materials'
+                                        ? 'text-gray-900'
+                                        : 'text-gray-400 hover:text-gray-600'
+                                }`}
+                            >
+                                학습 자료
+                                {activeTab === 'materials' && (
+                                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900"></div>
+                                )}
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('support')}
+                                className={`pb-4 text-base font-semibold transition-all relative ${
+                                    activeTab === 'support'
+                                        ? 'text-gray-900'
+                                        : 'text-gray-400 hover:text-gray-600'
+                                }`}
+                            >
+                                1:1 지원 & 노트
+                                {activeTab === 'support' && (
+                                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900"></div>
+                                )}
+                            </button>
+                        </nav>
 
-                    {/* Main Grid Layout */}
-                    <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
-                        {/* Sidebar */}
-                        <aside className="space-y-4">
-                            {/* Progress Card */}
-                            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">학습 진행률</div>
-                                <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-                                    <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${checklistProgressPercent}%` }}></div>
-                                </div>
-                                <div className="text-sm font-semibold text-gray-900">{Math.round(checklistProgressPercent)}% 완료</div>
-                            </div>
-
-                            {/* Module Navigation */}
-                            <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-                                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 mb-4">모듈 목록</div>
-                                <div className="space-y-2">
-                                    {modules.map((module) => (
-                                        <button
-                                            key={module.id}
-                                            onClick={() => handleModuleClick(module.id)}
-                                            className={`w-full text-left px-4 py-3.5 rounded-lg border transition-all ${
-                                                activeModule === module.id
-                                                    ? 'bg-blue-50 border-blue-200'
-                                                    : 'border-transparent hover:bg-gray-100 hover:border-gray-200'
-                                            }`}
-                                        >
-                                            <div className="text-xs text-gray-500 mb-1">{module.number}</div>
-                                            <div className="text-sm font-medium text-gray-900">{module.name}</div>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </aside>
-
-                        {/* Main Content */}
-                        <main className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                            {/* Tab Navigation */}
-                            <nav className="bg-gray-50 border-b border-gray-200 flex">
-                                <button
-                                    onClick={() => setActiveTab('materials')}
-                                    className={`flex-1 px-8 py-5 text-base font-semibold transition-all relative ${
-                                        activeTab === 'materials'
-                                            ? 'text-gray-900 bg-white'
-                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                                    }`}
-                                >
-                                    학습 자료
-                                    {activeTab === 'materials' && (
-                                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
-                                    )}
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('support')}
-                                    className={`flex-1 px-8 py-5 text-base font-semibold transition-all relative ${
-                                        activeTab === 'support'
-                                            ? 'text-gray-900 bg-white'
-                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                                    }`}
-                                >
-                                    1:1 지원 & 노트
-                                    {activeTab === 'support' && (
-                                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
-                                    )}
-                                </button>
-                            </nav>
-
-                            {/* Tab Content */}
-                            <div className="p-10">
+                        {/* Tab Content */}
+                        <section>
+                            <main>
                                 {activeTab === 'materials' && renderMaterialsTab()}
                                 {activeTab === 'support' && renderSupportTab()}
-                            </div>
-                        </main>
-                    </div>
+                            </main>
+                        </section>
+                    </section>
                 </div>
             </div>
             <Footer />
