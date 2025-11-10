@@ -18,7 +18,13 @@
       "Bash(.eslintrc.json)",
       "Bash(npm run build:*)",
       "Bash(/tmp/my-contents-backup.tsx)",
-      "Bash(git rebase:*)"
+      "Bash(git rebase:*)",
+      "Bash(git push:*)",
+      "Bash(/tmp/first-guide-old.tsx)",
+      "Bash(/tmp/system-builder-old.tsx)",
+      "Bash(/tmp/growth-book-old.tsx)",
+      "Bash(/tmp/strategy-source-old.tsx)",
+      "Bash(/tmp/strategy-vol1-old.tsx)"
     ],
     "deny": [],
     "ask": []
