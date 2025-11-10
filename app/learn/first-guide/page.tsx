@@ -465,73 +465,79 @@ const FirstGuideLearnPage = () => {
     };
 
     const renderMaterialsTab = () => (
-        <div className="space-y-5 max-w-4xl">
+        <div className="max-w-4xl">
             {learningResources.map((resource, index) => (
-                <div
-                    key={resource.id}
-                    ref={(el) => {
-                        resourceRefs.current[resource.id] = el;
-                    }}
-                    className={`bg-white rounded-2xl p-7 border-l-4 border-y border-r transition-shadow hover:shadow-md ${
-                        resource.special
-                            ? 'border-l-green-500 border-green-300 bg-green-50/30'
-                            : 'border-l-gray-900 border-gray-200'
-                    }`}
-                >
-                    {/* PART 라벨 */}
-                    <div className="mb-4">
-                        <span className="inline-block px-3 py-1 bg-gray-900 text-white text-xs font-bold rounded-md tracking-wide">
-                            PART {index + 1}
-                        </span>
+                <div key={resource.id}>
+                    {/* PART 구분선 - 모든 카드 상단에 표시 */}
+                    <div className="relative my-8">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-200"></div>
+                        </div>
+                        <div className="relative flex justify-start">
+                            <span className="bg-white pr-3 text-base font-bold text-gray-400 tracking-wide">
+                                PART {index + 1}
+                            </span>
+                        </div>
                     </div>
 
-                    <div className="flex gap-5 mb-4">
-                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    <div
+                        ref={(el) => {
+                            resourceRefs.current[resource.id] = el;
+                        }}
+                        className={`bg-white rounded-2xl p-7 border-l-4 border-y border-r transition-shadow hover:shadow-md ${
                             resource.special
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-gray-100 text-gray-700'
-                        }`}>
-                            {renderIcon(resource.icon, resource.special)}
+                                ? 'border-l-green-500 border-green-300 bg-green-50/30'
+                                : 'border-l-gray-900 border-gray-200'
+                        }`}
+                    >
+                        <div className="flex gap-5 mb-4">
+                            <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                                resource.special
+                                    ? 'bg-green-100 text-green-700'
+                                    : 'bg-gray-100 text-gray-700'
+                            }`}>
+                                {renderIcon(resource.icon, resource.special)}
+                            </div>
+                            <div className="flex-grow">
+                                <h3 className="text-lg font-bold text-gray-900 mb-1">{resource.name}</h3>
+                                <p className="text-sm text-gray-500">{resource.meta}</p>
+                            </div>
                         </div>
-                        <div className="flex-grow">
-                            <h3 className="text-lg font-bold text-gray-900 mb-1">{resource.name}</h3>
-                            <p className="text-sm text-gray-500">{resource.meta}</p>
+                        <p className="text-gray-600 text-base leading-relaxed mb-5">{resource.description}</p>
+                        <div className="flex gap-2">
+                            {resource.special ? (
+                                <>
+                                    <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                        레이아웃 적용하기
+                                    </button>
+                                    <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                        링크 복사
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        열람하기
+                                    </button>
+                                    <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                        다운로드
+                                    </button>
+                                </>
+                            )}
                         </div>
-                    </div>
-                    <p className="text-gray-600 text-base leading-relaxed mb-5">{resource.description}</p>
-                    <div className="flex gap-2">
-                        {resource.special ? (
-                            <>
-                                <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                    </svg>
-                                    레이아웃 적용하기
-                                </button>
-                                <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                    </svg>
-                                    링크 복사
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                    열람하기
-                                </button>
-                                <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                    </svg>
-                                    다운로드
-                                </button>
-                            </>
-                        )}
                     </div>
                 </div>
             ))}

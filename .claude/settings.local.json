@@ -24,7 +24,10 @@
       "Bash(/tmp/system-builder-old.tsx)",
       "Bash(/tmp/growth-book-old.tsx)",
       "Bash(/tmp/strategy-source-old.tsx)",
-      "Bash(/tmp/strategy-vol1-old.tsx)"
+      "Bash(/tmp/strategy-vol1-old.tsx)",
+      "Bash(for file in growth-book strategy-source strategy-vol1)",
+      "Bash(do echo \"Processing $file...\")",
+      "Bash(npx next build)"
     ],
     "deny": [],
     "ask": []
