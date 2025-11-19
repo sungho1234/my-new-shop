@@ -9,25 +9,25 @@ const reviews = [
     quote: "지금까지 감으로 했던 트레이딩을 과학적 및 기술적접근으로 단계를 높여주어서 감사합니다. 그리고 담당 트레이더님이랑 계속 연락을 주고받아서 더 쉽게 성장할수 있었어요.",
     author: "맨디(80270)",
     date: "24시간 전",
-    product: "전략 아카이브1",
-    flag: "🇰🇷", 
+    product: "일반인을 위한 시스템 투자 올인원",
+    flag: "🇰🇷",
   },
   {
     stars: 5,
     quote: "드디어 인사이트가 정리되었네요. 항상 투자를 배워보고싶었는데 기본적인 퀀트투자에 대한 지식을 가지게되어서 기뻣습니다. vol2도 궁금한데 현재는 담당 트레이더님은 vol숙달에 더 집중하고 넘어가라고 하셔서 실력을 기르고있네요.",
     author: "최승영",
     date: "24시간 전",
-    product: "The Archive Vol.1",
+    product: "일반인을 위한 첫번째 안내서",
     flag: "🇰🇷",
   },
   {
     stars: 5,
-    quote: "Finally, a systematic approach that removes emotion. It’s been a game-changer for my trading in the European session.",
+    quote: "Finally, a systematic approach that removes emotion. It's been a game-changer for my trading in the European session.",
     author: "John S.",
     location: "London, UK",
     flag: "🇬🇧",
     date: "3일 전",
-    product: "The Archive Vol. 2"
+    product: "시스템 빌더 풀 패키지"
   },
   {
     stars: 5,
@@ -36,7 +36,7 @@ const reviews = [
     location: "Berlin, DE",
     flag: "🇩🇪",
     date: "2주 전",
-    product: "Quant System Lite"
+    product: "일반인의 성장책: 스캠필터와 챌린지"
   },
   {
     stars: 5,
@@ -45,7 +45,7 @@ const reviews = [
     location: "Tokyo, JP",
     flag: "🇯🇵",
     date: "1주 전",
-    product: "MAXX Quant System v4.0"
+    product: "프로의 전략 원본"
   },
 ];
 
@@ -153,16 +153,12 @@ export default function GlobalProof() {
         </div>
       </div>
       
-      <div 
-        ref={scrollContainerRef} 
+      <div
+        ref={scrollContainerRef}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         // [핵심 수정] scrollbar-hide 클래스를 여기에 추가했습니다.
-        className="flex overflow-x-auto space-x-6 pb-4 scroll-snap-x-mandatory scrollbar-hide -mb-4"
-        style={{
-          paddingLeft: 'max(1.5rem, calc((100% - 1280px) / 2))',
-          paddingRight: '1.5rem'
-        }}
+        className="flex overflow-x-auto space-x-6 pb-4 scroll-snap-x-mandatory scrollbar-hide -mb-4 px-6"
       >
         {reviews.map((review, index) => (
           <div key={index} className="scroll-snap-center">
