@@ -174,31 +174,32 @@ const ProductDetailPage = () => {
             <div id="wrapper">
                 <div className={styles.mainContainer}>
                     <main className={styles.contentColumn}>
-                        
+
                         <section className={`${styles.mediaContainer} ${styles.card}`} {...animMedia}>
-                            <iframe 
+                            <iframe
                                 src="https://www.youtube.com/embed/YOUTUBE_VIDEO_ID"
-                                title="YouTube video player" 
-                                frameBorder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                title="YouTube video player"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen>
                             </iframe>
                         </section>
 
                         <div className={styles.contentArea}>
-
-                            <section {...animHeadline} className={styles.sectionSpacing}>
-                                <h2 className={styles.mainHeadline}>
+                            {/* 제목 섹션 */}
+                            <section style={{marginTop: '60px', marginBottom: '60px'}}>
+                                <h2 className={styles.mainHeadline} style={{textAlign: 'center', marginBottom: '16px'}}>
                                     일반인을 위한 첫번째 안내서
                                 </h2>
-                                <p className={styles.mainSubheadline}>
-                                    [현역 트레이더의 '시작 세팅법'과 '관점'을<br/> 당신의 모니터에 복사해 드립니다.]
+                                <p className={styles.mainSubheadline} style={{textAlign: 'center'}}>
+                                    [현역 트레이더의 '시작 세팅법'과 '관점'을 당신의 모니터에 복사해 드립니다.]
                                 </p>
                             </section>
 
-                            <section {...animIntro} className={styles.sectionSpacing}>
+                            {/* 소개 섹션 */}
+                            <section className={styles.sectionSpacing}>
                                 <p className={styles.bodyText}>
-                                    이 안내서는 [Your Team Name] 트레이딩 팀이 수많은 시행착오 끝에 결론내린,<br/>
+                                    이 안내서는 <strong>[Your Team Name] 트레이딩 팀</strong>이 수많은 시행착오 끝에 결론내린,<br/>
                                     가장 깔끔하고 효율적인 <strong>'시작 세팅법'</strong>입니다.
                                 </p>
                                 <p className={styles.bodyText}>
@@ -210,100 +211,344 @@ const ProductDetailPage = () => {
                                 </p>
                             </section>
 
-                            <hr className={styles.sectionSeparator} />
-                            <section {...animPackageIntro} className={styles.sectionSpacing}>
-                                <h3 className={styles.sectionTitle}>이 안내서에 포함된 모든 것</h3>
+                            <hr className={styles.sectionSeparator} style={{marginBottom: '60px'}} />
+
+                            {/* 소개 목차 */}
+                            <section style={{marginBottom: '40px'}}>
+                                <h3 style={{
+                                    fontSize: '24px',
+                                    fontWeight: '700',
+                                    color: '#333',
+                                    margin: '0',
+                                    paddingLeft: '16px',
+                                    borderLeft: '4px solid #FF6B35',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}>
+                                    소개
+                                </h3>
                             </section>
 
-                            <section {...animModules} className={styles.sectionSpacing} style={{marginTop: "-60px"}}>
-                                
-                                <div className={styles.moduleSpacing}>
-                                    <h4 className={styles.moduleTitle}>PART 1. 📘 원론집 (확실한 기준 세우기)</h4>
-                                    <p className={styles.bodyText}>
-                                        '왜' 그렇게 해야 하는가에 대한 명확한 철학과 기준을 세웁니다.
-                                    </p>
-                                    <ul className={styles.styledList}>
-                                        <li>
-                                            <strong>'안전하고 효율적인 거래소 선택 기준' 체크리스트</strong><br />
-                                            보안, 수수료, 유동성, 기능 등. 저희 팀이 '단 하나의 거래소'를 선택할 때 사용하는 실제 체크리스트와 그 이유를 공개합니다.
-                                        </li>
-                                        <li>
-                                            <strong>'관점이 담긴' 셋업 가이드</strong><br />
-                                            저희 팀이 데이터를 분석할 때 '어떤 기능'을, '왜' 사용하는지에 대한 명확한 관점을 공유합니다. 수십 가지 보조지표 중 살아남은 필수 지표와 시간을 낭비하지 않는 세팅법을 알려드립니다.
-                                        </li>
-                                        <li>
-                                            <strong>'버리는 기준'에 대한 철학</strong><br />
-                                            "정보의 홍수 속에서 가장 중요한 것은 '버리는 기준'입니다." 왜 저희는 2~3가지 보조지표만 화면에 둘까요? 차트를 깔끔하게 만들고 판단을 명료하게 만드는 팀의 확고한 철학을 공유합니다.
-                                        </li>
-                                    </ul>
-                                </div>
+                            {/* 이미지 섹션 */}
+                            <div style={{display: 'flex', flexDirection: 'column'}}>
+                                <img
+                                    src="/1.png"
+                                    alt="일반인을 위한 첫번째 안내서 - 섹션 1"
+                                    style={{
+                                        width: '760px',
+                                        height: 'auto',
+                                        display: 'block',
+                                        maxWidth: '100%'
+                                    }}
+                                />
+                                <img
+                                    src="/2.png"
+                                    alt="일반인을 위한 첫번째 안내서 - 섹션 2"
+                                    style={{
+                                        width: '760px',
+                                        height: 'auto',
+                                        display: 'block',
+                                        maxWidth: '100%',
+                                        marginTop: '-5px'
+                                    }}
+                                />
+                                <img
+                                    src="/3.png"
+                                    alt="일반인을 위한 첫번째 안내서 - 섹션 3"
+                                    style={{
+                                        width: '760px',
+                                        height: 'auto',
+                                        display: 'block',
+                                        maxWidth: '100%'
+                                    }}
+                                />
+                                <img
+                                    src="/4.png"
+                                    alt="일반인을 위한 첫번째 안내서 - 섹션 4"
+                                    style={{
+                                        width: '760px',
+                                        height: 'auto',
+                                        display: 'block',
+                                        maxWidth: '100%'
+                                    }}
+                                />
+                                <img
+                                    src="/5.gif"
+                                    alt="일반인을 위한 첫번째 안내서 - 섹션 5"
+                                    style={{
+                                        width: '760px',
+                                        height: 'auto',
+                                        display: 'block',
+                                        maxWidth: '100%'
+                                    }}
+                                />
+                                <img
+                                    src="/6.png"
+                                    alt="일반인을 위한 첫번째 안내서 - 섹션 6"
+                                    style={{
+                                        width: '760px',
+                                        height: 'auto',
+                                        display: 'block',
+                                        maxWidth: '100%'
+                                    }}
+                                />
+                            </div>
 
-                                <div className={styles.moduleSpacing}>
-                                    <h4 className={styles.moduleTitle}>PART 2. 📚 지식 심화 (실전 용어 해석집)</h4>
-                                    <p className={styles.bodyText}>
-                                        용어의 '정의'가 아닌 '실전 해석'을 배웁니다.
-                                    </p>
-                                    <h5 className={styles.subsectionTitle}>현역 트레이더의 퀀트 용어집</h5>
-                                    <p className={styles.bodyText}>
-                                        단순히 용어를 정의([translate:Define])하지 않습니다. '우리 팀은 이 용어를 실전에서 이렇게 해석하고 활용한다'는 '관점([translate:Perspective])'을 더한 실전 용어집입니다.
-                                    </p>
-                                    <h5 className={styles.subsectionTitle}>핵심 용어 15가지 (실전 차트 포함)</h5>
-                                    <p className={styles.bodyText}>
-                                        '추세선', '지지/저항', '변동성' 등. 초보자가 가장 헷갈려 하지만 실전에서 매일 쓰이는 핵심 용어 15개를 선별하여, '어떻게 해석해야 하는지'를 해설합니다.
-                                    </p>
-                                </div>
+                            <hr className={styles.sectionSeparator} style={{marginTop: '80px', marginBottom: '60px'}} />
 
-                                <div className={styles.moduleSpacing}>
-                                    <h4 className={styles.moduleTitle}>PART 3. ⚙️ 도구 세팅 (차트 즉시 복사)</h4>
-                                    <p className={styles.bodyText}>
-                                        클릭 한 번으로 전문가의 차트를 그대로 복사합니다.
-                                    </p>
-                                    <h5 className={styles.subsectionTitle}>1-Click 트레이딩뷰 표준 레이아웃 링크</h5>
-                                    <p className={styles.bodyText}>
-                                        클릭 한 번으로 당신의 트레이딩뷰 차트가 저희 팀의 표준 레이아웃(필수 이평선, 핵심 보조지표, 차트 색상 설정)으로 즉시 변경되는 공유 링크를 제공합니다.
-                                    </p>
-                                    <h5 className={styles.subsectionTitle}>더 이상 세팅에 시간을 낭비하지 마세요</h5>
-                                    <p className={styles.bodyText}>
-                                        잘못된 세팅으로 시간을 낭비하거나 혼란을 겪을 필요 없이, 검증된 전문가의 환경에서 즉시 시작할 수 있습니다.
-                                    </p>
+                            {/* FAQ 섹션 */}
+                            <section style={{marginBottom: '80px'}}>
+                                <h3 style={{
+                                    fontSize: '24px',
+                                    fontWeight: '700',
+                                    color: '#333',
+                                    margin: '0 0 40px 0',
+                                    paddingLeft: '16px',
+                                    borderLeft: '4px solid #FF6B35'
+                                }}>
+                                    자주 묻는 질문 (FAQ)
+                                </h3>
+
+                                <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
+                                    {/* FAQ 1 */}
+                                    <div style={{
+                                        padding: '24px',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '12px',
+                                        background: '#fff'
+                                    }}>
+                                        <h4 style={{
+                                            fontSize: '17px',
+                                            fontWeight: '700',
+                                            color: '#333',
+                                            marginBottom: '16px',
+                                            lineHeight: '1.6'
+                                        }}>
+                                            Q: 이 안내서에도 1:1 멘토링이 포함되나요?
+                                        </h4>
+                                        <p style={{
+                                            fontSize: '15px',
+                                            lineHeight: '1.7',
+                                            color: '#555',
+                                            margin: '0'
+                                        }}>
+                                            A: 아니요, 이 안내서는 1:1 지원을 포함하지 않습니다. 대신, 가장 합리적인 비용으로 현역 팀의 '핵심 노하우'와 '표준 세팅'을 온전히 습득할 수 있도록 설계된 <strong>'자습서(Self-Study Guide)'</strong>입니다.
+                                        </p>
+                                    </div>
+
+                                    {/* FAQ 2 */}
+                                    <div style={{
+                                        padding: '24px',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '12px',
+                                        background: '#fff'
+                                    }}>
+                                        <h4 style={{
+                                            fontSize: '17px',
+                                            fontWeight: '700',
+                                            color: '#333',
+                                            marginBottom: '16px',
+                                            lineHeight: '1.6'
+                                        }}>
+                                            Q: 이 안내서만 보면 바로 수익을 낼 수 있나요?
+                                        </h4>
+                                        <p style={{
+                                            fontSize: '15px',
+                                            lineHeight: '1.7',
+                                            color: '#555',
+                                            margin: '0'
+                                        }}>
+                                            A: 아니요, 이 안내서는 '수익'을 보장하지 않습니다. 이 자료는 '물고기'가 아닌, 트레이딩이라는 바다에 나가기 위한 <strong>'가장 튼튼한 배와 나침반을 세팅하는 법'</strong>을 알려드립니다. 올바른 시작은 성공의 확률을 높이지만, 결과는 전적으로 본인의 노력과 시장 상황에 달려있습니다.
+                                        </p>
+                                    </div>
+
+                                    {/* FAQ 3 */}
+                                    <div style={{
+                                        padding: '24px',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '12px',
+                                        background: '#fff'
+                                    }}>
+                                        <h4 style={{
+                                            fontSize: '17px',
+                                            fontWeight: '700',
+                                            color: '#333',
+                                            marginBottom: '16px',
+                                            lineHeight: '1.6'
+                                        }}>
+                                            Q: 구매 후 안내서는 어떻게 받나요?
+                                        </h4>
+                                        <p style={{
+                                            fontSize: '15px',
+                                            lineHeight: '1.7',
+                                            color: '#555',
+                                            margin: '0'
+                                        }}>
+                                            A: 구매 확정 즉시, PDF 안내서와 '차트 레이아웃 링크'가 포함된 디지털 콘텐츠에 액세스할 수 있는 링크가 이메일로 발송됩니다.
+                                        </p>
+                                    </div>
                                 </div>
                             </section>
 
-                            <hr className={styles.sectionSeparator} />
+                            <hr className={styles.sectionSeparator} style={{marginBottom: '60px'}} />
 
-                            <section {...animRecommend} className={styles.sectionSpacing}>
-                                <h3 className={styles.sectionTitle}>이런 분들에게 추천합니다</h3>
-                                <ul className={styles.styledListCheck}>
-                                    <li>✔️ 코인/주식/선물 트레이딩을 이제 막 시작하려는 완전 초보자</li>
-                                    <li>✔️ 수많은 정보와 보조지표 속에서 길을 잃고 혼란스러운 분</li>
-                                    <li>✔️ '전문가들은 도대체 차트를 어떻게 세팅할까?' 궁금했던 분</li>
-                                    <li>✔️ 1:1 멘토링은 부담스럽지만, 전문가의 핵심 노하우만 빠르게 얻고 싶은 분</li>
-                                    <li>✔️ 복잡한 것은 질색이고, 가장 효율적인 시작점을 원하는 분</li>
-                                </ul>
-                            </section>
+                            {/* 후기 섹션 */}
+                            <section>
+                                <div style={{display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px'}}>
+                                    <h3 style={{
+                                        fontSize: '24px',
+                                        fontWeight: '700',
+                                        color: '#333',
+                                        margin: '0',
+                                        paddingLeft: '16px',
+                                        borderLeft: '4px solid #FF6B35'
+                                    }}>
+                                        후기
+                                    </h3>
+                                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                        <span style={{fontSize: '20px', color: '#FFB800'}}>★</span>
+                                        <span style={{fontSize: '18px', fontWeight: '700', color: '#333'}}>4.9</span>
+                                        <span style={{fontSize: '14px', color: '#FF6B35', fontWeight: '600'}}>📝 831</span>
+                                    </div>
+                                </div>
 
-                            <hr className={styles.sectionSeparator} />
-                            
-                            <section className={styles.faqBox} {...animFaq}>
-                                <h3 className={styles.sectionTitle}>자주 묻는 질문 (FAQ)</h3>
-                                <div className={styles.accordion}>
-                                    {faqItems.map((item, index) => (
-                                        <div key={index} className={styles.accordionItem}>
+                                {/* 후기 작성 박스 */}
+                                <div style={{
+                                    padding: '24px',
+                                    border: '1px solid #e5e7eb',
+                                    borderRadius: '12px',
+                                    background: '#fff',
+                                    marginBottom: '24px'
+                                }}>
+                                    <div style={{display: 'flex', gap: '8px', marginBottom: '16px'}}>
+                                        <span style={{fontSize: '24px', color: '#e5e7eb', cursor: 'pointer'}}>★</span>
+                                        <span style={{fontSize: '24px', color: '#e5e7eb', cursor: 'pointer'}}>★</span>
+                                        <span style={{fontSize: '24px', color: '#e5e7eb', cursor: 'pointer'}}>★</span>
+                                        <span style={{fontSize: '24px', color: '#e5e7eb', cursor: 'pointer'}}>★</span>
+                                        <span style={{fontSize: '24px', color: '#e5e7eb', cursor: 'pointer'}}>★</span>
+                                    </div>
+                                    <textarea
+                                        placeholder="구매 후 작성이 가능합니다."
+                                        disabled
+                                        style={{
+                                            width: '100%',
+                                            minHeight: '100px',
+                                            padding: '16px',
+                                            border: '1px solid #e5e7eb',
+                                            borderRadius: '8px',
+                                            fontSize: '15px',
+                                            resize: 'vertical',
+                                            fontFamily: 'inherit',
+                                            color: '#9ca3af',
+                                            background: '#f9fafb'
+                                        }}
+                                    />
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        marginTop: '12px'
+                                    }}>
+                                        <span style={{fontSize: '13px', color: '#9ca3af'}}>이모티콘은 제작되어 보여집니다.</span>
+                                        <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>0/1000</span>
                                             <button
-                                                className={`${styles.accordionTitle} ${activeIndex === index ? styles.active : ''}`}
-                                                onClick={() => toggleAccordion(index)}
+                                                disabled
+                                                style={{
+                                                    padding: '8px 20px',
+                                                    background: '#e5e7eb',
+                                                    color: '#9ca3af',
+                                                    border: 'none',
+                                                    borderRadius: '6px',
+                                                    fontSize: '14px',
+                                                    fontWeight: '600',
+                                                    cursor: 'not-allowed'
+                                                }}
                                             >
-                                                {item.question}
-                                                <span className={styles.icon}>{activeIndex === index ? '-' : '+'}</span>
+                                                등록
                                             </button>
-                                            <div className={`${styles.accordionContent} ${activeIndex === index ? styles.show : ''}`}>
-                                                <p>{item.answer}</p>
-                                            </div>
                                         </div>
-                                    ))}
+                                    </div>
+                                </div>
+
+                                <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+                                    {/* 후기 1 */}
+                                    <div style={{
+                                        padding: '24px',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '12px',
+                                        background: '#fff'
+                                    }}>
+                                        <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
+                                            <div>
+                                                <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>혜차</div>
+                                                <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>★★★★★</div>
+                                            </div>
+                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>2일 전</span>
+                                        </div>
+                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
+                                            우연히 모르실리들 보고 바로 결제하신다! 정말더할 좋아보이거 빡독에 잦어서 부저어는 혜어저는 상황입니다. 막왕자를 꽃그 자신의의 떨어 되었으며 이렇게 자장아의 말자하는는 시대와 모든 평제들 등해 지도 새로써 시직혈료입니다!
+                                        </p>
+                                    </div>
+
+                                    {/* 후기 2 */}
+                                    <div style={{
+                                        padding: '24px',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '12px',
+                                        background: '#fff'
+                                    }}>
+                                        <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
+                                            <div>
+                                                <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>jjun0825</div>
+                                                <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>★★★★★</div>
+                                            </div>
+                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>2일 전</span>
+                                        </div>
+                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
+                                            만족했습니다. 전내에 별의 잦어다릅.....
+                                        </p>
+                                    </div>
+
+                                    {/* 후기 3 */}
+                                    <div style={{
+                                        padding: '24px',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '12px',
+                                        background: '#fff'
+                                    }}>
+                                        <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
+                                            <div>
+                                                <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>GO(26652)</div>
+                                                <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>★★★★★</div>
+                                            </div>
+                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>2일 전</span>
+                                        </div>
+                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
+                                            아직 강의듣기 전이지만 모르실리드를 듣발씨 예어저이어이 전반적엔 빡독의 필요성을 광센에에 너무 기대됩니다
+                                        </p>
+                                    </div>
+
+                                    {/* 후기 4 */}
+                                    <div style={{
+                                        padding: '24px',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '12px',
+                                        background: '#fff'
+                                    }}>
+                                        <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
+                                            <div>
+                                                <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>H.SW</div>
+                                                <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>★★★★★</div>
+                                            </div>
+                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>3일 전</span>
+                                        </div>
+                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
+                                            전제 구조 이번 강의는 수경사너 느낌 강의 좀 본후으서 참하이면 실적에서 바로 쓰어는 사구 체결한 전직 효율을 얻읍 다느는 것이다. 단순서 사느 노구돼 티 쓸 모는 분야 머니떼 관 그런게 해어 서고지, 어떤 입력에 사구 단개중 거저어 실인 바드느스크 상련로 이어거느집을 만들어서 노뎌 그러서 수잡이 끝나 나싀 상련로 최인의 기능됩다.
+                                        </p>
+                                    </div>
                                 </div>
                             </section>
-                            
                         </div>
                     </main>
 

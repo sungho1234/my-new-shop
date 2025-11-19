@@ -196,282 +196,220 @@ const ProductDetailPage = () => {
 
 
                         <div className={styles.contentArea}>
-
-
-                            {/* 메인 헤드라인 */}
-                            <section {...animHeadline} className={styles.sectionSpacing}>
-                                <h2 className={styles.mainHeadline}>
-                                    현역 퀀트 트레이더와 함께하는<br />
+                            {/* 제목 섹션 */}
+                            <section style={{marginTop: '60px', marginBottom: '60px'}}>
+                                <h2 className={styles.mainHeadline} style={{textAlign: 'center', marginBottom: '16px'}}>
+                                    현역 퀀트 트레이더와 함께하는<br/>
                                     2025 일반인을 위한 시스템 투자 올인원
                                 </h2>
-                                <p className={styles.mainSubheadline}>
-                                    5일간의 1:1 전담 멘토링으로 당신의 매매가 '감'이 아닌 '데이터'로<br/>
-                                    바뀌는 순간을 경험하세요.
+                                <p className={styles.mainSubheadline} style={{textAlign: 'center'}}>
+                                    5일간의 1:1 전담 멘토링으로 당신의 매매가 '감'이 아닌 '데이터'로 바뀌는 순간을 경험하세요.
                                 </p>
                             </section>
 
-
-                            {/* 이런 분들을 위해 준비했습니다 */}
-                            <section {...animPainPoints} className={styles.sectionSpacing}>
-                                <h3 className={styles.sectionTitle}>혹시, 이런 고민을 하고 계신가요?</h3>
-                                <p className={styles.subsectionTitle}>혼자 공부하며 길을 잃은 느낌이 듭니다...</p>
-                                
-                                <ul className={styles.styledList}>
-                                    <li>"수많은 유튜브와 강의를 봤지만, 어디서부터 시작해야 할지 모르겠어요."</li>
-                                    <li>"보조지표가 너무 많아 어떤 것을 믿어야 할지 혼란스러워요."</li>
-                                    <li>"매매할 때마다 불안하고, 손실이 나면 멘탈이 흔들려요."</li>
-                                    <li>"'수익률 75% 보장' 같은 광고가 진짜인지 가짜인지 분간이 안 돼요."</li>
-                                    <li>"혼자 하면 계속 같은 실수를 반복할 것 같아 두려워요."</li>
-                                </ul>
-                            </section>
-
-
-                            {/* 콜아웃 박스 */}
-                            <section {...animCallout} className={styles.sectionSpacing}>
-                                <div className={styles.calloutBox}>
-                                    <p><strong>당신은 혼자가 아닙니다.</strong></p>
-                                    <p>
-                                        우리는 소수에게만 허락되었던 퀀트 기술의 장벽을 무너뜨리고,<br/>
-                                        실력 있는 트레이더들의 성장 네트워크를 만들고 있습니다.
-                                    </p>
-                                </div>
-                            </section>
-
-
-                            {/* 도입부 문단 */}
-                            <section {...animCoreValue} className={styles.sectionSpacing}>
+                            {/* 소개 문구 */}
+                            <section className={styles.sectionSpacing}>
                                 <p className={styles.bodyText}>
-                                    이 올인원에서는 챌린지 설정, 기술 사용 등 다루는 정보를 물어보고<br/>
+                                    이 올인원에서는 전략 설정, 기술 사용 등 다루는 정보를 물어보고<br/>
                                     습득할 수 있도록 현역 트레이더 팀원 한명이 배정됩니다.
                                 </p>
                                 <p className={styles.bodyText}>
-                                    저희는 당신의 성장에 우리의 시간과 인력을 먼저 소비 합니다.<br/>
-                                    당신이 길을 잃지 않고 빠르게 성장하는 것이 곧 우리의 목표와 일치하기 떄문입니다.
+                                    저희는 당신의 성장에 우리의 시간과 인력을 먼저 투자합니다.<br/>
+                                    당신이 길을 잃지 않고 빠르게 성장하는 것이 곧 우리의 목표와 일치하기 때문입니다.
                                 </p>
                                 <p className={styles.bodyText}>
                                     <strong>위 패키지는 트레이딩 진입장벽을 무너뜨리기 위한 저희의 투자입니다.</strong>
                                 </p>
                             </section>
 
+                            <hr className={styles.sectionSeparator} style={{marginBottom: '60px'}} />
 
-                            {/* 패키지 앵커 제목 */}
-                            <hr className={styles.sectionSeparator} />
-                            <section {...animPackageIntro} className={styles.sectionSpacing}>
-                                <h3 className={styles.sectionTitle}>패키지에 포함된 6가지 핵심 자산</h3>
-                                <p className={styles.mainSubheadline} style={{fontSize: "20px"}}>
-                                    현역 트레이더의 1:1 멘토링부터 실전 도구 세팅까지,<br/>
-                                    성장에 필요한 모든 것을 담았습니다.
-                                </p>
+                            {/* 소개 목차 */}
+                            <section style={{marginBottom: '40px'}}>
+                                <h3 style={{
+                                    fontSize: '24px',
+                                    fontWeight: '700',
+                                    color: '#333',
+                                    margin: '0',
+                                    paddingLeft: '16px',
+                                    borderLeft: '4px solid #FF6B35'
+                                }}>
+                                    소개
+                                </h3>
                             </section>
 
+                            {/* 이미지 섹션 - g1 폴더의 이미지들 */}
+                            <div style={{display: 'flex', flexDirection: 'column'}}>
+                                <img src="/g1/g1.png" alt="시스템 투자 올인원 - 섹션 1" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g2.png" alt="시스템 투자 올인원 - 섹션 2" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g3.png" alt="시스템 투자 올인원 - 섹션 3" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g4.gif" alt="시스템 투자 올인원 - 섹션 4" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g5.png" alt="시스템 투자 올인원 - 섹션 5" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g6.png" alt="시스템 투자 올인원 - 섹션 6" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g7.png" alt="시스템 투자 올인원 - 섹션 7" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g8.png" alt="시스템 투자 올인원 - 섹션 8" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g9.png" alt="시스템 투자 올인원 - 섹션 9" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g10.png" alt="시스템 투자 올인원 - 섹션 10" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g11.png" alt="시스템 투자 올인원 - 섹션 11" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g12.png" alt="시스템 투자 올인원 - 섹션 12" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g13.png" alt="시스템 투자 올인원 - 섹션 13" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g14.png" alt="시스템 투자 올인원 - 섹션 14" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g15.png" alt="시스템 투자 올인원 - 섹션 15" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g16.png" alt="시스템 투자 올인원 - 섹션 16" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g17.png" alt="시스템 투자 올인원 - 섹션 17" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g18.png" alt="시스템 투자 올인원 - 섹션 18" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g19.gif" alt="시스템 투자 올인원 - 섹션 19" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g20.png" alt="시스템 투자 올인원 - 섹션 20" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <img src="/g1/g21.png" alt="시스템 투자 올인원 - 섹션 21" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                            </div>
 
-                            {/* 패키지 구성 */}
-                            <section {...animModules} className={styles.sectionSpacing} style={{marginTop: "-60px"}}>
-                                
-                                {/* 1. 퍼스널 멘토링 데스크 (강조) */}
-                                <div className={styles.highlightBox}>
-                                    <h4 className={styles.moduleTitle}>MODULE 1. 1:1 퍼스널 멘토링 데스크 ⭐</h4>
-                                    <p className={styles.bodyText}>
-                                        이 패키지의 핵심입니다. 구매 확정일로부터 <strong>5일간</strong>, 당신과 담당 팀원만 참여하는 <strong>1:1 프라이빗 채널</strong>이 개설됩니다.
-                                        시간에 구애받지 않고 질문을 남겨주시면, 담당 팀원이 직접 답변드립니다.
-                                    </p>
-                                    
-                                    <h5 className={styles.subsectionTitle}>멘토링으로 얻게 되는 4가지 핵심 가치:</h5>
-                                    <ul className={styles.styledList}>
-                                        <li><strong>학습의 가속화</strong><br />
-                                            '원론집'과 '트레이닝북'의 모든 궁금증을 완벽히 이해할 때까지 해결해 드립니다.
-                                        </li>
-                                        <li><strong>성장의 방향성 검증</strong><br />
-                                            '트레이닝북' 과제와 매매 일지에 대해 전문가의 피드백을 받고 방향성을 점검합니다.
-                                        </li>
-                                        <li><strong>실전 환경 세팅 지원</strong><br />
-                                            차트 세팅, API 연동, 보안 설정 등 기술적 문제들을 단계별로 함께 해결합니다.
-                                        </li>
-                                        <li><strong>심리적 안정감</strong><br />
-                                            혼자가 아니라는 확신. 막힐 때마다 물어볼 수 있는 전문가가 있다는 것은 큰 차이를 만듭니다.
-                                        </li>
-                                    </ul>
-                                </div>
+                            <hr className={styles.sectionSeparator} style={{marginTop: '80px', marginBottom: '60px'}} />
 
+                            {/* FAQ 섹션 */}
+                            <section style={{marginBottom: '80px'}}>
+                                <h3 style={{
+                                    fontSize: '24px',
+                                    fontWeight: '700',
+                                    color: '#333',
+                                    margin: '0 0 40px 0',
+                                    paddingLeft: '16px',
+                                    borderLeft: '4px solid #FF6B35'
+                                }}>
+                                    자주 묻는 질문 (FAQ)
+                                </h3>
 
-                                {/* 2. 원론집 */}
-                                <div className={styles.moduleSpacing}>
-                                    <h4 className={styles.moduleTitle}>MODULE 2. 📘 원론집 (Foundation Guidebook)</h4>
-                                    <p className={styles.bodyText}>
-                                        트레이딩의 기초를 탄탄하게 다지는 필수 가이드입니다. 시작부터 올바른 환경을 갖추는 것이 성공의 절반입니다.
-                                    </p>
-                                    <h5 className={styles.subsectionTitle}>포함 내용:</h5>
-                                    <ul className={styles.styledList}>
-                                        <li><strong>안전한 거래소 선택 체크리스트 (15개 항목)</strong></li>
-                                        <li><strong>실전 차트 셋업 가이드 (필수 보조지표 3가지 포함)</strong></li>
-                                        <li><strong>정보 필터링 원칙: '버리는 기준'을 명확히 아는 법</strong></li>
-                                    </ul>
-                                </div>
+                                <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
+                                    {/* FAQ 1 */}
+                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
+                                        <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '16px', lineHeight: '1.6'}}>
+                                            Q: 완전 초보도 따라갈 수 있나요?
+                                        </h4>
+                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#555', margin: '0'}}>
+                                            A: 네, 가능합니다. 이 패키지는 '어디서부터 시작할지' 모르는 분들을 위해 설계되었습니다. 1:1 멘토링을 통해 거래소 가입과 같은 기초 단계부터 차트 세팅, 용어 이해까지 모든 과정을 개인의 속도에 맞춰 지원합니다.
+                                        </p>
+                                    </div>
 
+                                    {/* FAQ 2 */}
+                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
+                                        <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '16px', lineHeight: '1.6'}}>
+                                            Q: 5일간의 멘토링 후에는 어떻게 하나요?
+                                        </h4>
+                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#555', margin: '0'}}>
+                                            A: 5일은 당신이 '혼자 설 수 있도록' 시스템의 기초를 다지고 모든 도구를 세팅하는 집중 기간입니다. 5일이 지나도, 당신은 '원론집', '스캠 필터', '과제집' 등 모든 핵심 자산을 영구적으로 소유합니다. 멘토링 기간 동안 습득한 '스스로 검증하고 개선하는 방법론'을 바탕으로 30일, 90일간 트레이닝을 지속하며 성장하게 됩니다.
+                                        </p>
+                                    </div>
 
-                                {/* 3. 지식 심화 */}
-                                <div className={styles.moduleSpacing}>
-                                    <h4 className={styles.moduleTitle}>MODULE 3. 📚 지식 심화 (Deep Knowledge Library)</h4>
-                                    <p className={styles.bodyText}>
-                                        단순한 용어 정의가 아닌, '우리 팀이 실전에서 이 개념을 어떻게 해석하고 활용하는지'를 더한 실무 중심 용어집입니다.
-                                    </p>
-                                    <h5 className={styles.subsectionTitle}>핵심 용어 15개 수록:</h5>
-                                    <ul className={styles.styledList}>
-                                        <li>추세선, 변동성, RSI, MACD, 볼린저 밴드</li>
-                                        <li>지지선/저항선, 거래량 분석, 백테스팅 방법론 등</li>
-                                    </ul>
-                                </div>
-
-
-                                {/* 4. 도구 세팅 */}
-                                <div className={styles.moduleSpacing}>
-                                    <h4 className={styles.moduleTitle}>MODULE 4. ⚙️ 도구 세팅 (Tool Setup Kit)</h4>
-                                    <p className={styles.bodyText}>
-                                        클릭 한 번으로 당신의 차트가 우리 팀이 사용하는 표준 레이아웃으로 즉시 변경됩니다. "이게 맞나?" 고민할 시간을 줄여드립니다.
-                                    </p>
-                                    <h5 className={styles.subsectionTitle}>포함 사항:</h5>
-                                    <ul className={styles.styledList}>
-                                        <li><strong>데이/스윙 트레이딩용 차트 레이아웃 3종</strong></li>
-                                        <li><strong>핵심 알림(Alert) 템플릿 5종</strong></li>
-                                        <li><strong>워치리스트 관리 방법론</strong></li>
-                                    </ul>
-                                </div>
-
-
-                                {/* 5. 스캠 필터링 */}
-                                <div className={styles.moduleSpacing}>
-                                    <h4 className={styles.moduleTitle}>MODULE 5. 🛡️ 스캠 필터링 체크리스트</h4>
-                                    <p className={styles.bodyText}>
-                                        "절대 손실 없음", "75% 수익률 보장" 같은 문구들이 왜 논리적으로 불가능한지, 현역 팀이 명확히 설명해 드립니다. 스스로 위험을 걸러내는 기준을 드립니다.
-                                    </p>
-                                    <h5 className={styles.subsectionTitle}>보호 체크리스트 포함:</h5>
-                                    <ul className={styles.styledList}>
-                                        <li><strong>11가지 사기 패턴 분석</strong></li>
-                                        <li><strong>피싱 및 해킹 방지 (2FA, 콜드월렛, 화이트리스트 설정)</strong></li>
-                                        <li><strong>의심스러운 링크와 스마트 컨트랙트 검증 방법</strong></li>
-                                    </ul>
-                                </div>
-
-
-                                {/* 6. 과제집 */}
-                                <div className={styles.moduleSpacing}>
-                                    <h4 className={styles.moduleTitle}>MODULE 6. 📊 과제집 (트레이닝북)</h4>
-                                    <p className={styles.bodyText}>
-                                        '감'에 의존하던 매매를 '데이터 기반'으로 교정하는 정교하게 설계된 실전 훈련 과제입니다.
-                                    </p>
-                                    
-                                    <h5 className={styles.subsectionTitle}>5단계 훈련 프로세스:</h5>
-                                    <ol className={styles.numberedFeatureList}>
-                                        <li>
-                                            <div className={styles.numberedFeatureContent}>
-                                                <h4 className={styles.numberedFeatureTitle}>1단계: 관찰 훈련</h4>
-                                                <p className={styles.numberedFeatureDesc}>30일간 매일 가격과 거래량 패턴 기록</p>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className={styles.numberedFeatureContent}>
-                                                <h4 className={styles.numberedFeatureTitle}>2단계: 가설 수립</h4>
-                                                <p className={styles.numberedFeatureDesc}>관찰 데이터를 바탕으로 진입/청산 조건 정의</p>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className={styles.numberedFeatureContent}>
-                                                <h4 className={styles.numberedFeatureTitle}>3단계: 백테스팅</h4>
-                                                <p className={styles.numberedFeatureDesc}>과거 데이터로 가설 검증 (승률, 손익비 계산)</p>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className={styles.numberedFeatureContent}>
-                                                <h4 className={styles.numberedFeatureTitle}>4단계: 소액 실전</h4>
-                                                <p className={styles.numberedFeatureDesc}>최소 금액으로 전략 실행 및 매매 일지 기록</p>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className={styles.numberedFeatureContent}>
-                                                <h4 className={styles.numberedFeatureTitle}>5단계: 분석 및 개선</h4>
-                                                <p className={styles.numberedFeatureDesc}>50회 거래 후 데이터 분석 및 규칙 수정</p>
-                                            </div>
-                                        </li>
-                                    </ol>
+                                    {/* FAQ 3 */}
+                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
+                                        <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '16px', lineHeight: '1.6'}}>
+                                            Q: 수익을 보장하나요?
+                                        </h4>
+                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#555', margin: '0'}}>
+                                            A: 아니요. 저희는 절대로 수익을 보장하지 않습니다. "수익 보장"을 약속하는 곳이 있다면 '스캠 필터링 체크리스트'에 따라 즉시 피하시길 권합니다. 우리는 '물고기'를 잡아주는 것이 아닌, 시장에서 평생 살아남을 수 있는 '시스템을 설계하고 검증하는 법'을 가르칩니다. 투자의 모든 최종 책임은 본인에게 있으며, 저희는 그 과정을 가장 안전하고 효율적으로 수행하도록 돕는 파트너입니다.
+                                        </p>
+                                    </div>
                                 </div>
                             </section>
 
+                            <hr className={styles.sectionSeparator} style={{marginBottom: '60px'}} />
 
-                            <hr className={styles.sectionSeparator} />
+                            {/* 후기 섹션 */}
+                            <section>
+                                <div style={{display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px'}}>
+                                    <h3 style={{
+                                        fontSize: '24px',
+                                        fontWeight: '700',
+                                        color: '#333',
+                                        margin: '0',
+                                        paddingLeft: '16px',
+                                        borderLeft: '4px solid #FF6B35'
+                                    }}>
+                                        후기
+                                    </h3>
+                                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                        <span style={{fontSize: '20px', color: '#FFB800'}}>★</span>
+                                        <span style={{fontSize: '18px', fontWeight: '700', color: '#333'}}>4.9</span>
+                                        <span style={{fontSize: '14px', color: '#FF6B35', fontWeight: '600'}}>📝 831</span>
+                                    </div>
+                                </div>
 
-
-                            {/* 왜 특별한가? */}
-                            <section {...animSpecial} className={styles.sectionSpacing}>
-                                <h3 className={styles.sectionTitle}>왜 이 패키지가 특별한가?</h3>
-                                <ul className={styles.styledListCheck}>
-                                    <li>
-                                        <strong>양방향 성장 파트너십</strong><br />
-                                        <span>
-                                            일방적인 영상 강의가 아닙니다. 5일간 당신의 전담 팀원이 함께합니다.
-                                        </span>
-                                    </li>
-                                    <li>
-                                        <strong>실전 중심 콘텐츠</strong><br />
-                                        <span>
-                                            이론만 가르치지 않습니다. 우리 팀이 실제로 사용하는 도구, 세팅, 전략을 그대로 공유합니다.
-                                        </span>
-                                    </li>
-                                    <li>
-                                        <strong>사기 방지 교육 포함</strong><br />
-                                        <span>
-                                            수익률만 외치는 시장에서, 우리는 당신을 보호하는 방법부터 가르칩니다.
-                                        </span>
-                                    </li>
-                                </ul>
-                            </section>
-
-
-                            {/* 기대 결과 */}
-                            <section {...animResults} className={styles.sectionSpacing}>
-                                <h3 className={styles.sectionTitle}>이런 결과를 기대할 수 있습니다</h3>
-                                <ul className={styles.styledListCheck}>
-                                    <li><strong>5일 후,</strong> 트레이딩 환경을 완벽히 세팅하고 자신감 있게 시작합니다.</li>
-                                    <li><strong>30일 후,</strong> 감이 아닌 데이터로 판단을 내리는 습관이 형성됩니다.</li>
-                                    <li><strong>90일 후,</strong> 자신만의 매매 시스템을 구축하고 지속적으로 개선할 수 있습니다.</li>
-                                </ul>
-                            </section>
-
-
-                            <hr className={styles.sectionSeparator} />
-                            
-                            {/* FAQ */}
-                            <section className={styles.faqBox} {...animFaq}>
-                                <h3 className={styles.sectionTitle}>자주 묻는 질문 (FAQ)</h3>
-                                <div className={styles.accordion}>
-                                    {faqItems.map((item, index) => (
-                                        <div key={index} className={styles.accordionItem}>
-                                            <button
-                                                className={`${styles.accordionTitle} ${activeIndex === index ? styles.active : ''}`}
-                                                onClick={() => toggleAccordion(index)}
-                                            >
-                                                {item.question}
-                                                <span className={styles.icon}>{activeIndex === index ? '-' : '+'}</span>
-                                            </button>
-                                            <div className={`${styles.accordionContent} ${activeIndex === index ? styles.show : ''}`}>
-                                                <p>{item.answer}</p>
-                                            </div>
+                                {/* 후기 작성 박스 */}
+                                <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff', marginBottom: '24px'}}>
+                                    <div style={{display: 'flex', gap: '8px', marginBottom: '16px'}}>
+                                        <span style={{fontSize: '24px', color: '#e5e7eb', cursor: 'pointer'}}>★</span>
+                                        <span style={{fontSize: '24px', color: '#e5e7eb', cursor: 'pointer'}}>★</span>
+                                        <span style={{fontSize: '24px', color: '#e5e7eb', cursor: 'pointer'}}>★</span>
+                                        <span style={{fontSize: '24px', color: '#e5e7eb', cursor: 'pointer'}}>★</span>
+                                        <span style={{fontSize: '24px', color: '#e5e7eb', cursor: 'pointer'}}>★</span>
+                                    </div>
+                                    <textarea
+                                        placeholder="구매 후 작성이 가능합니다."
+                                        disabled
+                                        style={{width: '100%', minHeight: '100px', padding: '16px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '15px', resize: 'vertical', fontFamily: 'inherit', color: '#9ca3af', background: '#f9fafb'}}
+                                    />
+                                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px'}}>
+                                        <span style={{fontSize: '13px', color: '#9ca3af'}}>이모티콘은 제작되어 보여집니다.</span>
+                                        <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>0/1000</span>
+                                            <button disabled style={{padding: '8px 20px', background: '#e5e7eb', color: '#9ca3af', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '600', cursor: 'not-allowed'}}>등록</button>
                                         </div>
-                                    ))}
+                                    </div>
                                 </div>
-                            </section>
 
+                                <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+                                    {/* 후기 카드들 */}
+                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
+                                        <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
+                                            <div>
+                                                <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>혜차</div>
+                                                <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>★★★★★</div>
+                                            </div>
+                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>2일 전</span>
+                                        </div>
+                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
+                                            우연히 모르실리들 보고 바로 결제하신다! 정말더할 좋아보이거 빡독에 잦어서 부저어는 혜어저는 상황입니다. 막왕자를 꽃그 자신의의 떨어 되었으며 이렇게 자장아의 말자하는는 시대와 모든 평제들 등해 지도 새로써 시직혈료입니다!
+                                        </p>
+                                    </div>
 
-                            {/* 마지막으로 */}
-                            <section className={`${styles.descriptionBox} ${styles.card}`} {...animFinal}>
-                                <h3 className={styles.sectionTitle}>마지막으로</h3>
-                                <p className={styles.bodyText}>트레이딩은 외롭고 어려운 여정입니다.<br/>
-                                    하지만 올바른 안내와 함께라면, 그 길은 훨씬 명확하고 안전해집니다.
-                                </p>
-                                <p className={styles.bodyText}>
-                                    이 패키지는 트레이딩 진입장벽을 무너뜨리기 위한 저희의 투자입니다.<br/>
-                                    우리는 당신이 길을 잃지 않고 빠르게 성장하는 것에 시간과 인력을 먼저 투자합니다.
-                                </p>
-                                <p className={styles.bodyText}><strong>당신의 성장이 곧 우리의 목표입니다.</strong></p>
+                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
+                                        <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
+                                            <div>
+                                                <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>jjun0825</div>
+                                                <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>★★★★★</div>
+                                            </div>
+                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>2일 전</span>
+                                        </div>
+                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
+                                            만족했습니다. 전내에 별의 잦어다릅.....
+                                        </p>
+                                    </div>
+
+                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
+                                        <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
+                                            <div>
+                                                <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>GO(26652)</div>
+                                                <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>★★★★★</div>
+                                            </div>
+                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>2일 전</span>
+                                        </div>
+                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
+                                            아직 강의듣기 전이지만 모르실리드를 듣발씨 예어저이어이 전반적엔 빡독의 필요성을 광센에에 너무 기대됩니다
+                                        </p>
+                                    </div>
+
+                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
+                                        <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
+                                            <div>
+                                                <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>H.SW</div>
+                                                <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>★★★★★</div>
+                                            </div>
+                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>3일 전</span>
+                                        </div>
+                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
+                                            전제 구조 이번 강의는 수경사너 느낌 강의 좀 본후으서 참하이면 실적에서 바로 쓰어는 사구 체결한 전직 효율을 얻읍 다느는 것이다. 단순서 사느 노구돼 티 쓸 모는 분야 머니떼 관 그런게 해어 서고지, 어떤 입력에 사구 단개중 거저어 실인 바드느스크 상련로 이어거느집을 만들어서 노뎌 그러서 수잡이 끝나 나싀 상련로 최인의 기능됩다.
+                                        </p>
+                                    </div>
+                                </div>
                             </section>
                         </div>
                     </main>
