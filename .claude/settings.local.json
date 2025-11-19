@@ -27,7 +27,14 @@
       "Bash(/tmp/strategy-vol1-old.tsx)",
       "Bash(for file in growth-book strategy-source strategy-vol1)",
       "Bash(do echo \"Processing $file...\")",
-      "Bash(npx next build)"
+      "Bash(npx next build)",
+      "Bash(npm run dev:*)",
+      "Bash(timeout:*)",
+      "Bash(git checkout:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(npx kill-port:*)"
     ],
     "deny": [],
     "ask": []

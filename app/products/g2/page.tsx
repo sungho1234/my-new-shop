@@ -1,6 +1,6 @@
-"use client"; 
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
 import styles from './ProductDetail.module.css';
 import Header from '@/components/Header';
@@ -39,7 +39,7 @@ const itemForPay: PaymentItem = {
 const ProductDetailPage = () => {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [paymentOpen, setPaymentOpen] = useState(false);
-    
+
     const { user, addToWishlist, removeFromWishlist, isLiked, isPurchased } = useAuth();
     const router = useRouter();
 
@@ -50,16 +50,28 @@ const ProductDetailPage = () => {
         price: '210,000',
         thumbnail: "/로고.png",
     };
-    
+
     const liked = isLiked(productInfo.id);
 
     const animMedia = useScrollFadeIn('up', 1, 0);
     const animHeadline = useScrollFadeIn('up', 1, 0.1);
     const animIntro = useScrollFadeIn('up', 1, 0);
     const animPackageIntro = useScrollFadeIn('up', 1, 0.1);
-    const animModules = useScrollFadeIn('up', 1, 0); 
-    const animRecommend = useScrollFadeIn('up', 1, 0.1); 
+    const animModules = useScrollFadeIn('up', 1, 0);
+    const animRecommend = useScrollFadeIn('up', 1, 0.1);
     const animFaq = useScrollFadeIn('up', 1, 0);
+
+    // 후기 섹션으로 스크롤
+    useEffect(() => {
+        if (window.location.hash === '#review-section') {
+            setTimeout(() => {
+                const reviewSection = document.getElementById('review-section');
+                if (reviewSection) {
+                    reviewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        }
+    }, []);
 
     const toggleAccordion = (index: number) => {
         setActiveIndex(activeIndex === index ? null : index);
@@ -393,7 +405,7 @@ const ProductDetailPage = () => {
                             <hr className={styles.sectionSeparator} style={{marginBottom: '60px'}} />
 
                             {/* 후기 섹션 */}
-                            <section>
+                            <section id="review-section">
                                 <div style={{display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px'}}>
                                     <h3 style={{
                                         fontSize: '24px',

@@ -1,7 +1,7 @@
-"use client"; 
+"use client";
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
 import styles from './ProductDetail.module.css';
 import Header from '@/components/Header';
@@ -58,12 +58,24 @@ const ProductDetailPage = () => {
     const animHeadline = useScrollFadeIn('up', 1, 0.1);
     const animPainPoints = useScrollFadeIn('up', 1, 0);
     const animCallout = useScrollFadeIn('up', 1, 0.1);
-    const animCoreValue = useScrollFadeIn('up', 1, 0); 
-    const animPackageIntro = useScrollFadeIn('up', 1, 0); 
-    const animModules = useScrollFadeIn('up', 1, 0); 
-    const animSpecial = useScrollFadeIn('up', 1, 0.1); 
-    const animResults = useScrollFadeIn('up', 1, 0); 
+    const animCoreValue = useScrollFadeIn('up', 1, 0);
+    const animPackageIntro = useScrollFadeIn('up', 1, 0);
+    const animModules = useScrollFadeIn('up', 1, 0);
+    const animSpecial = useScrollFadeIn('up', 1, 0.1);
+    const animResults = useScrollFadeIn('up', 1, 0);
     const animFaq = useScrollFadeIn('up', 1, 0);
+
+    // 후기 섹션으로 스크롤
+    useEffect(() => {
+        if (window.location.hash === '#review-section') {
+            setTimeout(() => {
+                const reviewSection = document.getElementById('review-section');
+                if (reviewSection) {
+                    reviewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        }
+    }, []);
     const animFinal = useScrollFadeIn('up', 1, 0.1);
 
 
@@ -314,7 +326,7 @@ const ProductDetailPage = () => {
                             <hr className={styles.sectionSeparator} style={{marginBottom: '60px'}} />
 
                             {/* 후기 섹션 */}
-                            <section>
+                            <section id="review-section">
                                 <div style={{display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px'}}>
                                     <h3 style={{
                                         fontSize: '24px',

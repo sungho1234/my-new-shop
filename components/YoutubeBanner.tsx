@@ -1,6 +1,7 @@
 // components/YoutubeBanner.tsx
 
 import React from 'react';
+import Link from 'next/link';
 
 // stories 데이터는 변경 없습니다.
 const stories = [
@@ -30,24 +31,27 @@ const stories = [
   },
   {
     type: 'image',
-    thumbnail: 'https://via.placeholder.com/600x400/CCCCCC/000000?text=AI%EB%A1%9C+%EC%A1%B0%ED%9A%8C%EC%88%98+13%EB%B0%B0',
+    thumbnail: '/블로그썸네일1.png',
     title: '',
-    author: 'Analyst(Berlin) | The Archive Vol.1 ',
-    description: '분석 모델을 시스템으로 전환하기까지: Maria G.의 회고',
+    author: '시스템 트레이더 ㅣ 일반인을 위한 첫번째 안내서',
+    description: '분석을 넘어 시스템으로: 코빠의 SMC 구축기',
+    href: 'https://blog.naver.com/credit777_31/224072068084',
   },
   {
     type: 'image',
     thumbnail: 'https://via.placeholder.com/600x400/CCCCCC/000000?text=%EC%A1%B0%ED%9A%8C%EC%88%98+30%EB%B0%B0+%EC%A6%9D%EA%B0%80',
     title: '',
-    author: 'Trader(London) | Quant System Lite',
-    description: '런던의 변동성을 지배하는 방법: John S.의 트레이딩 로그',
+    author: '대학생 ㅣ 일반인을 위한 시스템 투자 올인원',
+    description: '군적금 날려본 알바생의 이야기',
+    href: '/success-story',
   },
   {
     type: 'image',
     thumbnail: 'https://via.placeholder.com/600x400/CCCCCC/000000?text=19%EC%82%B4+%EB%8C%80%ED%95%99%EC%83%9D',
     title: '',
-    author: 'Market Expert(Tokyo) | MAXX Quant System v4.0',
-    description: '노이즈 속에서 알파(α)를 찾는 기술: 키노아 요코.의 전략 노트',
+    author: '컨텐츠 크리에이더 ㅣ 시스템 빌더 풀 패키지',
+    description: '추측을 멈추고 설계하기: S. Walker의 회고록',
+    href: 'https://medium.com/@invitetel02/i-bought-an-internal-manual-from-a-prop-trading-firm-and-here-is-what-happened-526e906442e3',
   },
 ];
 
@@ -97,30 +101,34 @@ const YoutubeBanner = () => {
 
         {/* --- 두 번째 줄 (이미지 카드) --- */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 mb-16">
-            {stories.slice(3, 6).map((story, index) => (
-                <div key={index} className="group">
-                    <a href="#" className="block">
-                        <div className="relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300">
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            <img
-                                src={story.thumbnail}
-                                alt={story.title}
-                                className="aspect-video w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                            />
-                            <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                                <div className="text-white transform transition-all duration-300">
-                                    <p className="text-xs font-medium opacity-90 mb-1">
-                                        {story.author}
-                                    </p>
-                                    <p className="text-sm font-bold">
-                                        {story.description}
-                                    </p>
-                                </div>
+            {stories.slice(3, 6).map((story, index) => {
+                const WrapperComponent = story.href ? Link : 'a';
+                const linkProps = story.href ? { href: story.href } : { href: '#' };
+
+                return (
+                    <div key={index} className="group">
+                        <WrapperComponent {...linkProps} className="block">
+                            {/* 이미지 영역 */}
+                            <div className="relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 mb-4">
+                                <img
+                                    src={story.thumbnail}
+                                    alt={story.title}
+                                    className="aspect-video w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                />
                             </div>
-                        </div>
-                    </a>
-                </div>
-            ))}
+                            {/* 텍스트 영역 - 이미지 아래 고정 */}
+                            <div className="px-2">
+                                <p className="text-xs font-medium text-gray-500 mb-2">
+                                    {story.author}
+                                </p>
+                                <p className="text-lg font-semibold text-gray-900 leading-snug">
+                                    {story.description}
+                                </p>
+                            </div>
+                        </WrapperComponent>
+                    </div>
+                );
+            })}
         </div>
 
         {/* 버튼 */}

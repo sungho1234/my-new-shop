@@ -43,42 +43,75 @@ const MyWishlistContent = () => {
         <span className="text-sm font-medium text-gray-700">총 <span className="text-gray-900 font-semibold">{mergedProducts.length}</span>개</span>
       </div>
 
-      {/* Horizontal Card Layout */}
-      <div className="space-y-4 max-w-5xl">
+      {/* 2열 그리드 레이아웃 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {mergedProducts.map((item) => (
-          <button
+          <div
             key={item.productId}
-            onClick={() => router.push(`/products/${item.id}`)}
-            className="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200 text-left w-full relative flex"
+            className="bg-white rounded-2xl p-7 shadow-sm hover:shadow-md border border-gray-200 transition-shadow relative"
           >
-            {/* Product Image - Left Side */}
-            <div className="relative w-40 md:w-48 flex-shrink-0 bg-gray-50 overflow-hidden">
-              <img
-                src={item.thumbnail || '/placeholder.png'}
-                alt={item.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-
-            {/* Product Info - Right Side */}
-            <div className="flex-1 p-5 flex flex-col justify-center relative">
-              <p className="text-xs text-gray-500 mb-2">저작</p>
-              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2 leading-snug line-clamp-2">{item.title}</h3>
-              <p className="text-sm md:text-base text-gray-600">{item.author}</p>
-
-              {/* Remove Button - Positioned absolutely in top right */}
+            {/* 우측 상단 X 버튼 */}
+            <div className="absolute top-6 right-6">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   removeFromWishlist(item.productId);
                 }}
-                className="absolute top-4 right-4 p-2 bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-red-500 rounded-lg transition-colors z-10"
+                className="p-2 bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-red-500 rounded-lg transition-colors"
                 aria-label="찜 해제"
               >
                 <XMarkIcon className="h-5 w-5" />
               </button>
             </div>
-          </button>
+
+            {/* 클릭 가능한 영역: 이미지 + 제목/정보 */}
+            <div
+              className="cursor-pointer group mb-5 flex gap-5"
+              onClick={() => router.push(`/products/${item.id}`)}
+            >
+              {/* 왼쪽: 썸네일 (세로로 긴 직사각형) */}
+              <div className="flex-shrink-0">
+                <div className="w-28 h-36 bg-gray-50 rounded-lg shadow-sm overflow-hidden group-hover:shadow-md transition-shadow">
+                  <img
+                    src={item.thumbnail || '/placeholder.png'}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* 오른쪽: 제목 + 제작자 + 가격 + 별점 */}
+              <div className="flex-1 flex flex-col pr-8">
+                <div>
+                  <p className="text-xs text-gray-500 mb-2">{item.author}</p>
+                  <h3 className="text-base font-bold text-gray-900 mb-4 line-clamp-2 leading-tight">
+                    {item.title}
+                  </h3>
+
+                  {/* 가격 */}
+                  <p className="text-lg font-bold text-gray-900 mb-2">
+                    {item.price === '100' ? '100원' : `${parseInt(item.price).toLocaleString()}원`}
+                  </p>
+
+                  {/* 별점 + 구매자 수 */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-yellow-400 text-sm">⭐</span>
+                    <span className="text-sm font-medium text-gray-700">4.9</span>
+                    <span className="text-xs text-gray-400">|</span>
+                    <span className="text-xs text-gray-500">구매 3,729명</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 하단: 구매하기 버튼 */}
+            <button
+              onClick={() => router.push(`/products/${item.id}`)}
+              className="w-full py-2.5 bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400 text-gray-700 rounded-lg text-sm font-medium transition-all"
+            >
+              구매하기
+            </button>
+          </div>
         ))}
       </div>
     </div>
@@ -211,7 +244,17 @@ const MyPurchasesContent = () => {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  // 후기 작성
+                  // 후기 작성 - 상세페이지로 이동 후 후기 섹션으로 스크롤
+                  if (item.productId === 'system-builder' || item.productId === 'first-guide') {
+                    const productPageMap: { [key: string]: string } = {
+                      'system-builder': '/products/g2',
+                      'first-guide': '/products/g1',
+                    };
+                    const productPage = productPageMap[item.productId];
+                    if (productPage) {
+                      router.push(`${productPage}#review-section`);
+                    }
+                  }
                 }}
                 className="w-full py-2.5 bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400 text-gray-700 rounded-lg text-sm font-medium transition-all"
               >

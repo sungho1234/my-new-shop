@@ -11,7 +11,7 @@ export const ALL_PRODUCTS: Product[] = [
     title: '일반인을 위한 시스템 투자 올인원',
     author: 'kobba',
     price: '100',
-    thumbnail: '/assets/product_g1.png',
+    thumbnail: '/g1.png',
   },
   {
     // DB ID: system-builder (g2 페이지)
@@ -19,7 +19,7 @@ export const ALL_PRODUCTS: Product[] = [
     title: '일반인을 위한 첫번째 안내서',
     author: 'kobba',
     price: '100',
-    thumbnail: '/assets/product_g2.png',
+    thumbnail: '/g2.png',
   },
   {
     // DB ID: growth-book (g3 페이지)
@@ -27,7 +27,7 @@ export const ALL_PRODUCTS: Product[] = [
     title: '일반인의 성장책: 스캠필터와 챌린지',
     author: 'kobba',
     price: '60,000',
-    thumbnail: '/assets/product_general-growth.png',
+    thumbnail: '/g3.png',
   },
   {
     // DB ID: strategy-vol1 (c1 페이지)
@@ -35,7 +35,7 @@ export const ALL_PRODUCTS: Product[] = [
     title: '시스템 빌더 풀 패키지',
     author: 'Analyst (Berlin)',
     price: '450000',
-    thumbnail: '/assets/product_c1.png',
+    thumbnail: '/c1.png',
   },
   {
     // DB ID: strategy-source (c2 페이지)
@@ -43,7 +43,7 @@ export const ALL_PRODUCTS: Product[] = [
     title: '프로의 전략 원본',
     author: 'kobba',
     price: '90,000',
-    thumbnail: '/assets/product_c2.png',
+    thumbnail: '/c2.png',
   },
 ];
 
