@@ -30,7 +30,7 @@ export default function Home() {
       <main className="container max-w-7xl mx-auto px-4">
         <div className="space-y-16 mt-16">
           <ProductSlider title="실시간 베스트" products={systemsData} />
-          <ProductSlider title="무료 베스트" products={strategiesData} />
+          <ProductSlider title="시스템&전략" products={strategiesData} />
         </div>
       </main>
 

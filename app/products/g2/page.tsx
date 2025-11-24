@@ -68,6 +68,8 @@ const itemForPay: PaymentItem = {
 const ProductDetailPage = () => {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [paymentOpen, setPaymentOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const reviewsPerPage = 4;
 
     const { user, addToWishlist, removeFromWishlist, isLiked, isPurchased } = useAuth();
     const router = useRouter();
@@ -513,81 +515,116 @@ const ProductDetailPage = () => {
                                 </div>
 
                                 <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-                                    {/* 후기 1 */}
-                                    <div style={{
-                                        padding: '24px',
-                                        border: '1px solid #e5e7eb',
-                                        borderRadius: '12px',
-                                        background: '#fff'
-                                    }}>
-                                        <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
-                                            <div>
-                                                <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>혜차</div>
-                                                <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>★★★★★</div>
+                                    {reviews
+                                        .slice((currentPage - 1) * reviewsPerPage, currentPage * reviewsPerPage)
+                                        .map((review, index) => (
+                                        <div key={index} style={{
+                                            padding: '24px',
+                                            border: '1px solid #e5e7eb',
+                                            borderRadius: '12px',
+                                            background: '#fff'
+                                        }}>
+                                            <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
+                                                <div>
+                                                    <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>{review.name}</div>
+                                                    <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>
+                                                        {'★'.repeat(review.rating)}
+                                                    </div>
+                                                </div>
+                                                <span style={{fontSize: '13px', color: '#9ca3af'}}>{review.date}</span>
                                             </div>
-                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>2일 전</span>
+                                            <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
+                                                {review.content}
+                                            </p>
                                         </div>
-                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
-                                            우연히 모르실리들 보고 바로 결제하신다! 정말더할 좋아보이거 빡독에 잦어서 부저어는 혜어저는 상황입니다. 막왕자를 꽃그 자신의의 떨어 되었으며 이렇게 자장아의 말자하는는 시대와 모든 평제들 등해 지도 새로써 시직혈료입니다!
-                                        </p>
-                                    </div>
+                                    ))}
+                                </div>
 
-                                    {/* 후기 2 */}
-                                    <div style={{
-                                        padding: '24px',
-                                        border: '1px solid #e5e7eb',
-                                        borderRadius: '12px',
-                                        background: '#fff'
-                                    }}>
-                                        <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
-                                            <div>
-                                                <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>jjun0825</div>
-                                                <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>★★★★★</div>
-                                            </div>
-                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>2일 전</span>
-                                        </div>
-                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
-                                            만족했습니다. 전내에 별의 잦어다릅.....
-                                        </p>
-                                    </div>
+                                {/* 페이지네이션 */}
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    marginTop: '40px'
+                                }}>
+                                    <button
+                                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                        disabled={currentPage === 1}
+                                        style={{
+                                            padding: '8px 12px',
+                                            border: 'none',
+                                            borderRadius: '6px',
+                                            background: 'transparent',
+                                            color: currentPage === 1 ? '#d1d5db' : '#6b7280',
+                                            cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                                            fontSize: '18px',
+                                            fontWeight: '400',
+                                            transition: 'color 0.2s'
+                                        }}
+                                    >
+                                        ‹
+                                    </button>
 
-                                    {/* 후기 3 */}
-                                    <div style={{
-                                        padding: '24px',
-                                        border: '1px solid #e5e7eb',
-                                        borderRadius: '12px',
-                                        background: '#fff'
-                                    }}>
-                                        <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
-                                            <div>
-                                                <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>GO(26652)</div>
-                                                <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>★★★★★</div>
-                                            </div>
-                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>2일 전</span>
-                                        </div>
-                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
-                                            아직 강의듣기 전이지만 모르실리드를 듣발씨 예어저이어이 전반적엔 빡독의 필요성을 광센에에 너무 기대됩니다
-                                        </p>
-                                    </div>
+                                    {(() => {
+                                        const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+                                        const maxVisible = 5;
+                                        let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+                                        let endPage = Math.min(totalPages, startPage + maxVisible - 1);
 
-                                    {/* 후기 4 */}
-                                    <div style={{
-                                        padding: '24px',
-                                        border: '1px solid #e5e7eb',
-                                        borderRadius: '12px',
-                                        background: '#fff'
-                                    }}>
-                                        <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
-                                            <div>
-                                                <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>H.SW</div>
-                                                <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>★★★★★</div>
-                                            </div>
-                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>3일 전</span>
-                                        </div>
-                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
-                                            전제 구조 이번 강의는 수경사너 느낌 강의 좀 본후으서 참하이면 실적에서 바로 쓰어는 사구 체결한 전직 효율을 얻읍 다느는 것이다. 단순서 사느 노구돼 티 쓸 모는 분야 머니떼 관 그런게 해어 서고지, 어떤 입력에 사구 단개중 거저어 실인 바드느스크 상련로 이어거느집을 만들어서 노뎌 그러서 수잡이 끝나 나싀 상련로 최인의 기능됩다.
-                                        </p>
-                                    </div>
+                                        if (endPage - startPage + 1 < maxVisible) {
+                                            startPage = Math.max(1, endPage - maxVisible + 1);
+                                        }
+
+                                        return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map(pageNum => (
+                                            <button
+                                                key={pageNum}
+                                                onClick={() => setCurrentPage(pageNum)}
+                                                style={{
+                                                    padding: '6px 12px',
+                                                    border: 'none',
+                                                    borderRadius: '4px',
+                                                    background: 'transparent',
+                                                    color: currentPage === pageNum ? '#FF6B35' : '#6b7280',
+                                                    cursor: 'pointer',
+                                                    fontSize: '15px',
+                                                    fontWeight: currentPage === pageNum ? '700' : '400',
+                                                    minWidth: '32px',
+                                                    transition: 'all 0.2s'
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    if (currentPage !== pageNum) {
+                                                        e.currentTarget.style.color = '#374151';
+                                                    }
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    if (currentPage !== pageNum) {
+                                                        e.currentTarget.style.color = '#6b7280';
+                                                    }
+                                                }}
+                                            >
+                                                {pageNum}
+                                            </button>
+                                        ));
+                                    })()}
+
+                                    <button
+                                        onClick={() => setCurrentPage(prev => Math.min(Math.ceil(reviews.length / reviewsPerPage), prev + 1))}
+                                        disabled={currentPage === Math.ceil(reviews.length / reviewsPerPage)}
+                                        style={{
+                                            padding: '8px 12px',
+                                            border: 'none',
+                                            borderRadius: '6px',
+                                            background: 'transparent',
+                                            color: currentPage === Math.ceil(reviews.length / reviewsPerPage) ? '#d1d5db' : '#6b7280',
+                                            cursor: currentPage === Math.ceil(reviews.length / reviewsPerPage) ? 'not-allowed' : 'pointer',
+                                            fontSize: '18px',
+                                            fontWeight: '400',
+                                            transition: 'color 0.2s'
+                                        }}
+                                    >
+                                        ›
+                                    </button>
                                 </div>
                             </section>
                         </div>

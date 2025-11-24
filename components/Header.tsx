@@ -92,7 +92,7 @@ const Header = () => {
                                                 <p className="text-xs text-gray-500 mb-1">{user.email}</p>
                                                 <div className="flex justify-between items-center">
                                                     <p className="text-lg font-bold text-gray-900">{user.nickname}</p>
-                                                    <Link href="/profile/edit" className="text-xs border border-gray-300 rounded-md px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition-colors">
+                                                    <Link href="/my-contents?tab=my-info" className="text-xs border border-gray-300 rounded-md px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition-colors">
                                                         정보수정하기
                                                     </Link>
                                                 </div>

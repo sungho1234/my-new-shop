@@ -53,12 +53,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
-  const [isLoadingPurchases, setIsLoadingPurchases] = useState<boolean>(false);
+  const [isLoadingPurchases, setIsLoadingPurchases] = useState<boolean>(true); // 초기값 true로 시작
+  const [isLoadingWishlist, setIsLoadingWishlist] = useState<boolean>(true); // 초기값 true로 시작
+  // isLoading은 더 이상 사용하지 않음 - 페이지 전체 블로킹 방지
   const router = useRouter();
 
   // 1. 찜 목록 로드 헬퍼 (useCallback으로 안정화 – Hooks 규칙 준수)
   const fetchWishlist = useCallback(async (kakaoId: number) => {
     console.log("📋 fetchWishlist 호출: kakaoId =", kakaoId);
+    setIsLoadingWishlist(true);
     try {
       const res = await fetch(`/api/wishlist?kakaoId=${kakaoId}`);
       if (!res.ok) throw new Error(`Failed to fetch wishlist: ${res.status}`);
@@ -68,6 +71,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (err) {
       console.error("❌ DB 찜 목록 로드 실패:", err);
       setWishlist([]);
+    } finally {
+      setIsLoadingWishlist(false);
     }
   }, []); // 의존성 없음 – 안정적
 
@@ -92,30 +97,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // 2. 초기 로드: localStorage에서 user 복원 (로그인 상태 유지)
   useEffect(() => {
-    try {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        const loadedUser: User = JSON.parse(storedUser);
-        console.log("🔄 localStorage에서 user 복원: ", loadedUser.nickname);
-        setUser(loadedUser);
-        // wishlist는 아래 useEffect가 처리
+    const initAuth = async () => {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const loadedUser: User = JSON.parse(storedUser);
+          console.log("🔄 localStorage에서 user 복원: ", loadedUser.nickname);
+          setUser(loadedUser);
+          // wishlist와 purchases는 아래 useEffect가 처리
+        } else {
+          // 로그인하지 않은 경우 로딩 상태 false로 변경
+          setIsLoadingPurchases(false);
+          setIsLoadingWishlist(false);
+        }
+      } catch (error) {
+        console.error("❌ localStorage User 파싱 오류:", error);
+        localStorage.removeItem('user'); // 손상된 데이터 삭제
+        setIsLoadingPurchases(false);
+        setIsLoadingWishlist(false);
       }
-    } catch (error) {
-      console.error("❌ localStorage User 파싱 오류:", error);
-      localStorage.removeItem('user'); // 손상된 데이터 삭제
-    }
+    };
+    initAuth();
   }, []);
 
   // 3. user 변경 시 wishlist와 purchases 자동 로드 (로그인 후 동기화 – Hooks 안전)
   useEffect(() => {
-    if (user) {
-      fetchWishlist(user.id);
-      fetchPurchasesInternal(user.id);
-    } else {
-      setWishlist([]); // 로그아웃 시 초기화
-      setPurchases([]);
-    }
-  }, [user, fetchWishlist, fetchPurchasesInternal]); // user 의존성 추가
+    const loadUserData = async () => {
+      if (user) {
+        // 병렬로 빠르게 로드 (await 없이 백그라운드에서 실행)
+        fetchWishlist(user.id);
+        fetchPurchasesInternal(user.id);
+      } else {
+        setWishlist([]); // 로그아웃 시 초기화
+        setPurchases([]);
+        setIsLoadingPurchases(false);
+        setIsLoadingWishlist(false);
+      }
+    };
+    loadUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]); // user만 의존성으로, fetchWishlist와 fetchPurchasesInternal은 useCallback으로 안정화되어 있음
 
   // 4. login 함수 (async 호출 제거 – setUser만, useEffect가 처리)
   const login = (kakaoUser: any, accessToken?: string): boolean => {
