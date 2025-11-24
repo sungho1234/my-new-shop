@@ -74,19 +74,27 @@ const ProductDetailPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const reviewsPerPage = 4;
 
+    // 후기 관련 state
+    const [dbReviews, setDbReviews] = useState<any[]>([]);
+    const [selectedRating, setSelectedRating] = useState(0);
+    const [reviewContent, setReviewContent] = useState('');
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+    const [hasWrittenReview, setHasWrittenReview] = useState(false);
+
     const { user, addToWishlist, removeFromWishlist, isLiked, isPurchased } = useAuth();
     const router = useRouter();
 
 
     const productInfo = {
-        id: 'first-guide',
+        id: 'first-guide',  // data/products.ts와 일치하도록 유지
         title: '일반인을 위한 시스템 투자 올인원',
         author: 'kobba',
         price: '100',
         thumbnail: "/로고.png",
     };
-    
+
     const liked = isLiked(productInfo.id);
+    const purchased = isPurchased(productInfo.id);
 
 
     // 스크롤 애니메이션 훅
@@ -101,6 +109,40 @@ const ProductDetailPage = () => {
     const animResults = useScrollFadeIn('up', 1, 0);
     const animFaq = useScrollFadeIn('up', 1, 0);
 
+    // DB에서 후기 불러오기
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const res = await fetch(`/api/reviews?productId=${productInfo.id}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setDbReviews(data.reviews);
+                }
+            } catch (error) {
+                console.error('후기 불러오기 실패:', error);
+            }
+        };
+        fetchReviews();
+    }, [productInfo.id]);
+
+    // 사용자가 이미 후기를 작성했는지 확인
+    useEffect(() => {
+        const checkUserReview = async () => {
+            if (user) {
+                try {
+                    const res = await fetch(`/api/reviews/check?kakaoId=${user.id}&productId=${productInfo.id}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        setHasWrittenReview(data.hasReviewed);
+                    }
+                } catch (error) {
+                    console.error('후기 확인 실패:', error);
+                }
+            }
+        };
+        checkUserReview();
+    }, [user, productInfo.id]);
+
     // 후기 섹션으로 스크롤
     useEffect(() => {
         if (window.location.hash === '#review-section') {
@@ -113,6 +155,71 @@ const ProductDetailPage = () => {
         }
     }, []);
     const animFinal = useScrollFadeIn('up', 1, 0.1);
+
+    // 후기 제출 함수
+    const handleSubmitReview = async () => {
+        if (!user) {
+            alert('로그인이 필요합니다.');
+            router.push('/login');
+            return;
+        }
+
+        if (!purchased) {
+            alert('구매한 상품만 후기를 작성할 수 있습니다.');
+            return;
+        }
+
+        if (selectedRating === 0) {
+            alert('별점을 선택해주세요.');
+            return;
+        }
+
+        if (reviewContent.trim().length < 10) {
+            alert('후기는 최소 10자 이상 작성해주세요.');
+            return;
+        }
+
+        if (reviewContent.length > 1000) {
+            alert('후기는 1000자를 초과할 수 없습니다.');
+            return;
+        }
+
+        setIsSubmittingReview(true);
+
+        try {
+            const res = await fetch('/api/reviews', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    kakaoId: user.id,
+                    productId: productInfo.id,
+                    rating: selectedRating,
+                    content: reviewContent
+                })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                alert('후기가 성공적으로 등록되었습니다!');
+
+                // 후기 목록에 새 후기 추가 (맨 위로)
+                setDbReviews([data.review, ...dbReviews]);
+
+                // 폼 초기화
+                setSelectedRating(0);
+                setReviewContent('');
+                setHasWrittenReview(true);
+            } else {
+                const errorData = await res.json();
+                alert(errorData.error || '후기 등록에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('후기 제출 실패:', error);
+            alert('후기 등록 중 오류가 발생했습니다.');
+        } finally {
+            setIsSubmittingReview(false);
+        }
+    };
 
 
     const toggleAccordion = (index: number) => {
@@ -383,51 +490,113 @@ const ProductDetailPage = () => {
                                     <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                                         <span style={{fontSize: '20px', color: '#FFB800'}}>★</span>
                                         <span style={{fontSize: '18px', fontWeight: '700', color: '#333'}}>4.9</span>
-                                        <span style={{fontSize: '14px', color: '#FF6B35', fontWeight: '600'}}>📝 {reviews.length}</span>
+                                        <span style={{fontSize: '14px', color: '#FF6B35', fontWeight: '600'}}>📝 {dbReviews.length + reviews.length}</span>
                                     </div>
                                 </div>
 
                                 {/* 후기 작성 박스 */}
-                                <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff', marginBottom: '24px'}}>
-                                    <div style={{display: 'flex', gap: '8px', marginBottom: '16px'}}>
-                                        <span style={{fontSize: '24px', color: '#e5e7eb', cursor: 'pointer'}}>★</span>
-                                        <span style={{fontSize: '24px', color: '#e5e7eb', cursor: 'pointer'}}>★</span>
-                                        <span style={{fontSize: '24px', color: '#e5e7eb', cursor: 'pointer'}}>★</span>
-                                        <span style={{fontSize: '24px', color: '#e5e7eb', cursor: 'pointer'}}>★</span>
-                                        <span style={{fontSize: '24px', color: '#e5e7eb', cursor: 'pointer'}}>★</span>
+                                {hasWrittenReview ? (
+                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#f9fafb', marginBottom: '24px', textAlign: 'center'}}>
+                                        <p style={{fontSize: '15px', color: '#6b7280', margin: 0}}>이미 후기를 작성하셨습니다.</p>
                                     </div>
-                                    <textarea
-                                        placeholder="구매 후 작성이 가능합니다."
-                                        disabled
-                                        style={{width: '100%', minHeight: '100px', padding: '16px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '15px', resize: 'vertical', fontFamily: 'inherit', color: '#9ca3af', background: '#f9fafb'}}
-                                    />
-                                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px'}}>
-                                        <span style={{fontSize: '13px', color: '#9ca3af'}}>이모티콘은 제작되어 보여집니다.</span>
-                                        <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
-                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>0/1000</span>
-                                            <button disabled style={{padding: '8px 20px', background: '#e5e7eb', color: '#9ca3af', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '600', cursor: 'not-allowed'}}>등록</button>
+                                ) : (
+                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff', marginBottom: '24px'}}>
+                                        <div style={{display: 'flex', gap: '8px', marginBottom: '16px'}}>
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <span
+                                                    key={star}
+                                                    onClick={() => {
+                                                        if (purchased && user) {
+                                                            setSelectedRating(star);
+                                                        } else if (!user) {
+                                                            alert('로그인이 필요합니다.');
+                                                            router.push('/login');
+                                                        } else if (!purchased) {
+                                                            alert('구매한 상품만 후기를 작성할 수 있습니다.');
+                                                        }
+                                                    }}
+                                                    style={{
+                                                        fontSize: '24px',
+                                                        color: star <= selectedRating ? '#FFB800' : '#e5e7eb',
+                                                        cursor: (purchased && user) ? 'pointer' : 'not-allowed',
+                                                        transition: 'color 0.2s'
+                                                    }}
+                                                >
+                                                    ★
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <textarea
+                                            placeholder={purchased && user ? "후기를 작성해주세요 (최소 10자)" : "구매 후 작성이 가능합니다."}
+                                            disabled={!purchased || !user}
+                                            value={reviewContent}
+                                            onChange={(e) => setReviewContent(e.target.value)}
+                                            maxLength={1000}
+                                            style={{
+                                                width: '100%',
+                                                minHeight: '100px',
+                                                padding: '16px',
+                                                border: '1px solid #e5e7eb',
+                                                borderRadius: '8px',
+                                                fontSize: '15px',
+                                                resize: 'vertical',
+                                                fontFamily: 'inherit',
+                                                color: (purchased && user) ? '#333' : '#9ca3af',
+                                                background: (purchased && user) ? '#fff' : '#f9fafb'
+                                            }}
+                                        />
+                                        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px'}}>
+                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>이모티콘은 제작되어 보여집니다.</span>
+                                            <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                                                <span style={{fontSize: '13px', color: '#9ca3af'}}>{reviewContent.length}/1000</span>
+                                                <button
+                                                    onClick={handleSubmitReview}
+                                                    disabled={!purchased || !user || isSubmittingReview || selectedRating === 0 || reviewContent.trim().length < 10}
+                                                    style={{
+                                                        padding: '8px 20px',
+                                                        background: (purchased && user && !isSubmittingReview && selectedRating > 0 && reviewContent.trim().length >= 10) ? '#FF6B35' : '#e5e7eb',
+                                                        color: (purchased && user && !isSubmittingReview && selectedRating > 0 && reviewContent.trim().length >= 10) ? '#fff' : '#9ca3af',
+                                                        border: 'none',
+                                                        borderRadius: '6px',
+                                                        fontSize: '14px',
+                                                        fontWeight: '600',
+                                                        cursor: (purchased && user && !isSubmittingReview && selectedRating > 0 && reviewContent.trim().length >= 10) ? 'pointer' : 'not-allowed',
+                                                        transition: 'background 0.2s'
+                                                    }}
+                                                >
+                                                    {isSubmittingReview ? '등록 중...' : '등록'}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                )}
 
                                 {/* 후기 카드들 */}
                                 <div style={{display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px'}}>
-                                    {reviews.slice((currentPage - 1) * reviewsPerPage, currentPage * reviewsPerPage).map((review, idx) => (
-                                        <div key={idx} style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
-                                            <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
-                                                <div>
-                                                    <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>{review.name}</div>
-                                                    <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>
-                                                        {'★'.repeat(review.rating)}
+                                    {(() => {
+                                        // DB 후기와 더미 후기를 합침 (DB 후기가 맨 위에)
+                                        const allReviews = [...dbReviews, ...reviews];
+                                        const paginatedReviews = allReviews.slice((currentPage - 1) * reviewsPerPage, currentPage * reviewsPerPage);
+
+                                        return paginatedReviews.map((review, idx) => (
+                                            <div key={review.id || `review-${idx}`} style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
+                                                <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
+                                                    <div>
+                                                        <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>
+                                                            {review.userName || review.name}
+                                                        </div>
+                                                        <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>
+                                                            {'★'.repeat(review.rating)}
+                                                        </div>
                                                     </div>
+                                                    <span style={{fontSize: '13px', color: '#9ca3af'}}>{review.date}</span>
                                                 </div>
-                                                <span style={{fontSize: '13px', color: '#9ca3af'}}>{review.date}</span>
+                                                <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
+                                                    {review.content}
+                                                </p>
                                             </div>
-                                            <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
-                                                {review.content}
-                                            </p>
-                                        </div>
-                                    ))}
+                                        ));
+                                    })()}
                                 </div>
 
                                 {/* 페이지네이션 */}
@@ -451,7 +620,8 @@ const ProductDetailPage = () => {
                                     </button>
 
                                     {(() => {
-                                        const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+                                        const allReviews = [...dbReviews, ...reviews];
+                                        const totalPages = Math.ceil(allReviews.length / reviewsPerPage);
                                         const maxVisible = 5;
                                         let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
                                         let endPage = Math.min(totalPages, startPage + maxVisible - 1);
@@ -493,15 +663,27 @@ const ProductDetailPage = () => {
                                     })()}
 
                                     <button
-                                        onClick={() => setCurrentPage(prev => Math.min(Math.ceil(reviews.length / reviewsPerPage), prev + 1))}
-                                        disabled={currentPage === Math.ceil(reviews.length / reviewsPerPage)}
+                                        onClick={() => {
+                                            const allReviews = [...dbReviews, ...reviews];
+                                            setCurrentPage(prev => Math.min(Math.ceil(allReviews.length / reviewsPerPage), prev + 1));
+                                        }}
+                                        disabled={(() => {
+                                            const allReviews = [...dbReviews, ...reviews];
+                                            return currentPage === Math.ceil(allReviews.length / reviewsPerPage);
+                                        })()}
                                         style={{
                                             padding: '8px 12px',
                                             border: 'none',
                                             borderRadius: '6px',
                                             background: 'transparent',
-                                            color: currentPage === Math.ceil(reviews.length / reviewsPerPage) ? '#d1d5db' : '#6b7280',
-                                            cursor: currentPage === Math.ceil(reviews.length / reviewsPerPage) ? 'not-allowed' : 'pointer',
+                                            color: (() => {
+                                                const allReviews = [...dbReviews, ...reviews];
+                                                return currentPage === Math.ceil(allReviews.length / reviewsPerPage) ? '#d1d5db' : '#6b7280';
+                                            })(),
+                                            cursor: (() => {
+                                                const allReviews = [...dbReviews, ...reviews];
+                                                return currentPage === Math.ceil(allReviews.length / reviewsPerPage) ? 'not-allowed' : 'pointer';
+                                            })(),
                                             fontSize: '18px',
                                             fontWeight: '400',
                                             transition: 'color 0.2s'
