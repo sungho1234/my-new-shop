@@ -346,10 +346,20 @@ const ProductDetailPage = () => {
                                     {/* FAQ 3 */}
                                     <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
                                         <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '16px', lineHeight: '1.6'}}>
-                                            Q: 수익을 보장하나요?
+                                            Q: 이 과정을 수료하면 바로 '전업 트레이더'가 될 수 있습니까?
                                         </h4>
                                         <p style={{fontSize: '15px', lineHeight: '1.7', color: '#555', margin: '0'}}>
-                                            A: 아니요. 저희는 절대로 수익을 보장하지 않습니다. "수익 보장"을 약속하는 곳이 있다면 '스캠 필터링 체크리스트'에 따라 즉시 피하시길 권합니다. 우리는 '물고기'를 잡아주는 것이 아닌, 시장에서 평생 살아남을 수 있는 '시스템을 설계하고 검증하는 법'을 가르칩니다. 투자의 모든 최종 책임은 본인에게 있으며, 저희는 그 과정을 가장 안전하고 효율적으로 수행하도록 돕는 파트너입니다.
+                                            A: 당장 사표를 쓰지 마십시오. 그것은 감정적인 결정입니다. 이 패키지의 목적은 당신의 월급을 대체할 '두 번째 현금 흐름(Second Cashflow)'을 만드는 것입니다. 시스템을 통해 얻은 수익이 당신의 월급을 3개월 연속 초과할 때, 그때 선택해도 늦지 않습니다. 우리는 당신이 감정에 휩쓸려 인생을 배팅하는 도박사가 아닌, 냉철하게 자산을 운용하는 '시스템 빌더(System Builder)'가 되기를 원합니다.
+                                        </p>
+                                    </div>
+
+                                    {/* FAQ 4 */}
+                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
+                                        <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '16px', lineHeight: '1.6'}}>
+                                            Q: 1:1 멘토링은 어떤 방식으로 진행되나요?
+                                        </h4>
+                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#555', margin: '0'}}>
+                                            A: 단순 질의응답이 아닌, '코드 리뷰'와 같습니다. 당신이 과제(백테스팅, 매매 일지)를 수행하면, 담당 현역 트레이더가 그 논리를 점검합니다. "왜 이 구간에서 진입했습니까?", "손절 라인의 근거는 무엇입니까?" 이 치열한 문답 과정을 통해, 당신의 머릿속에 있는 막연한 '감'은 날카로운 '데이터'로 다듬어집니다. 5일간 당신은 든든한 '금융 파트너'를 얻게 될 것입니다.
                                         </p>
                                     </div>
                                 </div>
