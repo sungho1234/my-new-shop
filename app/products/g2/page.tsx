@@ -100,7 +100,7 @@ const ProductDetailPage = () => {
     const animRecommend = useScrollFadeIn('up', 1, 0.1);
     const animFaq = useScrollFadeIn('up', 1, 0);
 
-    // DB에서 후기 불러오기
+    // DB에서 후기 불러오기 (후기 작성 여부도 함께 확인)
     useEffect(() => {
         const fetchReviews = async () => {
             try {
@@ -108,31 +108,19 @@ const ProductDetailPage = () => {
                 if (res.ok) {
                     const data = await res.json();
                     setDbReviews(data.reviews);
+
+                    // 내가 작성한 후기가 있는지 즉시 확인 (추가 API 호출 없이!)
+                    if (user) {
+                        const myReview = data.reviews.find((r: any) => r.kakaoId === String(user.id));
+                        setHasWrittenReview(!!myReview);
+                    }
                 }
             } catch (error) {
                 console.error('후기 불러오기 실패:', error);
             }
         };
         fetchReviews();
-    }, [productInfo.id]);
-
-    // 사용자가 이미 후기를 작성했는지 확인
-    useEffect(() => {
-        const checkUserReview = async () => {
-            if (user) {
-                try {
-                    const res = await fetch(`/api/reviews/check?kakaoId=${user.id}&productId=${productInfo.id}`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        setHasWrittenReview(data.hasReviewed);
-                    }
-                } catch (error) {
-                    console.error('후기 확인 실패:', error);
-                }
-            }
-        };
-        checkUserReview();
-    }, [user, productInfo.id]);
+    }, [productInfo.id, user]);
 
     // 후기 섹션으로 스크롤
     useEffect(() => {

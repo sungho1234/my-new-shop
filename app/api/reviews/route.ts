@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
             include: {
                 user: {
                     select: {
+                        kakaoId: true,  // kakaoId 추가 (클라이언트 비교용)
                         name: true,
                         email: true,
                     }
@@ -40,6 +41,8 @@ export async function GET(request: NextRequest) {
         // 응답 데이터 형식 변환
         const formattedReviews = reviews.map(review => ({
             id: review.id,
+            userId: review.userId,  // userId 추가 (DB cuid)
+            kakaoId: review.user.kakaoId,  // kakaoId 추가 (클라이언트 비교용)
             userName: review.user.name || '사용자',
             rating: review.rating,
             content: review.content,
@@ -139,6 +142,7 @@ export async function POST(request: NextRequest) {
             include: {
                 user: {
                     select: {
+                        kakaoId: true,  // kakaoId 추가
                         name: true,
                         email: true,
                     }
@@ -152,6 +156,8 @@ export async function POST(request: NextRequest) {
             success: true,
             review: {
                 id: review.id,
+                userId: review.userId,  // userId 추가
+                kakaoId: review.user.kakaoId,  // kakaoId 추가
                 userName: review.user.name || '사용자',
                 rating: review.rating,
                 content: review.content,
