@@ -1,37 +1,156 @@
+"use client";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ProductSlider from "@/components/ProductSlider";
+import ProductCard from "@/components/ProductCard";
 import YoutubeBanner from "@/components/YoutubeBanner";
 import Manifesto from "@/components/Manifesto";
 import GlobalProof from "@/components/GlobalProof";
-import HeroSection from "@/components/HeroSection"; // 새로 만든 HeroSection 컴포넌트를 가져옵니다.
+import HeroSection from "@/components/HeroSection";
+import PurchaseNotification from "@/components/PurchaseNotification";
+import { ALL_PRODUCTS } from "@/data/products";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
-// systemsData와 strategiesData는 그대로 유지됩니다.
-const systemsData = [
-  { imgSrc: "/g1.png", title: "2025 일반인을 위한 시스템 투자 올인원", desc: "⭐4.8 ㅣ 구매 280명", price: "210,000원", href: '/products/g1' },
-  { imgSrc: "/g2.png", title: "일반인을 위한 첫번째 안내서: 거래소 선택부터 차트 셋업까지", desc: "⭐4.8 ㅣ 구매 280명", price: "70,000원", href: '/products/g2' },
-  { imgSrc: "/g3.png", title: "일반인의 성장책: 스캠필터와 챌린지", desc: "⭐4.8 ㅣ 구매 280명", price: "60,000원", href: '/products/g3'  },
-];
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
+  const [selectedCategory, setSelectedCategory] = useState<'all' | 'system' | 'strategy'>('all');
 
-const strategiesData = [
-  { imgSrc: "/c1.png", title: "시스템 빌더 풀 패키지: 실행 엔진, 1:1 지원, 멤버십 키 ", desc: "⭐4.8 ㅣ 구매 280명", price: "₩210,000", href: '/products/c1' },
-  { imgSrc: "/c2.png", title: "프로의 전략 원본: 시스템 설계도와 데이터 분석 ", desc: "⭐4.8 ㅣ 구매 280명", price: "₩90,000", href: '/products/c2' },
-  { imgSrc: "https://via.placeholder.com/300x400/CA8A04/FFFFFF?text=Risk+Mgmt", title: "리스크 관리 전략", desc: "계좌를 지키는 기술", price: "₩350,000" },
-];
+  // productId를 URL 경로로 변환하는 매핑
+  const getProductUrl = (productId: string): string => {
+    const urlMap: Record<string, string> = {
+      'first-guide': 'g1',
+      'system-builder': 'g2',
+      'growth-book': 'g3',
+      'strategy-vol1': 'c1',
+      'strategy-source': 'c2'
+    };
+    return `/products/${urlMap[productId] || productId}`;
+  };
 
-export default function Home() {
+  // 검색어가 있으면 카테고리 필터 초기화
+  useEffect(() => {
+    if (searchQuery) {
+      setSelectedCategory('all');
+    }
+  }, [searchQuery]);
+
+  // 카테고리별 및 검색어 필터링
+  const filteredProducts = ALL_PRODUCTS.filter(product => {
+    // 검색어 필터링
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const titleMatch = product.title.toLowerCase().includes(query);
+      const authorMatch = product.author.toLowerCase().includes(query);
+      return titleMatch || authorMatch;
+    }
+
+    // 카테고리 필터링
+    if (selectedCategory === 'all') return true;
+    // first-guide, system-builder, growth-book은 시스템 학습
+    if (selectedCategory === 'system') {
+      return ['first-guide', 'system-builder', 'growth-book'].includes(product.id);
+    }
+    // strategy-vol1, strategy-source는 전략 패키지
+    if (selectedCategory === 'strategy') {
+      return ['strategy-vol1', 'strategy-source'].includes(product.id);
+    }
+    return true;
+  });
+
   return (
     <div>
       <Header />
 
-      {/* 기존의 정적 히어로 섹션이 새로운 슬라이드 컴포넌트로 교체되었습니다. */}
       <HeroSection />
-      
-      <main className="container max-w-7xl mx-auto px-4">
-        <div className="space-y-16 mt-16">
-          <ProductSlider title="실시간 베스트" products={systemsData} />
-          <ProductSlider title="시스템&전략" products={strategiesData} />
-        </div>
+
+      {/* 실시간 구매 알림 */}
+      <PurchaseNotification />
+
+      {/* 상품 그리드 섹션 */}
+      <main className="container max-w-7xl mx-auto px-4 py-16">
+        {/* 검색 결과 표시 */}
+        {searchQuery && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              '{searchQuery}' 검색 결과
+            </h2>
+            <p className="text-gray-600">
+              {filteredProducts.length > 0
+                ? `${filteredProducts.length}개의 상품을 찾았습니다.`
+                : '검색 결과가 없습니다. 다른 키워드로 검색해보세요.'
+              }
+            </p>
+          </div>
+        )}
+
+        {/* 카테고리 네비게이션 */}
+        {!searchQuery && (
+          <div className="flex items-center justify-between mb-12">
+            <div className="flex gap-4">
+              <button
+                onClick={() => setSelectedCategory('all')}
+                className={`px-6 py-2.5 rounded-full font-medium transition-all ${
+                  selectedCategory === 'all'
+                    ? 'bg-slate-800 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                전체
+              </button>
+              <button
+                onClick={() => setSelectedCategory('system')}
+                className={`px-6 py-2.5 rounded-full font-medium transition-all ${
+                  selectedCategory === 'system'
+                    ? 'bg-slate-800 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                시스템 학습
+              </button>
+              <button
+                onClick={() => setSelectedCategory('strategy')}
+                className={`px-6 py-2.5 rounded-full font-medium transition-all ${
+                  selectedCategory === 'strategy'
+                    ? 'bg-slate-800 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                전략 패키지
+              </button>
+            </div>
+            <span className="text-sm text-gray-500">
+              총 {filteredProducts.length}개의 상품
+            </span>
+          </div>
+        )}
+
+        {/* 상품 그리드 (3열) */}
+        {filteredProducts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                imgSrc={product.thumbnail}
+                title={product.title}
+                author={product.author}
+                rating="4.8"
+                studentCount="280"
+                price={product.price}
+                href={getProductUrl(product.id)}
+              />
+            ))}
+          </div>
+        ) : searchQuery ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <svg className="w-24 h-24 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <p className="text-gray-500 text-lg">검색 결과가 없습니다</p>
+          </div>
+        ) : null}
       </main>
 
       <section className="w-full bg-gradient-to-b from-gray-50 to-white py-20 mt-16">
@@ -85,5 +204,20 @@ export default function Home() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">로딩 중...</p>
+        </div>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }

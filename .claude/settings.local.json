@@ -35,7 +35,12 @@
       "Bash(findstr:*)",
       "Bash(taskkill:*)",
       "Bash(npx kill-port:*)",
-      "Bash(npx prisma migrate:*)"
+      "Bash(npx prisma migrate:*)",
+      "Bash(if not exist \".claude\" mkdir .claude)",
+      "Bash(for file in system-builder growth-book strategy-vol1 strategy-source)",
+      "Bash(do sed -i 's/bg-gradient-to-r from-slate-700 to-slate-800/bg-gradient-to-r from-primary-600 to-primary-700/g' \"$file/page.tsx\")",
+      "Bash(python examples/basic_usage.py:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

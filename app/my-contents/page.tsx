@@ -528,7 +528,7 @@ const MyContentsPageContent = () => {
         <>
             <Header />
             <div className="w-full bg-white pb-20 min-h-screen">
-                {/* 헤더 배너 - 레퍼런스와 동일 */}
+                {/* 헤더 배너 */}
                 <section className="bg-gradient-to-r from-slate-700 to-slate-800 py-16">
                     <div className="container mx-auto px-4 max-w-7xl text-center">
                         <h1 className="text-3xl font-bold text-white mb-2">{user.nickname}님의 콘텐츠</h1>
@@ -537,7 +537,7 @@ const MyContentsPageContent = () => {
 
                 <div className="container mx-auto px-4 max-w-7xl">
                     <section className="mt-8">
-                        {/* 탭 네비게이션 - 레퍼런스와 동일 */}
+                        {/* 탭 네비게이션 */}
                         <nav className="flex gap-12 border-b border-gray-200 mb-10">
                             {tabs.map(tab => (
                                 <button

@@ -20,12 +20,13 @@ model User {
   image     String?   // 프로필 이미지 저장용
   createdAt DateTime  @default(now())
 
-  // 관계 설정: User는 여러개의 찜 목록, 구매 내역, 체크리스트, 노트, 후기를 가질 수 있습니다.
-  wishlist    WishlistItem[]
-  purchases   Purchase[]
-  checklists  UserChecklist[]
-  notes       UserNote[]
-  reviews     Review[]
+  // 관계 설정: User는 여러개의 찜 목록, 구매 내역, 체크리스트, 노트, 후기, 매매일지를 가질 수 있습니다.
+  wishlist       WishlistItem[]
+  purchases      Purchase[]
+  checklists     UserChecklist[]
+  notes          UserNote[]
+  reviews        Review[]
+  tradingRecords TradingRecord[]
 }
 
 // 4. WishlistItem (찜 목록) 테이블 설계도 (기존 정의 유지)
@@ -112,4 +113,36 @@ model Review {
   @@unique([userId, productId])
   @@index([productId])
   @@index([userId])
+}
+
+// 9. TradingRecord (매매 일지) 테이블
+model TradingRecord {
+  id                String   @id @default(cuid())
+  userId            String
+  no                Int      // 거래 번호
+  symbol            String   // 'BTC/USDT', 'ETH/USDT', etc.
+  entryDateTime     String   // 진입 일시
+  exitDateTime      String   // 청산 일시
+  positionDirection String   // 'LONG' or 'SHORT'
+  leverage          Int      // 레버리지 배율 (1-50)
+  positionSize      Float    // 포지션 사이즈
+  entryPrice        Float    // 진입가
+  exitPrice         Float    // 청산가
+  pnl               Float    // 손익 (자동 계산값 저장)
+  roi               Float    // ROI % (자동 계산값 저장)
+  roundTripFee      Float    // 왕복 수수료
+  entryReason       String   @db.Text // 진입 근거
+  exitReason        String   @db.Text // 청산 근거
+  entryEmotion      String   // 진입 감정
+  exitEmotion       String   // 청산 감정
+  lessonLearned     String   @db.Text // 교훈
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // User 모델과 연결
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 특정 유저의 거래 기록을 빠르게 찾기 위한 인덱스
+  @@index([userId])
+  @@index([userId, entryDateTime])
 }

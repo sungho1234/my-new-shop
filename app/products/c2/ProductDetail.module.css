@@ -200,18 +200,21 @@
 .buyButton {
     width: 90%;
     margin: 0 auto;
-    background-color: var(--color-text-primary);
-    color: var(--color-background);
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: #ffffff;
     padding: 18px var(--space-md);
-    border-radius: 14px;
+    border-radius: 12px;
     border: none;
-    font-size: 15px;
-    font-weight: var(--font-weight-semibold);
+    font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
 }
 .buyButton:hover {
-    background-color: #333333;
+    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
 }
 
 

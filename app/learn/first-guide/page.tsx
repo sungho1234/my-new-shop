@@ -522,7 +522,14 @@ const FirstGuideLearnPage = () => {
                                 </>
                             ) : (
                                 <>
-                                    <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors">
+                                    <button
+                                        onClick={() => {
+                                            if (resource.id === 6) {
+                                                router.push('/trading-journal');
+                                            }
+                                        }}
+                                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                                    >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -989,7 +996,7 @@ const FirstGuideLearnPage = () => {
         <>
             <Header />
             <div className="w-full bg-white pb-20 min-h-screen">
-                {/* Hero Banner - Slate Gradient */}
+                {/* Hero Banner */}
                 <section className="bg-gradient-to-r from-slate-700 to-slate-800 py-16">
                     <div className="container mx-auto px-4 max-w-7xl text-center">
                         <h1 className="text-3xl font-bold text-white mb-2">2025 일반인을 위한 시스템 투자 올인원</h1>
@@ -999,7 +1006,7 @@ const FirstGuideLearnPage = () => {
 
                 <div className="container mx-auto px-4 max-w-7xl">
                     <section className="mt-8">
-                        {/* Tab Navigation - Underline Style */}
+                        {/* Tab Navigation */}
                         <nav className="flex gap-12 border-b border-gray-200 mb-10">
                             <button
                                 onClick={() => setActiveTab('materials')}

@@ -25,6 +25,7 @@ const Header = () => {
     const { user, logout, purchases, wishlist } = useAuth();
     const router = useRouter();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -58,23 +59,70 @@ const Header = () => {
         logout();
         window.location.href = kakaoLogoutUrl;
     };
+
+    // 검색 기능
+    const handleSearch = () => {
+        if (searchQuery.trim()) {
+            router.push(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+        } else {
+            router.push('/');
+        }
+    };
+
+    const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
     // ------------------------------------
 
     // --- 최종 수정된 JSX ---
     return (
-        <header className="sticky top-0 z-50 w-full border-b bg-white/70 backdrop-blur-[10px]">
-            <div className="container mx-auto px-4">
-                <div className={`flex items-center justify-between transition-all duration-300 ${isScrolled ? 'py-4' : 'py-8'}`}>
-                    {/* ===== 로고 (원본 유지) ===== */}
-                    <h1 className="text-2xl font-bold text-black">
-                        <Link href="/">MAXX Systems</Link>
-                    </h1>
+        <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur-md shadow-sm">
+            <div className="container max-w-7xl mx-auto px-4">
+                <div className={`flex items-center justify-between transition-all duration-300 ${isScrolled ? 'py-3' : 'py-5'}`}>
+                    {/* ===== 로고 ===== */}
+                    <Link href="/">
+                        <h1 className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors cursor-pointer">
+                            MAXX Systems
+                        </h1>
+                    </Link>
 
-                    {/* ===== 버튼 그룹 ===== */}
-                    <div className="hidden items-center md:flex">
+                    {/* ===== 중앙 검색바 ===== */}
+                    <div className="hidden lg:flex flex-1 max-w-md mx-8">
+                        <div className="relative w-full">
+                            <input
+                                type="text"
+                                placeholder="배우고 싶은 강의를 검색하세요"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyDown={handleSearchKeyDown}
+                                className="w-full px-5 py-2.5 pl-12 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm"
+                            />
+                            <button
+                                onClick={handleSearch}
+                                className="absolute left-4 top-1/2 -translate-y-1/2 cursor-pointer"
+                            >
+                                <svg
+                                    className="w-5 h-5 text-gray-400 hover:text-blue-600 transition-colors"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* ===== 우측 버튼 그룹 ===== */}
+                    <div className="hidden items-center md:flex gap-3">
                         {user ? (
-                            <div className="flex items-center gap-3 ml-auto mr-40">
-                                <Link href="/my-contents" className="bg-white text-black px-5 py-2.5 rounded-full text-sm font-medium border border-gray-300 hover:bg-gray-50 transition-colors">
+                            <>
+                                <Link
+                                    href="/my-contents"
+                                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                                >
                                     My콘텐츠
                                 </Link>
                                 <div ref={menuRef} className="relative">
@@ -131,23 +179,27 @@ const Header = () => {
                                         </div>
                                     )}
                                 </div>
-                            </div>
+                            </>
                         ) : (
-                            <Link href="/login" className="rounded-md border px-4 py-2 hover:bg-gray-100">
+                            <Link
+                                href="/login"
+                                className="px-6 py-2.5 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors shadow-sm"
+                            >
                                 로그인
                             </Link>
                         )}
                     </div>
                 </div>
-                
+
                 {/* --- 스크롤 시 사라지는 하단 메뉴 --- */}
                 <div
-                    className={`overflow-hidden transition-all duration-300 ease-in-out ${isScrolled ? 'max-h-0 opacity-0' : 'max-h-20 opacity-100'}`}
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${isScrolled ? 'max-h-0 opacity-0' : 'max-h-16 opacity-100'}`}
                 >
-                    <nav className="flex items-center space-x-6 pb-4 text-sm font-semibold text-gray-800">
-                        <Link href="/builder-start" className="hover:text-black">빌더의 시작</Link>
-                        <Link href="/system-strategy" className="hover:text-black">시스템&전략</Link>
-                        <Link href="/about" className="hover:text-black">팀소개</Link>
+                    <nav className="flex items-center space-x-8 pb-4 text-sm font-medium text-gray-700 border-t border-gray-100 pt-4">
+                        <Link href="/builder-start" className="hover:text-blue-600 transition-colors">빌더의 시작</Link>
+                        <Link href="/system-strategy" className="hover:text-blue-600 transition-colors">시스템&전략</Link>
+                        <Link href="/about" className="hover:text-blue-600 transition-colors">팀소개</Link>
+                        <Link href="/" className="hover:text-blue-600 transition-colors">전체상품</Link>
                     </nav>
                 </div>
             </div>
