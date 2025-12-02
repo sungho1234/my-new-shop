@@ -68,6 +68,7 @@ const itemForPay: PaymentItem = {
 };
 
 const ProductDetailPage = () => {
+    const [activeTab, setActiveTab] = useState('intro'); // 탭 상태 추가
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [paymentOpen, setPaymentOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -296,126 +297,182 @@ const ProductDetailPage = () => {
     return (
         <div>
             <Script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js" />
-            
+
             <Header />
-            <div id="wrapper">
+            <div id="wrapper" style={{maxWidth: '1280px', margin: '0 auto', padding: '40px 16px 0 16px'}}>
                 <div className={styles.mainContainer}>
                     <main className={styles.contentColumn}>
-                        
+
+                        {/* 유튜브 영상 */}
                         <section className={`${styles.mediaContainer} ${styles.card}`} {...animMedia}>
-                            <iframe 
-                                src="https://www.youtube.com/embed/YOUTUBE_VIDEO_ID" // (성장책용 영상 ID로 변경)
-                                title="YouTube video player" 
-                                frameBorder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            <iframe
+                                src="https://www.youtube.com/embed/YOUTUBE_VIDEO_ID"
+                                title="YouTube video player"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen>
                             </iframe>
                         </section>
 
+                        {/* 탭 메뉴 */}
+                        <div style={{
+                            display: 'flex',
+                            gap: '40px',
+                            borderBottom: '1px solid #e5e7eb',
+                            marginTop: '32px',
+                            marginBottom: '0'
+                        }}>
+                            {[
+                                { id: 'intro', label: '소개' },
+                                { id: 'curriculum', label: '전체목차' },
+                                { id: 'faq', label: 'FAQ' },
+                                { id: 'review', label: '후기' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        padding: '16px 4px',
+                                        fontSize: '15px',
+                                        fontWeight: activeTab === tab.id ? '600' : '400',
+                                        color: activeTab === tab.id ? '#1a1a1a' : '#9ca3af',
+                                        cursor: 'pointer',
+                                        borderBottom: activeTab === tab.id ? '2px solid #1a1a1a' : '2px solid transparent',
+                                        marginBottom: '-1px',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+
                         <div className={styles.contentArea}>
-                            {/* 제목 섹션 */}
-                            <section style={{marginTop: '60px', marginBottom: '60px'}}>
-                                <h2 className={styles.mainHeadline} style={{textAlign: 'center', marginBottom: '16px'}}>
-                                    일반인의 성장책: 스캠필터와 챌린지
-                                </h2>
-                                <p className={styles.mainSubheadline} style={{textAlign: 'center'}}>
-                                    스스로를 '분석'하고 '성장'시키는 데이터 기반 훈련법입니다.
-                                </p>
-                            </section>
+                            {/* 소개 탭 */}
+                            {activeTab === 'intro' && (
+                                <div style={{padding: '40px 0'}}>
+                                    {/* 제목 섹션 */}
+                                    <section style={{marginBottom: '40px'}}>
+                                        <h2 className={styles.mainHeadline} style={{textAlign: 'center', marginBottom: '16px'}}>
+                                            일반인의 성장책: 스캠필터와 챌린지
+                                        </h2>
+                                        <p className={styles.mainSubheadline} style={{textAlign: 'center'}}>
+                                            스스로를 '분석'하고 '성장'시키는 데이터 기반 훈련법입니다.
+                                        </p>
+                                    </section>
 
-                            {/* 소개 문구 */}
-                            <section className={styles.sectionSpacing}>
-                                <p className={styles.bodyText} style={{textAlign: 'center', marginBottom: '20px'}}>
-                                    <strong>성급한 매매로 돈을 잃고, 사기성 정보에 속거나<br/>
-                                    해킹당한 경험이 있으신가요?</strong>
-                                </p>
-                                <p className={styles.bodyText} style={{textAlign: 'center', marginBottom: '20px'}}>
-                                    이 성장책에는 위험을 피하는 <strong>'스캠 필터링'</strong>과 저희 팀이 신입에게 가장 먼저 가르치는 '생존 원칙',<br/>
-                                    그리고 <strong>'데이터 기반 훈련법'</strong>을 모두 담았습니다.
-                                </p>
-                                <p className={styles.bodyText} style={{textAlign: 'center'}}>
-                                    더 이상 '감'이 아닌, 스스로의 실력을 '데이터'로 분석하고<br/>
-                                    성장하는 과정을 직접 경험하세요.
-                                </p>
-                            </section>
+                                    {/* 소개 문구 */}
+                                    <section style={{marginBottom: '60px'}}>
+                                        <p className={styles.bodyText} style={{textAlign: 'center', marginBottom: '20px'}}>
+                                            <strong>성급한 매매로 돈을 잃고, 사기성 정보에 속거나<br/>
+                                            해킹당한 경험이 있으신가요?</strong>
+                                        </p>
+                                        <p className={styles.bodyText} style={{textAlign: 'center', marginBottom: '20px'}}>
+                                            이 성장책에는 위험을 피하는 <strong>'스캠 필터링'</strong>과 저희 팀이 신입에게 가장 먼저 가르치는 '생존 원칙',<br/>
+                                            그리고 <strong>'데이터 기반 훈련법'</strong>을 모두 담았습니다.
+                                        </p>
+                                        <p className={styles.bodyText} style={{textAlign: 'center'}}>
+                                            더 이상 '감'이 아닌, 스스로의 실력을 '데이터'로 분석하고<br/>
+                                            성장하는 과정을 직접 경험하세요.
+                                        </p>
+                                    </section>
 
-                            <hr className={styles.sectionSeparator} style={{marginBottom: '60px'}} />
-
-                            {/* 소개 목차 */}
-                            <section style={{marginBottom: '40px'}}>
-                                <h3 style={{
-                                    fontSize: '24px',
-                                    fontWeight: '700',
-                                    color: '#333',
-                                    margin: '0',
-                                    paddingLeft: '16px',
-                                    borderLeft: '4px solid #FF6B35'
-                                }}>
-                                    소개
-                                </h3>
-                            </section>
-
-                            {/* 이미지 섹션 - g3 폴더의 이미지들 */}
-                            <div style={{display: 'flex', flexDirection: 'column'}}>
-                                <img src="/g3/1.png" alt="성장책 - 섹션 1" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g3/2.png" alt="성장책 - 섹션 2" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g3/3.png" alt="성장책 - 섹션 3" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g3/4.png" alt="성장책 - 섹션 4" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g3/5.png" alt="성장책 - 섹션 5" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g3/6.png" alt="성장책 - 섹션 6" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g3/7.png" alt="성장책 - 섹션 7" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                            </div>
-
-                            <hr className={styles.sectionSeparator} style={{marginTop: '80px', marginBottom: '60px'}} />
-
-                            {/* FAQ 섹션 */}
-                            <section style={{marginBottom: '80px'}}>
-                                <h3 style={{
-                                    fontSize: '24px',
-                                    fontWeight: '700',
-                                    color: '#333',
-                                    margin: '0 0 40px 0',
-                                    paddingLeft: '16px',
-                                    borderLeft: '4px solid #FF6B35'
-                                }}>
-                                    자주 묻는 질문 (FAQ)
-                                </h3>
-
-                                <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
-                                    {faqItems.map((item, index) => (
-                                        <div key={index} style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
-                                            <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '16px', lineHeight: '1.6'}}>
-                                                {item.question}
-                                            </h4>
-                                            <p style={{fontSize: '15px', lineHeight: '1.7', color: '#555', margin: '0'}}>
-                                                {item.answer}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </section>
-
-                            <hr className={styles.sectionSeparator} style={{marginBottom: '60px'}} />
-
-                            {/* 후기 섹션 */}
-                            <section id="review-section">
-                                <div style={{display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px'}}>
-                                    <h3 style={{
-                                        fontSize: '24px',
-                                        fontWeight: '700',
-                                        color: '#333',
-                                        margin: '0',
-                                        paddingLeft: '16px',
-                                        borderLeft: '4px solid #FF6B35'
-                                    }}>
-                                        후기
-                                    </h3>
-                                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                                        <span style={{fontSize: '20px', color: '#FFB800'}}>★</span>
-                                        <span style={{fontSize: '18px', fontWeight: '700', color: '#333'}}>4.9</span>
-                                        <span style={{fontSize: '14px', color: '#FF6B35', fontWeight: '600'}}>📝 {dbReviews.length + reviews.length}</span>
+                                    {/* 이미지 섹션 */}
+                                    <div style={{display: 'flex', flexDirection: 'column'}}>
+                                        <img src="/g3/1.png" alt="성장책 - 섹션 1" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                        <img src="/g3/2.png" alt="성장책 - 섹션 2" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                        <img src="/g3/3.png" alt="성장책 - 섹션 3" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                        <img src="/g3/4.png" alt="성장책 - 섹션 4" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                        <img src="/g3/5.png" alt="성장책 - 섹션 5" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                        <img src="/g3/6.png" alt="성장책 - 섹션 6" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                        <img src="/g3/7.png" alt="성장책 - 섹션 7" style={{width: '100%', height: 'auto', display: 'block'}} />
                                     </div>
                                 </div>
+                            )}
+
+                            {/* 전체목차 탭 */}
+                            {activeTab === 'curriculum' && (
+                                <div style={{padding: '40px 0'}}>
+                                    <h3 style={{fontSize: '24px', fontWeight: '700', color: '#333', marginBottom: '32px'}}>
+                                        📚 전체 목차
+                                    </h3>
+                                    <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+                                        <div style={{padding: '20px', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#fff'}}>
+                                            <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '8px'}}>
+                                                📖 PART 1. 스캠 필터링 체크리스트
+                                            </h4>
+                                            <p style={{fontSize: '15px', color: '#6b7280', lineHeight: '1.6'}}>
+                                                • 사기 프로젝트를 걸러내는 논리적 체크리스트<br/>
+                                                • 욕망을 컨트롤하는 이성적 안전장치<br/>
+                                                • 투자 전 필수 확인 항목
+                                            </p>
+                                        </div>
+                                        <div style={{padding: '20px', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#fff'}}>
+                                            <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '8px'}}>
+                                                🎯 PART 2. 30일 챌린지 과제집
+                                            </h4>
+                                            <p style={{fontSize: '15px', color: '#6b7280', lineHeight: '1.6'}}>
+                                                • 하루하루 실력이 쌓이는 체계적 훈련법<br/>
+                                                • 데이터 기반 자기 분석 및 개선 방법<br/>
+                                                • 점진적 난이도 상승으로 자연스러운 성장
+                                            </p>
+                                        </div>
+                                        <div style={{padding: '20px', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#fff'}}>
+                                            <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '8px'}}>
+                                                🛡️ PART 3. 생존 원칙
+                                            </h4>
+                                            <p style={{fontSize: '15px', color: '#6b7280', lineHeight: '1.6'}}>
+                                                • 현역 팀이 신입에게 가장 먼저 가르치는 원칙<br/>
+                                                • 계좌를 지키는 리스크 관리 핵심<br/>
+                                                • 손실을 최소화하는 실전 방어 전략
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* FAQ 탭 */}
+                            {activeTab === 'faq' && (
+                                <section style={{padding: '40px 0'}}>
+                                    <h3 style={{fontSize: '24px', fontWeight: '700', color: '#333', marginBottom: '32px'}}>
+                                        ❓ 자주 묻는 질문 (FAQ)
+                                    </h3>
+
+                                    <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
+                                        {faqItems.map((item, index) => (
+                                            <div key={index} style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
+                                                <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '16px', lineHeight: '1.6'}}>
+                                                    {item.question}
+                                                </h4>
+                                                <p style={{fontSize: '15px', lineHeight: '1.7', color: '#555', margin: '0'}}>
+                                                    {item.answer}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* 후기 탭 */}
+                            {activeTab === 'review' && (
+                                <section id="review-section" style={{padding: '40px 0'}}>
+                                    <div style={{display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px'}}>
+                                        <h3 style={{
+                                            fontSize: '24px',
+                                            fontWeight: '700',
+                                            color: '#333',
+                                            margin: '0'
+                                        }}>
+                                            ⭐ 후기
+                                        </h3>
+                                        <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                            <span style={{fontSize: '20px', color: '#FFB800'}}>★</span>
+                                            <span style={{fontSize: '18px', fontWeight: '700', color: '#333'}}>4.9</span>
+                                            <span style={{fontSize: '14px', color: '#FF6B35', fontWeight: '600'}}>📝 {dbReviews.length + reviews.length}</span>
+                                        </div>
+                                    </div>
 
                                 {/* 후기 작성 박스 */}
                                 {hasWrittenReview ? (
@@ -615,66 +672,264 @@ const ProductDetailPage = () => {
                                         ›
                                     </button>
                                 </div>
-                            </section>
+                                </section>
+                            )}
                         </div>
                     </main>
 
                     {/* 사이드바 */}
                     <aside className={styles.sidebarColumn}>
-                        <div className={styles.sidebarContent}>
-                            <div className={styles.collectionInfo}>
-                                <img src="/로고.png" alt="MAXX Quant System logo" />
-                                <a href="#">MAXX Quant System</a>
-                            </div>
-                            
-                            {/* [ 5. 수정 ] 사이드바 상품명 변경 (가독성을 위해 2줄로) */}
-                            <h1 className={styles.productTitle}>일반인의 성장책:<br/>스캠필터와 챌린지</h1>
-                            
-                            <div className={styles.participants}>
-                                <div className={styles.participantItem}>
-                                    <img src="/코빠로고1.png" alt="Creator logo" />
-                                    <div>
-                                        <span>Creator</span>
-                                        <a href="#">kobba</a>
-                                    </div>
+                        <div style={{
+                            background: '#fff',
+                            borderRadius: '0',
+                            padding: '24px',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+                            border: '1px solid #e5e7eb',
+                            maxWidth: '350px',
+                            marginLeft: '60px'
+                        }}>
+                            {/* 상단: 카테고리 배지와 아이콘 */}
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'flex-start',
+                                marginBottom: '6px'
+                            }}>
+                                <span style={{
+                                    display: 'inline-block',
+                                    padding: '5px 10px',
+                                    background: '#fff',
+                                    color: '#FF6B35',
+                                    fontSize: '13px',
+                                    fontWeight: '600',
+                                    borderRadius: '4px',
+                                    marginLeft: '-6px',
+                                    marginTop: '3px'
+                                }}>
+                                    코빠
+                                </span>
+                                <div style={{display: 'flex', gap: '6px'}}>
+                                    <button
+                                        onClick={handleLikeClick}
+                                        style={{
+                                            width: '32px',
+                                            height: '32px',
+                                            background: '#fff',
+                                            border: '1px solid #e5e7eb',
+                                            borderRadius: '6px',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            padding: '0',
+                                            transition: 'all 0.2s'
+                                        }}
+                                    >
+                                        {liked ? (
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" strokeWidth="2">
+                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                            </svg>
+                                        ) : (
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{color: '#374151'}}>
+                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                            </svg>
+                                        )}
+                                    </button>
+                                    <button
+                                        onClick={handleShareClick}
+                                        style={{
+                                            width: '32px',
+                                            height: '32px',
+                                            background: '#fff',
+                                            border: '1px solid #e5e7eb',
+                                            borderRadius: '6px',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            padding: '0',
+                                            transition: 'all 0.2s'
+                                        }}
+                                    >
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{color: '#374151'}}>
+                                            <circle cx="18" cy="5" r="3"></circle>
+                                            <circle cx="6" cy="12" r="3"></circle>
+                                            <circle cx="18" cy="19" r="3"></circle>
+                                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
-                            <div className={styles.actionBar}>
+
+                            {/* 상품 제목 */}
+                            <h1 style={{
+                                fontSize: '21px',
+                                fontWeight: '700',
+                                lineHeight: '1.35',
+                                color: '#1a1a1a',
+                                marginBottom: '10px',
+                                marginTop: '0'
+                            }}>
+                                일반인의 성장책
+                            </h1>
+
+                            {/* 평점 및 구매자 수 */}
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                marginBottom: '10px'
+                            }}>
+                                <span style={{fontSize: '14px', color: '#FFB800'}}>★</span>
+                                <span style={{fontSize: '14px', fontWeight: '600', color: '#1a1a1a'}}>4.9</span>
+                                <span style={{fontSize: '13px', color: '#d1d5db'}}>|</span>
+                                <span style={{fontSize: '13px', color: '#9ca3af'}}>구매 {dbReviews.length + reviews.length}명</span>
+                            </div>
+
+                            {/* 배지 */}
+                            <div style={{
+                                display: 'flex',
+                                gap: '6px',
+                                marginBottom: '16px',
+                                paddingBottom: '16px',
+                                borderBottom: '1px solid #e5e7eb'
+                            }}>
+                                <span style={{
+                                    display: 'inline-block',
+                                    padding: '4px 8px',
+                                    background: '#fff',
+                                    color: '#FF6B35',
+                                    fontSize: '12px',
+                                    fontWeight: '600',
+                                    borderRadius: '4px',
+                                    border: '1px solid #FF6B35'
+                                }}>
+                                    강의
+                                </span>
+                                <span style={{
+                                    display: 'inline-block',
+                                    padding: '4px 8px',
+                                    background: '#ef4444',
+                                    color: '#fff',
+                                    fontSize: '12px',
+                                    fontWeight: '700',
+                                    borderRadius: '4px'
+                                }}>
+                                    New
+                                </span>
+                            </div>
+
+                            {/* 가격 정보 - 오른쪽 정렬 */}
+                            <div style={{marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'flex-end',
+                                    gap: '8px',
+                                    marginBottom: '6px'
+                                }}>
+                                    <span style={{
+                                        fontSize: '15px',
+                                        fontWeight: '700',
+                                        color: '#ef4444'
+                                    }}>
+                                        20% 할인
+                                    </span>
+                                    <span style={{
+                                        fontSize: '14px',
+                                        color: '#9ca3af',
+                                        textDecoration: 'line-through'
+                                    }}>
+                                        490,000원
+                                    </span>
+                                </div>
+                                <div style={{
+                                    fontSize: '28px',
+                                    fontWeight: '800',
+                                    color: '#1a1a1a',
+                                    lineHeight: '1',
+                                    letterSpacing: '-0.5px',
+                                    whiteSpace: 'nowrap'
+                                }}>
+                                    32,500<span style={{fontSize: '17px', fontWeight: '500'}}>원/월</span>
+                                </div>
+                            </div>
+
+                            {/* 구매 버튼 */}
+                            {isPurchased(productInfo.id) ? (
                                 <button
-                                    onClick={handleLikeClick}
-                                    className={`${styles.actionBtn} ${liked ? styles.liked : ''}`}
+                                    onClick={handleLearnClick}
+                                    style={{
+                                        width: '100%',
+                                        padding: '15px',
+                                        background: '#10b981',
+                                        color: '#fff',
+                                        fontSize: '16px',
+                                        fontWeight: '700',
+                                        border: 'none',
+                                        borderRadius: '10px',
+                                        cursor: 'pointer',
+                                        marginBottom: '8px',
+                                        transition: 'all 0.2s'
+                                    }}
                                 >
-                                    {liked ? (
-                                        <HeartIconSolid className="w-5 h-5" />
-                                    ) : (
-                                        <HeartIcon className="w-5 h-5" />
-                                    )}
+                                    학습하기
                                 </button>
-                                <button onClick={handleShareClick} className={styles.actionBtn}>
-                                    ↑ Share
+                            ) : (
+                                <button
+                                    onClick={handleBuyNowClick}
+                                    style={{
+                                        width: '100%',
+                                        padding: '15px',
+                                        background: '#FF6B35',
+                                        color: '#fff',
+                                        fontSize: '16px',
+                                        fontWeight: '700',
+                                        border: 'none',
+                                        borderRadius: '10px',
+                                        cursor: 'pointer',
+                                        marginBottom: '8px',
+                                        transition: 'all 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.background = '#ff5722';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.background = '#FF6B35';
+                                    }}
+                                >
+                                    구매하기
                                 </button>
-                                <button className={styles.actionBtn}>↻ Refresh</button>
-                                <button className={styles.actionBtn}>···</button>
-                            </div>
-                            <hr className={styles.separator} />
-                            <div className={`${styles.priceBox} ${styles.card}`}>
-                                <div className={styles.priceInfo}>
-                                    <span>Price</span>
-                                    {/* [ 6. 수정 ] 사이드바 가격 변경 (임시 50,000원) */}
-                                    <span className={styles.price}>50,000원</span>
-                                    <span className={styles.priceSecondary}>($35)</span>
-                                    {/* (달러 가격은 제거) */}
-                                </div>
-                                {isPurchased(productInfo.id) ? (
-                                    <button className={styles.buyButton} onClick={handleLearnClick} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
-                                        학습하기 →
-                                    </button>
-                                ) : (
-                                    <button className={styles.buyButton} onClick={handleBuyNowClick}>
-                                        Buy now
-                                    </button>
-                                )}
-                            </div>
+                            )}
+
+                            {/* 무료 강의 보기 버튼 */}
+                            <button
+                                style={{
+                                    width: '100%',
+                                    padding: '14px',
+                                    background: '#fff',
+                                    color: '#FF6B35',
+                                    fontSize: '15px',
+                                    fontWeight: '600',
+                                    border: '1.5px solid #FF6B35',
+                                    borderRadius: '10px',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '6px'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = '#fff4ed';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = '#fff';
+                                }}
+                            >
+                                <span>📺</span> 무료 강의 보기
+                            </button>
                         </div>
                     </aside>
                 </div>
