@@ -47,6 +47,74 @@ const reviews = [
     date: "1주 전",
     product: "프로의 전략 원본"
   },
+  {
+    stars: 5,
+    quote: "시스템 트레이딩의 기초부터 고급까지 체계적으로 배울 수 있었습니다. 특히 백테스팅 방법론이 정말 도움이 되었어요. 이제 자신감을 가지고 실전 투자를 하고 있습니다.",
+    author: "김민수",
+    date: "3일 전",
+    product: "시스템 빌더 풀 패키지",
+    flag: "🇰🇷",
+  },
+  {
+    stars: 5,
+    quote: "Trading psychology and risk management sections are excellent. This course helped me overcome my biggest weakness - emotional trading.",
+    author: "David L.",
+    location: "New York, USA",
+    flag: "🇺🇸",
+    date: "5일 전",
+    product: "일반인의 성장책: 스캠필터와 챌린지"
+  },
+  {
+    stars: 5,
+    quote: "처음에는 반신반의했는데, 실제로 따라하니 수익률이 안정적으로 나오기 시작했어요. 담당 트레이더님의 피드백도 정말 세심하고 도움이 됩니다.",
+    author: "박지훈",
+    date: "1주 전",
+    product: "프로의 전략 원본",
+    flag: "🇰🇷",
+  },
+  {
+    stars: 5,
+    quote: "Les stratégies sont clairement expliquées et faciles à mettre en œuvre. J'ai enfin trouvé une approche systématique qui fonctionne.",
+    author: "Sophie M.",
+    location: "Paris, FR",
+    flag: "🇫🇷",
+    date: "4일 전",
+    product: "시스템 빌더 풀 패키지"
+  },
+  {
+    stars: 5,
+    quote: "암호화폐 트레이딩 처음 시작하는데 너무 막막했는데, 이 강의 덕분에 기초를 탄탄히 다질 수 있었습니다. 리스크 관리의 중요성을 제대로 배웠어요.",
+    author: "이서연",
+    date: "2일 전",
+    product: "일반인을 위한 첫번째 안내서",
+    flag: "🇰🇷",
+  },
+  {
+    stars: 5,
+    quote: "Excellent course! The technical indicators and pattern recognition modules are incredibly detailed. Worth every penny.",
+    author: "Alex K.",
+    location: "Sydney, AU",
+    flag: "🇦🇺",
+    date: "6일 전",
+    product: "프로의 전략 원본"
+  },
+  {
+    stars: 5,
+    quote: "여러 투자 강의를 들어봤지만, 이렇게 실전적이고 체계적인 강의는 처음입니다. 특히 포트폴리오 구성 방법이 정말 유용했어요.",
+    author: "정현우",
+    date: "1주 전",
+    product: "일반인을 위한 시스템 투자 올인원",
+    flag: "🇰🇷",
+  },
+  {
+    stars: 5,
+    quote: "The community support is amazing. Fellow traders are helpful and the instructor responds quickly to questions. Great learning environment!",
+    author: "Lisa W.",
+    location: "Singapore",
+    flag: "🇸🇬",
+    date: "3일 전",
+    product: "일반인의 성장책: 스캠필터와 챌린지"
+  },
 ];
 
 // ▼▼▼ 1. 여기에 타입을 정의합니다 ▼▼▼
@@ -70,28 +138,16 @@ interface ReviewCardProps {
 // ▼▼▼ 2. 여기에 props 타입을 적용합니다 ▼▼▼
 // 후기 카드 UI 컴포넌트
 const ReviewCard = ({ review }: ReviewCardProps) => (
-  <div className="flex-shrink-0 w-80 sm:w-96 h-96">
-    <div className="bg-white rounded-xl shadow-lg p-6 h-full flex flex-col justify-between border border-gray-100">
-      <div>
-        <div className="text-yellow-400 text-lg mb-4">{'★'.repeat(review.stars)}</div>
-        <p className="text-gray-800 leading-relaxed line-clamp-6">
-          {review.quote}
-        </p>
+  <div className="flex-shrink-0 w-72 h-64">
+    <div className="bg-white rounded-xl shadow-lg p-6 h-full flex flex-col border border-gray-200">
+      <div className="text-yellow-400 text-lg mb-3">{'★'.repeat(review.stars)}</div>
+      <div className="mb-3">
+        <p className="font-semibold text-sm text-gray-900">{review.author}</p>
+        <p className="text-xs text-gray-500 mt-1">{review.date}</p>
       </div>
-      <div className="mt-6 flex items-center">
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center font-semibold text-gray-600 mr-3">
-          {review.flag ? review.flag : review.author.charAt(0)}
-        </div>
-        <div>
-          <p className="font-semibold text-sm text-gray-900">{review.author}</p>
-          <p className="text-xs text-gray-500">{review.date}</p>
-        </div>
-      </div>
-      <div className="mt-6 -mx-6 -mb-6 p-4 bg-blue-600 rounded-b-xl">
-        <p className="text-white text-sm font-semibold text-center truncate">
-          {review.product}
-        </p>
-      </div>
+      <p className="text-gray-800 text-sm leading-relaxed line-clamp-4">
+        {review.quote}
+      </p>
     </div>
   </div>
 );
@@ -99,43 +155,45 @@ const ReviewCard = ({ review }: ReviewCardProps) => (
 export default function GlobalProof() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const [isPaused, setIsPaused] = useState(false);
 
   // ▼▼▼ 3. 여기에 파라미터 타입을 적용합니다 ▼▼▼
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const scrollAmount = 344;
-      scrollContainerRef.current.scrollBy({ 
-        left: direction === 'left' ? -scrollAmount : scrollAmount, 
-        behavior: 'smooth' 
+      const scrollAmount = 312;
+      scrollContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
       });
     }
   };
   // ▲▲▲ 여기까지 수정 ▲▲▲
 
   useEffect(() => {
-    if (isPaused || !scrollContainerRef.current) return;
+    if (!scrollContainerRef.current) return;
 
     intervalRef.current = setInterval(() => {
       const container = scrollContainerRef.current;
       if (container) {
-        if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
-          container.scrollTo({ left: 0, behavior: 'smooth' });
+        // 전체 콘텐츠의 절반(원본 리뷰 끝)에 도달하면 처음으로 즉시 리셋
+        const halfWidth = container.scrollWidth / 2;
+        if (container.scrollLeft >= halfWidth) {
+          container.scrollTo({ left: 0, behavior: 'auto' });
         } else {
-          scroll('right');
+          // 부드러운 연속 스크롤
+          container.scrollBy({ left: 1, behavior: 'auto' });
         }
       }
-    }, 2000);
+    }, 20);
 
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isPaused]);
+  }, []);
 
   return (
-    <section className="bg-gray-50 py-20 w-full overflow-hidden">
+    <section className="bg-gray-50 py-8 w-full overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex justify-between items-center mb-10">
           <div>
@@ -155,18 +213,17 @@ export default function GlobalProof() {
       
       <div
         ref={scrollContainerRef}
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-        // [핵심 수정] scrollbar-hide 클래스를 여기에 추가했습니다.
-        className="flex overflow-x-auto space-x-6 pb-4 scroll-snap-x-mandatory scrollbar-hide -mb-4 px-6"
+        className="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide -mb-4 px-6"
       >
+        {/* 원본 리뷰 */}
         {reviews.map((review, index) => (
-          <div key={index} className="scroll-snap-center">
+          <div key={index}>
               <ReviewCard review={review} />
           </div>
         ))}
-        {reviews.slice(0, 2).map((review, index) => (
-          <div key={`clone-${index}`} className="scroll-snap-center">
+        {/* 복제된 리뷰 (무한 스크롤용) */}
+        {reviews.map((review, index) => (
+          <div key={`clone-${index}`}>
               <ReviewCard review={review} />
           </div>
         ))}

@@ -9,6 +9,7 @@ export interface Product {
   author: string;
   price: string;
   thumbnail: string;
+  hidden?: boolean; // 메인페이지에서 숨김 여부
 }
 
 export interface WishlistItem {

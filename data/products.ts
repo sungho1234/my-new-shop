@@ -36,6 +36,7 @@ export const ALL_PRODUCTS: Product[] = [
     author: 'Analyst (Berlin)',
     price: '450000',
     thumbnail: '/c1.png',
+    hidden: true, // 메인페이지에서 숨김
   },
   {
     // DB ID: strategy-source (c2 페이지)
