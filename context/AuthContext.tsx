@@ -10,6 +10,14 @@ export interface Product {
   price: string;
   thumbnail: string;
   hidden?: boolean; // 메인페이지에서 숨김 여부
+  duration?: string; // 수강 기간 (예: '365일 수강')
+  maxStudents?: string; // 모집 인원 (예: '100명 모집')
+  instructor?: string; // 강사/팀 정보 (예: '팀멘사')
+  installment?: string; // 할부 정보 (예: '12개월 할부 시 원 666,666원')
+  discount?: string; // 할인율 (예: '63%')
+  originalPrice?: string; // 원가 (예: '총 3,000,000원')
+  rating?: string; // 별점 (예: '5.0')
+  reviewCount?: string; // 리뷰 수 (예: '33')
 }
 
 export interface WishlistItem {
