@@ -122,7 +122,7 @@ export default function PaymentModal({ open, onClose, item, productId, onPay }: 
         console.log('→ 카드 결제');
       }
 
-      await tossPayments.requestPayment(paymentMethod, paymentOptions);
+      await tossPayments.requestPayment(paymentMethod as any, paymentOptions);
 
     } catch (error) {
       console.error('결제 오류:', error);
