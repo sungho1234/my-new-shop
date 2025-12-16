@@ -7,7 +7,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     ...(process.env.KAKAO_CLIENT_ID && process.env.KAKAO_CLIENT_SECRET
       ? [
@@ -112,6 +112,7 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (dbUser) {
+          // @ts-ignore - 추가 필드
           session.user.id = dbUser.id;
           session.user.name = dbUser.name;
           session.user.image = dbUser.image;
