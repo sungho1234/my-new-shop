@@ -63,7 +63,7 @@ const deleteNote = async (kakaoId: number, noteId: string) => {
 };
 
 const StrategyVol1LearnPage = () => {
-    const { user, purchases } = useAuth();
+    const { user, courseAccess } = useAuth();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<'materials' | 'support'>('materials');
     const [activeModule, setActiveModule] = useState<number>(1);
@@ -95,10 +95,10 @@ const StrategyVol1LearnPage = () => {
         module: string;
     }>>([]);
 
-    const hasPurchased = purchases.some(p => p.productId === 'strategy-vol1');
+    const hasPurchased = courseAccess.some(access => access.productId === 'strategy-vol1' && access.isActive);
 
     // 구매 날짜 가져오기
-    const purchaseDate = purchases.find(p => p.productId === 'strategy-vol1')?.createdAt;
+    const purchaseDate = courseAccess.find(access => access.productId === 'strategy-vol1')?.grantedAt;
     const formattedPurchaseDate = purchaseDate
         ? new Date(purchaseDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric' }).replace(/\. /g, '. ')
         : '2025. 10. 30.';

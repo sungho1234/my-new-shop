@@ -14,19 +14,30 @@ datasource db {
 // 3. User (회원) 테이블 설계도 (하나로 통합)
 model User {
   id        String    @id @default(cuid())
-  kakaoId   String    @unique
-  name      String?   // 카카오 'nickname' 저장용 (기존 파일의 nickname, name 필드 통합)
+  kakaoId   String?   @unique  // 카카오 로그인 ID (선택)
+  naverId   String?   @unique  // 네이버 로그인 ID (선택)
+  googleId  String?   @unique  // 구글 로그인 ID (선택)
+  name      String?   // 사용자 이름
   email     String?   @unique
   image     String?   // 프로필 이미지 저장용
+
+  // SMS 인증 및 추가 정보
+  phone            String?   // 전화번호
+  phoneVerified    Boolean   @default(false) // 전화번호 인증 여부
+  birthday         String?   // 생년월일 (YYYY-MM-DD)
+  gender           String?   // 성별 (male, female, other)
+  isProfileComplete Boolean  @default(false) // 프로필 완료 여부 (첫 가입 시 추가 정보 입력 완료)
+
   createdAt DateTime  @default(now())
 
-  // 관계 설정: User는 여러개의 찜 목록, 구매 내역, 체크리스트, 노트, 후기, 매매일지를 가질 수 있습니다.
+  // 관계 설정: User는 여러개의 찜 목록, 주문, 체크리스트, 노트, 후기, 매매일지를 가질 수 있습니다.
   wishlist       WishlistItem[]
-  purchases      Purchase[]
+  orders         Order[]
   checklists     UserChecklist[]
   notes          UserNote[]
   reviews        Review[]
   tradingRecords TradingRecord[]
+  courseAccess   CourseAccess[]
 }
 
 // 4. WishlistItem (찜 목록) 테이블 설계도 (기존 정의 유지)
@@ -43,19 +54,119 @@ model WishlistItem {
   @@unique([userId, productId])
 }
 
-// 5. Purchase (구매 내역) 테이블 설계도 (하나로 통합)
-model Purchase {
-  id        String   @id @default(cuid())
-  productId String
-  amount    Int      // 결제 금액 (기존 파일의 amount 필드 유지)
-  createdAt DateTime @default(now())
+// 5. Product (상품) 테이블 - 상품 정보를 DB에 저장
+model Product {
+  id            String   @id @default(cuid()) // 상품 고유 ID (예: 'first-guide', 'system-builder')
+  title         String   // 상품명
+  description   String?  @db.Text // 상품 설명
+  price         Int      // 정가 (원)
+  originalPrice Int?     // 할인 전 가격
+  discount      Int?     // 할인율 (%)
+  category      String   // 카테고리 (예: 'course', 'guide')
+  instructor    String?  // 강사명
+  duration      String?  // 학습 기간
+  maxStudents   String?  // 최대 수강 인원
+  imageUrl      String?  // 상품 이미지 URL
+  badge         String?  // 배지 (예: '할인', 'VOD')
+  rating        Float    @default(0) // 평균 평점
+  reviewCount   Int      @default(0) // 후기 수
+  isActive      Boolean  @default(true) // 판매 활성화 여부
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  // User 모델과 연결
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // 관계 설정
+  orderItems    OrderItem[]
+  reviews       Review[]
 
-  // 특정 유저의 구매내역을 빠르게 찾기 위한 인덱스
+  @@index([category])
+  @@index([isActive])
+}
+
+// 6. Order (주문) 테이블 - 주문 정보 관리
+model Order {
+  id            String   @id @default(cuid())
+  orderNumber   String   @unique // 주문 번호 (예: 'ORD-20231215-001')
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 주문 상태
+  status        String   @default("PENDING") // PENDING, PAID, COMPLETED, CANCELLED, REFUNDED
+
+  // 금액 정보
+  totalAmount   Int      // 총 결제 금액
+  discountAmount Int     @default(0) // 할인 금액
+  finalAmount   Int      // 최종 결제 금액
+
+  // 주문자 정보
+  buyerName     String?  // 주문자명
+  buyerEmail    String?  // 주문자 이메일
+  buyerPhone    String?  // 주문자 연락처
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 관계 설정
+  orderItems    OrderItem[]
+  payment       Payment?
+
   @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// 7. OrderItem (주문 상품) 테이블 - 주문에 포함된 상품 목록
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+
+  // 주문 당시의 상품 정보 (가격 변동 대비)
+  productName String   // 상품명
+  price       Int      // 구매 당시 가격
+  quantity    Int      @default(1) // 수량 (강의는 보통 1개)
+
+  createdAt   DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+// 8. Payment (결제) 테이블 - 결제 정보 관리
+model Payment {
+  id              String   @id @default(cuid())
+  orderId         String   @unique
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  // 결제 정보
+  paymentMethod   String   // 결제 수단 (CARD, BANK_TRANSFER, KAKAO_PAY, TOSS_PAY 등)
+  paymentProvider String?  // 결제 게이트웨이 (toss, portone, kakao 등)
+
+  // 결제 상태
+  status          String   @default("PENDING") // PENDING, COMPLETED, FAILED, CANCELLED, REFUNDED
+
+  // 결제 금액
+  amount          Int      // 결제 금액
+
+  // 외부 결제 시스템 정보
+  transactionId   String?  @unique // 외부 결제 시스템의 거래 ID
+  receiptUrl      String?  // 영수증 URL
+
+  // 결제/취소 시각
+  paidAt          DateTime? // 결제 완료 시각
+  cancelledAt     DateTime? // 취소 시각
+  refundedAt      DateTime? // 환불 완료 시각
+
+  // 실패 정보
+  failReason      String?  // 결제 실패 사유
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status])
+  @@index([transactionId])
 }
 
 // 6. UserChecklist (사용자 학습 체크리스트) 테이블
@@ -96,18 +207,19 @@ model UserNote {
   @@index([userId, productId])
 }
 
-// 8. Review (후기) 테이블
+// 9. Review (후기) 테이블
 model Review {
   id        String   @id @default(cuid())
   userId    String
-  productId String   // 상품 ID (예: 'first-guide', 'system-builder')
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
   rating    Int      // 1~5 별점
   content   String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  // User 모델과 연결
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // 한 유저가 같은 상품에 후기 1개만 작성 가능
   @@unique([userId, productId])
@@ -115,7 +227,31 @@ model Review {
   @@index([userId])
 }
 
-// 9. TradingRecord (매매 일지) 테이블
+// 10. CourseAccess (강의 접근 권한) 테이블
+model CourseAccess {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId   String   // 구매한 강의 ID
+  orderId     String?  // 구매한 주문 ID (추적용)
+
+  grantedAt   DateTime @default(now()) // 권한 부여 시각
+  expiresAt   DateTime? // 만료 시각 (null이면 평생)
+
+  isActive    Boolean  @default(true) // 활성화 여부 (환불 시 false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 한 유저가 같은 강의에 중복 접근 권한을 가질 수 없음
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
+  @@index([isActive])
+}
+
+// 11. TradingRecord (매매 일지) 테이블
 model TradingRecord {
   id                String   @id @default(cuid())
   userId            String
@@ -145,4 +281,23 @@ model TradingRecord {
   // 특정 유저의 거래 기록을 빠르게 찾기 위한 인덱스
   @@index([userId])
   @@index([userId, entryDateTime])
+}
+
+// 12. CommunityRequest (커뮤니티 가입 신청) 테이블
+model CommunityRequest {
+  id          String   @id @default(cuid())
+  userId      String
+  productId   String   // 어떤 상품의 커뮤니티인지 (예: 'first-guide')
+  phone       String   // 전화번호
+  telegramId  String   // 텔레그램 ID
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  note        String?  // 관리자 메모
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 한 유저가 같은 상품의 커뮤니티에 중복 신청 불가
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
+  @@index([status])
 }

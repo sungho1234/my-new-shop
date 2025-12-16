@@ -1,7 +1,6 @@
 "use client"; 
 
 import React, { useState, useEffect } from 'react';
-import Script from 'next/script';
 import styles from './ProductDetail.module.css'; // [정보] CSS 파일은 기존 v4/first-guide와 동일한 것을 공유합니다.
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -68,7 +67,6 @@ const itemForPay: PaymentItem = {
 };
 
 const ProductDetailPage = () => {
-    const [activeTab, setActiveTab] = useState('intro'); // 탭 상태 추가
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [paymentOpen, setPaymentOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -196,58 +194,6 @@ const ProductDetailPage = () => {
         setActiveIndex(activeIndex === index ? null : index);
     };
 
-    const handlePayRequest = (item: PaymentItem, method: "KAKAOPAY" | "NAVERPAY") => {
-        // @ts-ignore
-        const { IMP } = window;
-        if (!IMP) {
-            alert("결제 모듈 로딩에 실패했습니다. 페이지를 새로고침 후 다시 시도해주세요.");
-            return;
-        }
-        IMP.init('iamport');
-        const payData = {
-            pg: method === 'KAKAOPAY' ? 'kakaopay' : 'html5_inicis.INIpayTest',
-            pay_method: method === 'NAVERPAY' ? 'naverpay' : 'card',
-            merchant_uid: `GROWTH-${new Date().getTime()}`,
-            name: item.title,
-            amount: 100, // 테스트 금액
-            buyer_email: "test@example.com",
-            buyer_name: user?.nickname || "테스터",
-            buyer_tel: "010-1234-5678",
-        };
-
-        IMP.request_pay(payData, async (rsp: any) => {
-            if (rsp.success) {
-                try {
-                    const response = await fetch('/api/purchases', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            kakaoId: user?.id,
-                            productId: productInfo.id,
-                            amount: payData.amount,
-                        }),
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || '구매 기록 저장에 실패했습니다.');
-                    }
-
-                    alert("결제가 완료되었습니다. 구매내역 페이지에서 확인하실 수 있습니다.");
-
-                } catch (error) {
-                    console.error(error);
-                    const errorMessage = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
-                    alert(`결제는 성공했으나 구매 기록 저장 중 오류가 발생했습니다: ${errorMessage}. 관리자에게 문의해주세요.`);
-                }
-            } else {
-                alert("결제에 실패하였습니다. 에러: " + rsp.error_msg);
-            }
-        });
-    };
-
     const handleBuyNowClick = () => {
         if (!user) {
             if (window.confirm("로그인이 필요한 서비스입니다. 로그인 하시겠습니까?")) {
@@ -296,8 +242,6 @@ const ProductDetailPage = () => {
 
     return (
         <div>
-            <Script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js" />
-
             <Header />
             <div id="wrapper" style={{maxWidth: '1280px', margin: '0 auto', padding: '40px 16px 0 16px'}}>
                 <div className={styles.mainContainer}>
@@ -314,34 +258,49 @@ const ProductDetailPage = () => {
                             </iframe>
                         </section>
 
-                        {/* 탭 메뉴 */}
+                        {/* 탭 메뉴 - 스크롤 네비게이션 */}
                         <div style={{
                             display: 'flex',
                             gap: '40px',
                             borderBottom: '1px solid #e5e7eb',
                             marginTop: '32px',
-                            marginBottom: '0'
+                            marginBottom: '0',
+                            position: 'sticky',
+                            top: '0',
+                            background: '#fff',
+                            zIndex: 10
                         }}>
                             {[
-                                { id: 'intro', label: '소개' },
-                                { id: 'curriculum', label: '전체목차' },
-                                { id: 'faq', label: 'FAQ' },
-                                { id: 'review', label: '후기' }
+                                { id: 'intro-section', label: '소개' },
+                                { id: 'curriculum-section', label: 'Curriculum' },
+                                { id: 'faq-section', label: 'FAQ' },
+                                { id: 'review-section', label: '후기' }
                             ].map(tab => (
                                 <button
                                     key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
+                                    onClick={() => {
+                                        const element = document.getElementById(tab.id);
+                                        if (element) {
+                                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                        }
+                                    }}
                                     style={{
                                         background: 'none',
                                         border: 'none',
                                         padding: '16px 4px',
                                         fontSize: '15px',
-                                        fontWeight: activeTab === tab.id ? '600' : '400',
-                                        color: activeTab === tab.id ? '#1a1a1a' : '#9ca3af',
+                                        fontWeight: '400',
+                                        color: '#9ca3af',
                                         cursor: 'pointer',
-                                        borderBottom: activeTab === tab.id ? '2px solid #1a1a1a' : '2px solid transparent',
+                                        borderBottom: '2px solid transparent',
                                         marginBottom: '-1px',
                                         transition: 'all 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.color = '#1a1a1a';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.color = '#9ca3af';
                                     }}
                                 >
                                     {tab.label}
@@ -350,9 +309,20 @@ const ProductDetailPage = () => {
                         </div>
 
                         <div className={styles.contentArea}>
-                            {/* 소개 탭 */}
-                            {activeTab === 'intro' && (
-                                <div style={{padding: '40px 0'}}>
+                            {/* 소개 섹션 */}
+                            <div id="intro-section" style={{padding: '40px 0', borderBottom: '1px solid #e5e7eb'}}>
+                                    {/* 섹션 제목 */}
+                                    <h3 style={{
+                                        fontSize: '20px',
+                                        fontWeight: '700',
+                                        color: '#333',
+                                        marginBottom: '32px',
+                                        paddingLeft: '16px',
+                                        borderLeft: '4px solid #000000'
+                                    }}>
+                                        소개
+                                    </h3>
+
                                     {/* 제목 섹션 */}
                                     <section style={{marginBottom: '40px'}}>
                                         <h2 className={styles.mainHeadline} style={{textAlign: 'center', marginBottom: '16px'}}>
@@ -390,87 +360,364 @@ const ProductDetailPage = () => {
                                         <img src="/g3/7.png" alt="성장책 - 섹션 7" style={{width: '100%', height: 'auto', display: 'block'}} />
                                     </div>
                                 </div>
-                            )}
 
-                            {/* 전체목차 탭 */}
-                            {activeTab === 'curriculum' && (
-                                <div style={{padding: '40px 0'}}>
-                                    <h3 style={{fontSize: '24px', fontWeight: '700', color: '#333', marginBottom: '32px'}}>
-                                        📚 전체 목차
-                                    </h3>
-                                    <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-                                        <div style={{padding: '20px', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#fff'}}>
-                                            <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '8px'}}>
-                                                📖 PART 1. 스캠 필터링 체크리스트
-                                            </h4>
-                                            <p style={{fontSize: '15px', color: '#6b7280', lineHeight: '1.6'}}>
-                                                • 사기 프로젝트를 걸러내는 논리적 체크리스트<br/>
-                                                • 욕망을 컨트롤하는 이성적 안전장치<br/>
-                                                • 투자 전 필수 확인 항목
-                                            </p>
-                                        </div>
-                                        <div style={{padding: '20px', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#fff'}}>
-                                            <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '8px'}}>
-                                                🎯 PART 2. 30일 챌린지 과제집
-                                            </h4>
-                                            <p style={{fontSize: '15px', color: '#6b7280', lineHeight: '1.6'}}>
-                                                • 하루하루 실력이 쌓이는 체계적 훈련법<br/>
-                                                • 데이터 기반 자기 분석 및 개선 방법<br/>
-                                                • 점진적 난이도 상승으로 자연스러운 성장
-                                            </p>
-                                        </div>
-                                        <div style={{padding: '20px', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#fff'}}>
-                                            <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '8px'}}>
-                                                🛡️ PART 3. 생존 원칙
-                                            </h4>
-                                            <p style={{fontSize: '15px', color: '#6b7280', lineHeight: '1.6'}}>
-                                                • 현역 팀이 신입에게 가장 먼저 가르치는 원칙<br/>
-                                                • 계좌를 지키는 리스크 관리 핵심<br/>
-                                                • 손실을 최소화하는 실전 방어 전략
-                                            </p>
-                                        </div>
+                            {/* Curriculum 섹션 */}
+                            <div id="curriculum-section" style={{padding: '40px 0', borderBottom: '1px solid #e5e7eb'}}>
+                                <h3 style={{
+                                    fontSize: '20px',
+                                    fontWeight: '700',
+                                    color: '#333',
+                                    marginBottom: '32px',
+                                    paddingLeft: '16px',
+                                    borderLeft: '4px solid #000000'
+                                }}>
+                                    Curriculum
+                                </h3>
+
+                                {/* VOD 리스트 */}
+                                <div style={{display: 'flex', flexDirection: 'column', gap: '0'}}>
+                                    {/* 섹션 1: 노동 소득에서 시스템 소득으로 */}
+                                    <div style={{
+                                        padding: '20px 0',
+                                        borderBottom: '1px solid #f3f4f6',
+                                        fontSize: '15px',
+                                        fontWeight: '500',
+                                        color: '#6b7280'
+                                    }}>
+                                        노동 소득에서 시스템 소득으로
                                     </div>
-                                </div>
-                            )}
 
-                            {/* FAQ 탭 */}
-                            {activeTab === 'faq' && (
-                                <section style={{padding: '40px 0'}}>
-                                    <h3 style={{fontSize: '24px', fontWeight: '700', color: '#333', marginBottom: '32px'}}>
-                                        ❓ 자주 묻는 질문 (FAQ)
-                                    </h3>
-
-                                    <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
-                                        {faqItems.map((item, index) => (
-                                            <div key={index} style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
-                                                <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '16px', lineHeight: '1.6'}}>
-                                                    {item.question}
-                                                </h4>
-                                                <p style={{fontSize: '15px', lineHeight: '1.7', color: '#555', margin: '0'}}>
-                                                    {item.answer}
-                                                </p>
+                                    {/* VOD 1 */}
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        padding: '16px 0',
+                                        borderBottom: '1px solid #f3f4f6'
+                                    }}>
+                                        <div style={{display: 'flex', alignItems: 'center', gap: '12px', flex: 1}}>
+                                            <div style={{
+                                                width: '32px',
+                                                height: '32px',
+                                                background: '#3b82f6',
+                                                borderRadius: '6px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                flexShrink: 0
+                                            }}>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                                                    <path d="M8 5v14l11-7z"/>
+                                                </svg>
                                             </div>
-                                        ))}
+                                            <div style={{flex: 1}}>
+                                                <div style={{fontSize: '12px', color: '#9ca3af', marginBottom: '4px', fontWeight: '400'}}>VOD</div>
+                                                <div style={{fontSize: '15px', color: '#374151', fontWeight: '400'}}>OT - 당신이 잠든 사이에도 코드는 돈을 벌고있습니다.</div>
+                                            </div>
+                                        </div>
+                                        <button style={{
+                                            padding: '8px 16px',
+                                            background: '#3b82f6',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '6px',
+                                            fontSize: '13px',
+                                            fontWeight: '500',
+                                            cursor: 'pointer',
+                                            flexShrink: 0
+                                        }}>
+                                            무료공개 ▶
+                                        </button>
                                     </div>
-                                </section>
-                            )}
 
-                            {/* 후기 탭 */}
-                            {activeTab === 'review' && (
-                                <section id="review-section" style={{padding: '40px 0'}}>
+                                    {/* VOD 2 */}
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        padding: '16px 0',
+                                        borderBottom: '1px solid #f3f4f6'
+                                    }}>
+                                        <div style={{display: 'flex', alignItems: 'center', gap: '12px', flex: 1}}>
+                                            <div style={{
+                                                width: '32px',
+                                                height: '32px',
+                                                background: '#3b82f6',
+                                                borderRadius: '6px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                flexShrink: 0
+                                            }}>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                                                    <path d="M8 5v14l11-7z"/>
+                                                </svg>
+                                            </div>
+                                            <div style={{flex: 1}}>
+                                                <div style={{fontSize: '12px', color: '#9ca3af', marginBottom: '4px', fontWeight: '400'}}>VOD</div>
+                                                <div style={{fontSize: '15px', color: '#374151', fontWeight: '400'}}>돈버는 시간대 (지표 제공)</div>
+                                            </div>
+                                        </div>
+                                        <button style={{
+                                            padding: '8px 16px',
+                                            background: '#3b82f6',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '6px',
+                                            fontSize: '13px',
+                                            fontWeight: '500',
+                                            cursor: 'pointer',
+                                            flexShrink: 0
+                                        }}>
+                                            무료공개 ▶
+                                        </button>
+                                    </div>
+
+                                    {/* 섹션 2: 기초 용어를 넘어 시장의 '미시구조(Microstructure)'를 이해하는 단계 */}
+                                    <div style={{
+                                        padding: '20px 0',
+                                        borderBottom: '1px solid #f3f4f6',
+                                        fontSize: '15px',
+                                        fontWeight: '500',
+                                        color: '#6b7280',
+                                        marginTop: '12px'
+                                    }}>
+                                        기초 용어를 넘어 시장의 '미시구조(Microstructure)'를 이해하는 단계
+                                    </div>
+
+                                    {/* VOD 3-6 */}
+                                    {[
+                                        { title: "API 통신과 캔들(OHLCV) 데이터의 구조", time: "00:15:32" },
+                                        { title: "과적합(Overfitting)의 함정과 성과 검증", time: "00:22:18" },
+                                        { title: "슬리피지와 수수료, '히든 코스트' 통제하기", time: "00:18:45" },
+                                        { title: "파산을 막는 '포지션 사이징'과 레버리지", time: "00:24:11" }
+                                    ].map((vod, idx) => (
+                                        <div key={idx} style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            padding: '16px 0',
+                                            borderBottom: '1px solid #f3f4f6'
+                                        }}>
+                                            <div style={{display: 'flex', alignItems: 'center', gap: '12px', flex: 1}}>
+                                                <div style={{
+                                                    width: '32px',
+                                                    height: '32px',
+                                                    background: '#3b82f6',
+                                                    borderRadius: '6px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    flexShrink: 0
+                                                }}>
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                                                        <path d="M8 5v14l11-7z"/>
+                                                    </svg>
+                                                </div>
+                                                <div style={{flex: 1}}>
+                                                    <div style={{fontSize: '12px', color: '#9ca3af', marginBottom: '4px', fontWeight: '400'}}>VOD</div>
+                                                    <div style={{fontSize: '15px', color: '#374151', fontWeight: '400'}}>{vod.title}</div>
+                                                </div>
+                                            </div>
+                                            <div style={{fontSize: '14px', color: '#6b7280', flexShrink: 0, fontWeight: '400'}}>{vod.time}</div>
+                                        </div>
+                                    ))}
+
+                                    {/* 섹션 3: 프로가 사용하는 4가지 핵심 지표 */}
+                                    <div style={{
+                                        padding: '20px 0',
+                                        borderBottom: '1px solid #f3f4f6',
+                                        fontSize: '15px',
+                                        fontWeight: '500',
+                                        color: '#6b7280',
+                                        marginTop: '12px'
+                                    }}>
+                                        프로가 사용하는 4가지 핵심 지표
+                                    </div>
+
+                                    {/* VOD 7-10 */}
+                                    {[
+                                        { title: "EMA를 활용한 추세 추종 메커니즘", time: "00:19:27" },
+                                        { title: "ATR을 활용한 동적(Dynamic) 리스크 관리", time: "00:21:33" },
+                                        { title: "CCI로 포착하는 과매수·과매도 반전 구간", time: "00:17:56" },
+                                        { title: "VWAP과 표준편차 밴드의 통계적 활용", time: "00:23:42" }
+                                    ].map((vod, idx) => (
+                                        <div key={idx} style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            padding: '16px 0',
+                                            borderBottom: '1px solid #f3f4f6'
+                                        }}>
+                                            <div style={{display: 'flex', alignItems: 'center', gap: '12px', flex: 1}}>
+                                                <div style={{
+                                                    width: '32px',
+                                                    height: '32px',
+                                                    background: '#3b82f6',
+                                                    borderRadius: '6px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    flexShrink: 0
+                                                }}>
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                                                        <path d="M8 5v14l11-7z"/>
+                                                    </svg>
+                                                </div>
+                                                <div style={{flex: 1}}>
+                                                    <div style={{fontSize: '12px', color: '#9ca3af', marginBottom: '4px', fontWeight: '400'}}>VOD</div>
+                                                    <div style={{fontSize: '15px', color: '#374151', fontWeight: '400'}}>{vod.title}</div>
+                                                </div>
+                                            </div>
+                                            <div style={{fontSize: '14px', color: '#6b7280', flexShrink: 0, fontWeight: '400'}}>{vod.time}</div>
+                                        </div>
+                                    ))}
+
+                                    {/* 섹션 4: 단순한 매매법이 아닌, 논리적인 '프레임워크'를 갖추는 단계 */}
+                                    <div style={{
+                                        padding: '20px 0',
+                                        borderBottom: '1px solid #f3f4f6',
+                                        fontSize: '15px',
+                                        fontWeight: '500',
+                                        color: '#6b7280',
+                                        marginTop: '12px'
+                                    }}>
+                                        단순한 매매법이 아닌, 논리적인 '프레임워크'를 갖추는 단계
+                                    </div>
+
+                                    {/* VOD 11-13 */}
+                                    {[
+                                        { title: "직관을 이기는 '확률적 사고'와 기대값", time: "00:26:14" },
+                                        { title: "4가지 지표를 통합한 '하이브리드 전략' 설계", time: "00:31:28" },
+                                        { title: "인간의 한계를 넘는 시스템만의 영역", time: "00:20:55" }
+                                    ].map((vod, idx) => (
+                                        <div key={idx} style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            padding: '16px 0',
+                                            borderBottom: '1px solid #f3f4f6'
+                                        }}>
+                                            <div style={{display: 'flex', alignItems: 'center', gap: '12px', flex: 1}}>
+                                                <div style={{
+                                                    width: '32px',
+                                                    height: '32px',
+                                                    background: '#3b82f6',
+                                                    borderRadius: '6px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    flexShrink: 0
+                                                }}>
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                                                        <path d="M8 5v14l11-7z"/>
+                                                    </svg>
+                                                </div>
+                                                <div style={{flex: 1}}>
+                                                    <div style={{fontSize: '12px', color: '#9ca3af', marginBottom: '4px', fontWeight: '400'}}>VOD</div>
+                                                    <div style={{fontSize: '15px', color: '#374151', fontWeight: '400'}}>{vod.title}</div>
+                                                </div>
+                                            </div>
+                                            <div style={{fontSize: '14px', color: '#6b7280', flexShrink: 0, fontWeight: '400'}}>{vod.time}</div>
+                                        </div>
+                                    ))}
+
+                                    {/* 섹션 5: 실제 개발 환경을 구축하고 시스템을 '배포(Deploy)'하는 단계 */}
+                                    <div style={{
+                                        padding: '20px 0',
+                                        borderBottom: '1px solid #f3f4f6',
+                                        fontSize: '15px',
+                                        fontWeight: '500',
+                                        color: '#6b7280',
+                                        marginTop: '12px'
+                                    }}>
+                                        실제 개발 환경을 구축하고 시스템을 '배포(Deploy)'하는 단계
+                                    </div>
+
+                                    {/* VOD 14-17 */}
+                                    {[
+                                        { title: "파이썬 & VS Code 개발 환경 구축하기", time: "00:28:36" },
+                                        { title: "AI가 이해하는 '전략 명세서' 작성법", time: "00:25:19" },
+                                        { title: '"코드 써줘" 한 마디로 완성하는 봇 개발 실습', time: "00:35:47" },
+                                        { title: "24시간 무중단 서버 운영과 알림 시스템", time: "00:29:22" }
+                                    ].map((vod, idx) => (
+                                        <div key={idx} style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            padding: '16px 0',
+                                            borderBottom: idx === 3 ? 'none' : '1px solid #f3f4f6'
+                                        }}>
+                                            <div style={{display: 'flex', alignItems: 'center', gap: '12px', flex: 1}}>
+                                                <div style={{
+                                                    width: '32px',
+                                                    height: '32px',
+                                                    background: '#3b82f6',
+                                                    borderRadius: '6px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    flexShrink: 0
+                                                }}>
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                                                        <path d="M8 5v14l11-7z"/>
+                                                    </svg>
+                                                </div>
+                                                <div style={{flex: 1}}>
+                                                    <div style={{fontSize: '12px', color: '#9ca3af', marginBottom: '4px', fontWeight: '400'}}>VOD</div>
+                                                    <div style={{fontSize: '15px', color: '#374151', fontWeight: '400'}}>{vod.title}</div>
+                                                </div>
+                                            </div>
+                                            <div style={{fontSize: '14px', color: '#6b7280', flexShrink: 0, fontWeight: '400'}}>{vod.time}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* FAQ 섹션 */}
+                            <section id="faq-section" style={{padding: '40px 0', borderBottom: '1px solid #e5e7eb'}}>
+                                <h3 style={{
+                                    fontSize: '20px',
+                                    fontWeight: '700',
+                                    color: '#333',
+                                    marginBottom: '32px',
+                                    paddingLeft: '16px',
+                                    borderLeft: '4px solid #000000'
+                                }}>
+                                    자주 묻는 질문 (FAQ)
+                                </h3>
+
+                                <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
+                                    {faqItems.map((item, index) => (
+                                        <div key={index} style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
+                                            <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '16px', lineHeight: '1.6'}}>
+                                                {item.question}
+                                            </h4>
+                                            <p style={{fontSize: '15px', lineHeight: '1.7', color: '#555', margin: '0'}}>
+                                                {item.answer}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+
+                            {/* 후기 섹션 */}
+                            <section id="review-section" style={{padding: '40px 0'}}>
                                     <div style={{display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px'}}>
                                         <h3 style={{
-                                            fontSize: '24px',
+                                            fontSize: '20px',
                                             fontWeight: '700',
                                             color: '#333',
-                                            margin: '0'
+                                            margin: '0',
+                                            paddingLeft: '16px',
+                                            borderLeft: '4px solid #000000'
                                         }}>
-                                            ⭐ 후기
+                                            후기
                                         </h3>
                                         <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                                            <span style={{fontSize: '20px', color: '#FFB800'}}>★</span>
-                                            <span style={{fontSize: '18px', fontWeight: '700', color: '#333'}}>4.9</span>
-                                            <span style={{fontSize: '14px', color: '#FF6B35', fontWeight: '600'}}>📝 {dbReviews.length + reviews.length}</span>
+                                            <span style={{fontSize: '18px', color: '#FFB800'}}>★</span>
+                                            <span style={{fontSize: '16px', fontWeight: '700', color: '#333'}}>4.9</span>
+                                            <span style={{fontSize: '14px', color: '#9ca3af'}}>({dbReviews.length + reviews.length})</span>
                                         </div>
                                     </div>
 
@@ -534,7 +781,7 @@ const ProductDetailPage = () => {
                                                     disabled={!purchased || !user || isSubmittingReview || selectedRating === 0 || reviewContent.trim().length < 10}
                                                     style={{
                                                         padding: '8px 20px',
-                                                        background: (purchased && user && !isSubmittingReview && selectedRating > 0 && reviewContent.trim().length >= 10) ? '#FF6B35' : '#e5e7eb',
+                                                        background: (purchased && user && !isSubmittingReview && selectedRating > 0 && reviewContent.trim().length >= 10) ? '#3b82f6' : '#e5e7eb',
                                                         color: (purchased && user && !isSubmittingReview && selectedRating > 0 && reviewContent.trim().length >= 10) ? '#fff' : '#9ca3af',
                                                         border: 'none',
                                                         borderRadius: '6px',
@@ -619,7 +866,7 @@ const ProductDetailPage = () => {
                                                     border: 'none',
                                                     borderRadius: '4px',
                                                     background: 'transparent',
-                                                    color: currentPage === pageNum ? '#FF6B35' : '#6b7280',
+                                                    color: currentPage === pageNum ? '#3b82f6' : '#6b7280',
                                                     cursor: 'pointer',
                                                     fontSize: '15px',
                                                     fontWeight: currentPage === pageNum ? '700' : '400',
@@ -673,7 +920,6 @@ const ProductDetailPage = () => {
                                     </button>
                                 </div>
                                 </section>
-                            )}
                         </div>
                     </main>
 
@@ -699,7 +945,7 @@ const ProductDetailPage = () => {
                                     display: 'inline-block',
                                     padding: '5px 10px',
                                     background: '#fff',
-                                    color: '#FF6B35',
+                                    color: '#ef4444',
                                     fontSize: '13px',
                                     fontWeight: '600',
                                     borderRadius: '4px',
@@ -771,7 +1017,7 @@ const ProductDetailPage = () => {
                                 marginBottom: '10px',
                                 marginTop: '0'
                             }}>
-                                일반인의 성장책
+                                매일 20만원씩 벌어오는 "시스템 트레이딩" 가이드
                             </h1>
 
                             {/* 평점 및 구매자 수 */}
@@ -820,39 +1066,32 @@ const ProductDetailPage = () => {
                                 </span>
                             </div>
 
-                            {/* 가격 정보 - 오른쪽 정렬 */}
-                            <div style={{marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
-                                <div style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'flex-end',
-                                    gap: '8px',
-                                    marginBottom: '6px'
-                                }}>
-                                    <span style={{
-                                        fontSize: '15px',
-                                        fontWeight: '700',
-                                        color: '#ef4444'
-                                    }}>
-                                        20% 할인
-                                    </span>
-                                    <span style={{
-                                        fontSize: '14px',
-                                        color: '#9ca3af',
-                                        textDecoration: 'line-through'
-                                    }}>
-                                        490,000원
-                                    </span>
+                            {/* 가격 정보 */}
+                            <div style={{marginBottom: '20px'}}>
+                                {/* 12개월 할부 시 */}
+                                <p style={{fontSize: '13px', color: '#9ca3af', marginBottom: '4px'}}>12개월 할부 시</p>
+
+                                {/* 할인율 + 월 가격 */}
+                                <div style={{display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '16px'}}>
+                                    <span style={{fontSize: '20px', fontWeight: '700', color: '#ef4444'}}>73%</span>
+                                    <span style={{fontSize: '14px', color: '#1a1a1a'}}>월</span>
+                                    <span style={{fontSize: '26px', fontWeight: '800', color: '#1a1a1a'}}>107,000원</span>
                                 </div>
-                                <div style={{
-                                    fontSize: '28px',
-                                    fontWeight: '800',
-                                    color: '#1a1a1a',
-                                    lineHeight: '1',
-                                    letterSpacing: '-0.5px',
-                                    whiteSpace: 'nowrap'
-                                }}>
-                                    32,500<span style={{fontSize: '17px', fontWeight: '500'}}>원/월</span>
+
+                                {/* 가격 상세 */}
+                                <div style={{display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '14px'}}>
+                                    <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                                        <span style={{color: '#9ca3af'}}>권장 소비자 가격</span>
+                                        <span style={{color: '#9ca3af', textDecoration: 'line-through'}}>4,780,000원</span>
+                                    </div>
+                                    <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                                        <span style={{color: '#9ca3af'}}>할인 금액</span>
+                                        <span style={{color: '#6b7280'}}>3,490,000원</span>
+                                    </div>
+                                    <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                                        <span style={{color: '#9ca3af'}}>할인 판매가</span>
+                                        <span style={{color: '#1a1a1a', fontWeight: '700'}}>1,290,000원</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -882,7 +1121,7 @@ const ProductDetailPage = () => {
                                     style={{
                                         width: '100%',
                                         padding: '15px',
-                                        background: '#FF6B35',
+                                        background: '#3b82f6',
                                         color: '#fff',
                                         fontSize: '16px',
                                         fontWeight: '700',
@@ -893,10 +1132,10 @@ const ProductDetailPage = () => {
                                         transition: 'all 0.2s'
                                     }}
                                     onMouseEnter={(e) => {
-                                        e.currentTarget.style.background = '#ff5722';
+                                        e.currentTarget.style.background = '#2563eb';
                                     }}
                                     onMouseLeave={(e) => {
-                                        e.currentTarget.style.background = '#FF6B35';
+                                        e.currentTarget.style.background = '#3b82f6';
                                     }}
                                 >
                                     구매하기
@@ -909,10 +1148,10 @@ const ProductDetailPage = () => {
                                     width: '100%',
                                     padding: '14px',
                                     background: '#fff',
-                                    color: '#FF6B35',
+                                    color: '#3b82f6',
                                     fontSize: '15px',
                                     fontWeight: '600',
-                                    border: '1.5px solid #FF6B35',
+                                    border: '1.5px solid #3b82f6',
                                     borderRadius: '10px',
                                     cursor: 'pointer',
                                     transition: 'all 0.2s',
@@ -922,7 +1161,7 @@ const ProductDetailPage = () => {
                                     gap: '6px'
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.background = '#fff4ed';
+                                    e.currentTarget.style.background = '#eff6ff';
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.background = '#fff';
@@ -930,6 +1169,36 @@ const ProductDetailPage = () => {
                             >
                                 <span>📺</span> 무료 강의 보기
                             </button>
+
+                            {/* 구분선 */}
+                            <div style={{borderTop: '1px solid #e5e7eb', margin: '16px 0'}}></div>
+
+                            {/* 하단 정보 */}
+                            <div style={{display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px', color: '#6b7280'}}>
+                                <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                    <span>Enrollment limit: 49/27</span>
+                                </div>
+                                <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                                    </svg>
+                                    <span>Video: 21</span>
+                                </div>
+                                <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    <span>365 days</span>
+                                </div>
+                            </div>
                         </div>
                     </aside>
                 </div>
@@ -941,7 +1210,7 @@ const ProductDetailPage = () => {
                     open={paymentOpen}
                     onClose={() => setPaymentOpen(false)}
                     item={itemForPay}
-                    onPay={handlePayRequest}
+                    productId="growth-book"
                 />
             )}
         </div>

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 export interface Product {
   id: string; // 상품 ID (예: 'maxx-quant-v4')
@@ -27,19 +28,23 @@ export interface WishlistItem {
   createdAt?: Date; // 옵션
 }
 
-export interface Purchase {
+export interface CourseAccess {
   id: string; // DB의 CUID
   productId: string; // 상품 ID
-  amount: number; // 구매 금액
   userId: string; // DB의 User CUID
-  createdAt: Date; // 구매 날짜
+  orderId: string | null; // 주문 ID
+  grantedAt: Date; // 권한 부여 날짜
+  expiresAt: Date | null; // 만료 날짜
+  isActive: boolean; // 활성 여부
 }
 
 interface User {
-  id: number; // 카카오 ID
+  id: number; // 카카오 ID 또는 해시된 숫자
+  dbId?: string; // DB의 실제 CUID (네이버/구글 로그인용)
   nickname: string;
   profileImage: string;
   email?: string;
+  createdAt?: Date; // 가입일
 }
 
 interface AuthContextType {
@@ -50,10 +55,10 @@ interface AuthContextType {
   addToWishlist: (product: Product) => Promise<void>;
   removeFromWishlist: (productId: string) => Promise<void>;
   isLiked: (productId: string) => boolean;
-  purchases: Purchase[];
-  fetchPurchases: () => Promise<void>;
+  courseAccess: CourseAccess[];
+  fetchCourseAccess: () => Promise<void>;
   isPurchased: (productId: string) => boolean;
-  isLoadingPurchases: boolean;
+  isLoadingCourseAccess: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -61,18 +66,21 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
-  const [purchases, setPurchases] = useState<Purchase[]>([]);
-  const [isLoadingPurchases, setIsLoadingPurchases] = useState<boolean>(true); // 초기값 true로 시작
+  const [courseAccess, setCourseAccess] = useState<CourseAccess[]>([]);
+  const [isLoadingCourseAccess, setIsLoadingCourseAccess] = useState<boolean>(true); // 초기값 true로 시작
   const [isLoadingWishlist, setIsLoadingWishlist] = useState<boolean>(true); // 초기값 true로 시작
   // isLoading은 더 이상 사용하지 않음 - 페이지 전체 블로킹 방지
   const router = useRouter();
+  const { data: session, status } = useSession(); // NextAuth 세션 체크
 
   // 1. 찜 목록 로드 헬퍼 (useCallback으로 안정화 – Hooks 규칙 준수)
-  const fetchWishlist = useCallback(async (kakaoId: number) => {
-    console.log("📋 fetchWishlist 호출: kakaoId =", kakaoId);
+  const fetchWishlist = useCallback(async (kakaoId: number, dbId?: string) => {
+    console.log("📋 fetchWishlist 호출: kakaoId =", kakaoId, ", dbId =", dbId);
     setIsLoadingWishlist(true);
     try {
-      const res = await fetch(`/api/wishlist?kakaoId=${kakaoId}`);
+      // dbId가 있으면 userId로, 없으면 kakaoId로 조회
+      const query = dbId ? `userId=${dbId}` : `kakaoId=${kakaoId}`;
+      const res = await fetch(`/api/wishlist?${query}`);
       if (!res.ok) throw new Error(`Failed to fetch wishlist: ${res.status}`);
       const data: WishlistItem[] = await res.json();
       setWishlist(data);
@@ -85,67 +93,94 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []); // 의존성 없음 – 안정적
 
-  // 1-1. 구매내역 로드 헬퍼
-  const fetchPurchasesInternal = useCallback(async (kakaoId: number) => {
-    console.log("🛒 fetchPurchases 호출: kakaoId =", kakaoId);
-    setIsLoadingPurchases(true);
+  // 1-1. 강의 접근 권한 로드 헬퍼
+  const fetchCourseAccessInternal = useCallback(async (kakaoId: number, dbId?: string) => {
+    console.log("🎓 fetchCourseAccess 호출: kakaoId =", kakaoId, ", dbId =", dbId);
+    setIsLoadingCourseAccess(true);
     try {
-      // 먼저 kakaoId로 userId를 찾아야 함
-      const res = await fetch(`/api/purchases?kakaoId=${kakaoId}`);
-      if (!res.ok) throw new Error(`Failed to fetch purchases: ${res.status}`);
-      const data: Purchase[] = await res.json();
-      setPurchases(data);
-      console.log("✅ DB 구매내역 로드 성공:", data.length, "개");
+      // dbId가 있으면 userId로, 없으면 kakaoId로 조회
+      const query = dbId ? `userId=${dbId}` : `kakaoId=${kakaoId}`;
+      const res = await fetch(`/api/course-access/check?${query}`);
+      if (!res.ok) throw new Error(`Failed to fetch course access: ${res.status}`);
+      const data = await res.json();
+      setCourseAccess(data.courses || []);
+      console.log("✅ DB 강의 접근 권한 로드 성공:", data.courses?.length || 0, "개");
     } catch (err) {
-      console.error("❌ DB 구매내역 로드 실패:", err);
-      setPurchases([]);
+      console.error("❌ DB 강의 접근 권한 로드 실패:", err);
+      setCourseAccess([]);
     } finally {
-      setIsLoadingPurchases(false);
+      setIsLoadingCourseAccess(false);
     }
   }, []);
 
-  // 2. 초기 로드: localStorage에서 user 복원 (로그인 상태 유지)
+  // 2. 초기 로드: localStorage + NextAuth 세션 체크
   useEffect(() => {
     const initAuth = async () => {
       try {
+        // NextAuth 세션이 있으면 email로 DB 조회
+        if (status === 'authenticated' && session?.user?.email) {
+          console.log("🔄 NextAuth 세션에서 user 복원:", session.user.email);
+
+          // DB에서 email로 user 조회
+          const response = await fetch(`/api/user?email=${encodeURIComponent(session.user.email)}`);
+          if (response.ok) {
+            const dbUser = await response.json();
+            const nextAuthUser: User = {
+              id: dbUser.hashedId, // 해시된 숫자 ID
+              dbId: dbUser.dbId, // 실제 CUID
+              nickname: dbUser.name || session.user.name || '사용자',
+              profileImage: dbUser.image || session.user.image || '',
+              email: dbUser.email,
+              createdAt: dbUser.createdAt ? new Date(dbUser.createdAt) : undefined,
+            };
+            console.log("✅ NextAuth user 로드 성공:", nextAuthUser);
+            setUser(nextAuthUser);
+            localStorage.setItem('user', JSON.stringify(nextAuthUser));
+            return;
+          }
+        }
+
+        // NextAuth 세션이 없으면 localStorage 체크
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
           const loadedUser: User = JSON.parse(storedUser);
           console.log("🔄 localStorage에서 user 복원: ", loadedUser.nickname);
           setUser(loadedUser);
-          // wishlist와 purchases는 아래 useEffect가 처리
         } else {
-          // 로그인하지 않은 경우 로딩 상태 false로 변경
-          setIsLoadingPurchases(false);
+          // 로그인하지 않은 경우
+          setIsLoadingCourseAccess(false);
           setIsLoadingWishlist(false);
         }
       } catch (error) {
-        console.error("❌ localStorage User 파싱 오류:", error);
-        localStorage.removeItem('user'); // 손상된 데이터 삭제
-        setIsLoadingPurchases(false);
+        console.error("❌ User 복원 오류:", error);
+        localStorage.removeItem('user');
+        setIsLoadingCourseAccess(false);
         setIsLoadingWishlist(false);
       }
     };
-    initAuth();
-  }, []);
 
-  // 3. user 변경 시 wishlist와 purchases 자동 로드 (로그인 후 동기화 – Hooks 안전)
+    if (status !== 'loading') {
+      initAuth();
+    }
+  }, [session, status]);
+
+  // 3. user 변경 시 wishlist와 courseAccess 자동 로드 (로그인 후 동기화 – Hooks 안전)
   useEffect(() => {
     const loadUserData = async () => {
       if (user) {
         // 병렬로 빠르게 로드 (await 없이 백그라운드에서 실행)
-        fetchWishlist(user.id);
-        fetchPurchasesInternal(user.id);
+        fetchWishlist(user.id, user.dbId);
+        fetchCourseAccessInternal(user.id, user.dbId);
       } else {
         setWishlist([]); // 로그아웃 시 초기화
-        setPurchases([]);
-        setIsLoadingPurchases(false);
+        setCourseAccess([]);
+        setIsLoadingCourseAccess(false);
         setIsLoadingWishlist(false);
       }
     };
     loadUserData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]); // user만 의존성으로, fetchWishlist와 fetchPurchasesInternal은 useCallback으로 안정화되어 있음
+  }, [user]); // user만 의존성으로, fetchWishlist와 fetchCourseAccessInternal은 useCallback으로 안정화되어 있음
 
   // 4. login 함수 (async 호출 제거 – setUser만, useEffect가 처리)
   const login = (kakaoUser: any, accessToken?: string): boolean => {
@@ -159,6 +194,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const nickname = kakaoUser?.kakao_account?.profile?.nickname ?? '사용자';
     const profileImage = kakaoUser?.kakao_account?.profile?.profile_image_url ?? '';
     const email = kakaoUser?.kakao_account?.email ?? '';
+
+    console.log("📧 카카오에서 받은 이메일:", email);
+    console.log("📦 kakao_account 전체:", kakaoUser?.kakao_account);
 
     const newUser: User = {
       id: kakaoUser.id,
@@ -184,7 +222,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
           return res.json();
         })
-        .then((dbUser) => console.log("✅ DB 로그인/회원가입 성공:", dbUser?.nickname || '새 사용자 생성'))
+        .then(async (dbUser) => {
+          console.log("✅ DB 로그인/회원가입 성공:", dbUser?.nickname || '새 사용자 생성');
+          console.log("📧 DB에서 받은 이메일:", dbUser.email);
+          console.log("📦 DB 전체 응답:", dbUser);
+
+          // 카카오에서 이메일을 못 받았을 경우, DB에서 kakaoId로 조회해서 이메일 가져오기
+          let finalEmail = dbUser.email || newUser.email;
+          if (!finalEmail && kakaoUser.id) {
+            try {
+              const userResponse = await fetch(`/api/user?kakaoId=${kakaoUser.id}`);
+              if (userResponse.ok) {
+                const userData = await userResponse.json();
+                finalEmail = userData.email || '';
+                console.log("📧 DB에서 kakaoId로 조회한 이메일:", finalEmail);
+              }
+            } catch (error) {
+              console.error("❌ DB에서 이메일 조회 실패:", error);
+            }
+          }
+
+          // DB에서 받은 정보로 user 객체 업데이트 (email, createdAt 포함)
+          const updatedUser: User = {
+            ...newUser,
+            email: finalEmail, // DB에서 받은 이메일 우선 사용
+            createdAt: dbUser.createdAt ? new Date(dbUser.createdAt) : undefined,
+          };
+          console.log("🔄 업데이트된 user 객체:", updatedUser);
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+          setUser(updatedUser);
+        })
         .catch((err) => console.error("❌ DB 로그인 실패:", err));
     } else {
       console.warn("⚠️ accessToken 없음 - DB 동기화 생략");
@@ -195,17 +262,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // 5. logout
-  const logout = () => {
+  const logout = async () => {
     console.log("🚪 logout 호출");
     localStorage.removeItem('user');
     setUser(null); // useEffect가 wishlist와 purchases 초기화
+
+    // NextAuth 세션도 종료
+    if (session) {
+      const { signOut } = await import('next-auth/react');
+      await signOut({ redirect: false });
+    }
+
     router.push('/');
   };
 
-  // 5-1. 구매내역 새로고침용 함수 (외부에서 호출 가능)
-  const fetchPurchases = async () => {
+  // 5-1. 강의 접근 권한 새로고침용 함수 (외부에서 호출 가능)
+  const fetchCourseAccess = async () => {
     if (user) {
-      await fetchPurchasesInternal(user.id);
+      await fetchCourseAccessInternal(user.id, user.dbId);
     }
   };
 
@@ -221,18 +295,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const tempItem: WishlistItem = {
       id: 'temp-' + Date.now(),
       productId: product.id,
-      userId: user.id.toString(),
+      userId: user.dbId || user.id.toString(),
     };
     setWishlist(prev => [...prev, tempItem]);
 
     try {
+      const body = user.dbId
+        ? { userId: user.dbId, product }
+        : { kakaoId: user.id, product };
+
       const response = await fetch('/api/wishlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kakaoId: user.id, product }),
+        body: JSON.stringify(body),
       });
       if (!response.ok) throw new Error(`Add failed: ${response.status}`);
-      await fetchWishlist(user.id); // DB에서 정확한 데이터로 재로드
+      await fetchWishlist(user.id, user.dbId); // DB에서 정확한 데이터로 재로드
       console.log("✅ 찜 추가 성공");
     } catch (error) {
       console.error("❌ 찜 추가 실패:", error);
@@ -255,7 +333,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setWishlist(prev => prev.filter(item => item.productId !== productId));
 
     try {
-      const response = await fetch(`/api/wishlist?kakaoId=${user.id}&productId=${productId}`, {
+      const query = user.dbId
+        ? `userId=${user.dbId}&productId=${productId}`
+        : `kakaoId=${user.id}&productId=${productId}`;
+
+      const response = await fetch(`/api/wishlist?${query}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error(`Remove failed: ${response.status}`);
@@ -273,9 +355,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return wishlist.some((item) => item.productId === productId);
   };
 
-  // 9. isPurchased - 이미 구매한 상품인지 확인
+  // 9. isPurchased - 이미 구매한 상품인지 확인 (강의 접근 권한이 있는지)
   const isPurchased = (productId: string) => {
-    return purchases.some((item) => item.productId === productId);
+    return courseAccess.some((item: CourseAccess) => item.productId === productId && item.isActive);
   };
 
   const value: AuthContextType = {
@@ -286,10 +368,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     addToWishlist,
     removeFromWishlist,
     isLiked,
-    purchases,
-    fetchPurchases,
+    courseAccess,
+    fetchCourseAccess,
     isPurchased,
-    isLoadingPurchases,
+    isLoadingCourseAccess,
   };
 
   return (

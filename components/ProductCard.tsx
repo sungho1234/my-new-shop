@@ -22,6 +22,7 @@ interface ProductCardProps {
   discount?: string; // 할인율
   originalPrice?: string; // 원가
   reviewCount?: string; // 리뷰 수
+  soldOut?: boolean; // 마감된 상품 (클릭 불가)
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -43,6 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   discount,
   originalPrice,
   reviewCount,
+  soldOut = false,
 }) => {
   // 컴팩트 가로형 레이아웃
   if (compact) {
@@ -112,42 +114,49 @@ const ProductCard: React.FC<ProductCardProps> = ({
   }
 
   // 기본 카드 레이아웃
-  return (
-    <Link href={href}>
-      <div className="group cursor-pointer">
-        {/* 썸네일 영역 */}
-        <div className="relative overflow-hidden rounded-lg mb-3 bg-gray-100 aspect-[16/9] border border-gray-200 shadow-sm group-hover:shadow-md transition-shadow duration-300">
-          <img
-            src={imgSrc}
-            alt={title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-          {/* 배지들 */}
-          {badges.length > 0 && (
-            <div className="absolute top-6 left-6 flex gap-1">
-              {badges.map((badge, index) => (
-                <span
-                  key={index}
-                  className={`px-2.5 py-1 text-xs font-bold flex items-center gap-1 ${
-                    badge === "할인"
-                      ? "bg-orange-500 text-white rounded-xl"
-                      : "border border-white text-white rounded-full"
-                  }`}
-                >
-                  {badge === "VOD" && (
-                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                  )}
-                  {badge}
-                </span>
-              ))}
-            </div>
-          )}
-          {/* 호버 시 오버레이 효과 */}
+  const cardContent = (
+    <div className={`group ${soldOut ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+      {/* 썸네일 영역 */}
+      <div className={`relative overflow-hidden rounded-lg mb-3 bg-gray-100 aspect-[16/9] border border-gray-200 shadow-sm ${!soldOut ? 'group-hover:shadow-md' : ''} transition-shadow duration-300`}>
+        <img
+          src={imgSrc}
+          alt={title}
+          className={`w-full h-full object-cover transition-all duration-300 ${!soldOut ? 'group-hover:scale-105' : 'group-hover:grayscale group-hover:opacity-70'}`}
+        />
+        {/* 배지들 */}
+        {badges.length > 0 && (
+          <div className="absolute top-6 left-6 flex gap-1">
+            {badges.map((badge, index) => (
+              <span
+                key={index}
+                className={`px-2.5 py-1 text-xs font-bold flex items-center gap-1 ${
+                  badge === "할인"
+                    ? "bg-orange-500 text-white rounded-xl"
+                    : badge === "마감"
+                    ? "bg-black text-white rounded-xl"
+                    : "bg-white border border-black text-black rounded-full"
+                }`}
+              >
+                {badge === "VOD" && (
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                )}
+                {badge}
+              </span>
+            ))}
+          </div>
+        )}
+        {/* 호버 시 오버레이 효과 또는 마감 오버레이 */}
+        {soldOut ? (
+          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 flex items-center justify-center transition-all duration-300">
+            <span className="text-white text-2xl font-bold tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-300">마감</span>
+          </div>
+        ) : (
           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300" />
-        </div>
+        )}
+      </div>
 
-        {/* 상품 정보 영역 */}
-        <div className="space-y-1.5">
+      {/* 상품 정보 영역 */}
+      <div className="space-y-1.5">
           {/* 상단 정보: 수강기간 | 모집인원 | 강사 */}
           <div className="flex items-center gap-2">
             {(duration || maxStudents) && (
@@ -191,7 +200,22 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
           {/* 할부 정보 */}
           {installment && (
-            <p className="text-xs text-gray-600">{installment}</p>
+            <p className="text-xs text-gray-600">
+              {(() => {
+                const priceMatch = installment.match(/(\d{1,3}(?:,\d{3})*)원/);
+                if (priceMatch) {
+                  const parts = installment.split(priceMatch[0]);
+                  return (
+                    <>
+                      {parts[0]}
+                      <span style={{ textDecoration: 'line-through' }}>{priceMatch[0]}</span>
+                      {parts[1]}
+                    </>
+                  );
+                }
+                return installment;
+              })()}
+            </p>
           )}
 
           {/* 할인율 + 가격 + 별점 */}
@@ -209,12 +233,22 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
           </div>
 
-          {/* 원가 */}
-          {originalPrice && (
-            <p className="text-xs text-gray-500">{originalPrice}</p>
-          )}
-        </div>
+        {/* 원가 */}
+        {originalPrice && (
+          <p className="text-xs text-gray-500">{originalPrice}</p>
+        )}
       </div>
+    </div>
+  );
+
+  // soldOut이면 Link 없이 div로 감싸고, 아니면 Link로 감싸기
+  if (soldOut) {
+    return cardContent;
+  }
+
+  return (
+    <Link href={href}>
+      {cardContent}
     </Link>
   );
 };

@@ -53,7 +53,7 @@ export default function SuccessStoryPage() {
             {/* Q&A 2 */}
             <div className="py-8">
               <p className="text-lg font-bold text-gray-900 mb-6">
-                Q. 대학생에게는 약간 적지 않은 금액인데, 올인원 패키지를 결제한 이유가 있을까요?
+                Q. 대학생에게는 약간 적지 않은 금액인데, 시스템 가이드 패키지를 결제한 이유가 있을까요?
               </p>
               <p className="text-gray-700 leading-relaxed text-base">
                 A. 솔직히 처음엔 과거 기억떄문에 망설였습니다. 그런데 리디방처럼 무조건적인 수익률을 약속하지 않았고,
@@ -132,9 +132,9 @@ export default function SuccessStoryPage() {
                 Q. 강의 내용 중 가장 좋았던 점은 무엇인가요?
               </p>
               <p className="text-gray-700 leading-relaxed text-base">
-                A. "과제집"과 '1:1 멘토링'이요. 아예 퀀트투자를 모르는 지식 0 부터 시작했는데,
-                그 이후 저만의 시스템 투자로 변화하고, 퀀트에 대해서 지식을 습득할 때 "과제집"을 활용해서 빠르게 적응할 수 있었습니다.
-                또한 이 과제를 진행하면서 저만의 시스템 투자를 구축할 때 1:1 멘토링이 저한테는 필수적 이었어요.
+                A. "매매일지"와 '1:1 멘토링'이요. 아예 퀀트투자를 모르는 지식 0 부터 시작했는데,
+                그 이후 저만의 시스템 투자로 변화하고, 퀀트에 대해서 지식을 습득할 때 "매매일지"를 활용해서 제 트레이딩 패턴을 분석하고 빠르게 적응할 수 있었습니다.
+                또한 매매일지를 작성하면서 저만의 시스템 투자를 구축할 때 1:1 멘토링이 저한테는 필수적 이었어요.
                 멘토링 때 제가 멍청한 질문을 해도 "엘리트 상사가 후배 코칭하듯" 진짜 꼼꼼하게 답변해 주셨어요.
                 단순히 "이게 이거에요"가 아니라 "이 데이터 때문에 이 자리와 정보는 위험합니다"라고 논리적으로 설명해 주시니까,
                 저도 스스로 판단하는 눈이 생기더라고요.
@@ -236,7 +236,7 @@ export default function SuccessStoryPage() {
             <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex gap-5">
                 <div className="w-28 h-28 flex-shrink-0">
-                  <img src="/g1.png" alt="시스템 투자 올인원" className="w-full h-full object-cover rounded-lg" />
+                  <img src="/시스템썸넬후보1.png" alt="시스템 트레이딩 가이드" className="w-full h-full object-cover rounded-lg" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <a href="/products/g1" className="block mb-2">

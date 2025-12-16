@@ -99,15 +99,16 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 2. 구매 여부 확인
-        const purchase = await prisma.purchase.findFirst({
+        // 2. 구매 여부 확인 (CourseAccess를 통해)
+        const courseAccess = await prisma.courseAccess.findFirst({
             where: {
                 userId: user.id,
-                productId: productId
+                productId: productId,
+                isActive: true
             }
         });
 
-        if (!purchase) {
+        if (!courseAccess) {
             return NextResponse.json(
                 { error: 'You must purchase this product before writing a review' },
                 { status: 403 }

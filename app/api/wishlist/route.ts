@@ -32,25 +32,32 @@ async function getDbUserId(kakaoId: string): Promise<string | null> {
   }
 }
 
-// 1. 찜 목록 '조회' (GET 요청) – 기존 유지, 로그 추가
+// 1. 찜 목록 '조회' (GET 요청) – kakaoId 또는 userId로 조회
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const kakaoId = searchParams.get('kakaoId');
-    console.log("📋 GET /api/wishlist: kakaoId =", kakaoId);
+    const userId = searchParams.get('userId'); // 네이버/구글 로그인용
+    console.log("📋 GET /api/wishlist: kakaoId =", kakaoId, ", userId =", userId);
 
-    if (!kakaoId) {
-      return NextResponse.json({ error: 'Kakao ID is required' }, { status: 400 });
+    let dbUserId: string | null = null;
+
+    if (userId) {
+      // userId가 있으면 직접 사용 (네이버/구글 로그인)
+      dbUserId = userId;
+    } else if (kakaoId) {
+      // kakaoId로 조회 (카카오 로그인)
+      dbUserId = await getDbUserId(String(kakaoId));
+    } else {
+      return NextResponse.json({ error: 'kakaoId or userId is required' }, { status: 400 });
     }
 
-    const userId = await getDbUserId(String(kakaoId));
-    if (!userId) {
+    if (!dbUserId) {
       return NextResponse.json({ error: 'User not found in DB' }, { status: 404 });
     }
 
     const wishlistItems = await prisma.wishlistItem.findMany({
-      where: { userId: userId },
-      // include: { user: true } // 나중에 필요 시
+      where: { userId: dbUserId },
     });
     console.log("✅ GET 성공: wishlist 길이 =", wishlistItems.length);
     return NextResponse.json(wishlistItems, { status: 200 });
@@ -60,32 +67,41 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// 2. 찜 '추가' (POST 요청) – 에러 핸들링 강화
+// 2. 찜 '추가' (POST 요청) – kakaoId 또는 userId 지원
 export async function POST(request: Request) {
   try {
     console.log("❤️ POST /api/wishlist 시작");
     const body = await request.json();
-    console.log("📥 POST body:", body); // { kakaoId: number, product: { id: string, ... } }
+    console.log("📥 POST body:", body);
 
-    const { kakaoId, product } = body;
-    if (!kakaoId || !product || !product.id) {
-      console.warn("⚠️ POST: kakaoId 또는 product.id 누락 – kakaoId:", kakaoId, ", product.id:", product?.id);
-      return NextResponse.json({ error: 'kakaoId and product.id are required' }, { status: 400 });
+    const { kakaoId, userId, product } = body;
+    if (!product || !product.id) {
+      console.warn("⚠️ POST: product.id 누락");
+      return NextResponse.json({ error: 'product.id is required' }, { status: 400 });
     }
 
-    const userId = await getDbUserId(String(kakaoId));
-    if (!userId) {
-      console.warn("⚠️ POST: User not found – kakaoId:", kakaoId);
+    let dbUserId: string | null = null;
+
+    if (userId) {
+      // userId가 있으면 직접 사용 (네이버/구글 로그인)
+      dbUserId = userId;
+    } else if (kakaoId) {
+      // kakaoId로 조회 (카카오 로그인)
+      dbUserId = await getDbUserId(String(kakaoId));
+    } else {
+      return NextResponse.json({ error: 'kakaoId or userId is required' }, { status: 400 });
+    }
+
+    if (!dbUserId) {
+      console.warn("⚠️ POST: User not found");
       return NextResponse.json({ error: 'User not found in DB' }, { status: 404 });
     }
 
-    console.log("➕ POST: userId =", userId, ", productId =", product.id, " – Prisma create 시도");
+    console.log("➕ POST: userId =", dbUserId, ", productId =", product.id);
     const newWishlistItem = await prisma.wishlistItem.create({
       data: {
-        userId: userId,
-        productId: product.id, // 상품의 고유 ID (e.g., 'general-growth')
-        // title: product.title, // 옵션: WishlistItem에 추가 필드 있으면
-        // thumbnail: product.thumbnail,
+        userId: dbUserId,
+        productId: product.id,
       },
     });
 
@@ -93,42 +109,49 @@ export async function POST(request: Request) {
     return NextResponse.json(newWishlistItem, { status: 201 });
   } catch (error: any) {
     console.error("❌ POST /api/wishlist 에러 상세:", error);
-    if (error.code === 'P2002') { // Prisma unique violation (이미 찜)
+    if (error.code === 'P2002') {
       console.log("🔄 POST: 이미 찜된 상품 – 409 반환");
       return NextResponse.json({ error: 'Item already in wishlist' }, { status: 409 });
     }
-    if (error.message?.includes('PrismaClientInitializationError') || error.message?.includes('DB connection')) {
-      console.error("🚨 POST: DB 연결/Prisma 초기화 실패");
-      return NextResponse.json({ error: 'Database connection failed' }, { status: 500 });
-    }
-    // 기타 에러 (e.g., invalid data, network)
     console.error("🚨 POST: 기타 서버 에러");
     return NextResponse.json({ error: 'Failed to add to wishlist: ' + error.message }, { status: 500 });
   }
 }
 
-// 3. 찜 '삭제' (DELETE 요청) – 에러 핸들링 강화
+// 3. 찜 '삭제' (DELETE 요청) – kakaoId 또는 userId 지원
 export async function DELETE(request: NextRequest) {
   try {
     console.log("🗑️ DELETE /api/wishlist 시작");
     const { searchParams } = new URL(request.url);
     const kakaoId = searchParams.get('kakaoId');
+    const userId = searchParams.get('userId');
     const productId = searchParams.get('productId');
-    console.log("📥 DELETE params: kakaoId =", kakaoId, ", productId =", productId);
+    console.log("📥 DELETE params: kakaoId =", kakaoId, ", userId =", userId, ", productId =", productId);
 
-    if (!kakaoId || !productId) {
-      return NextResponse.json({ error: 'kakaoId and productId are required' }, { status: 400 });
+    if (!productId) {
+      return NextResponse.json({ error: 'productId is required' }, { status: 400 });
     }
 
-    const userId = await getDbUserId(String(kakaoId));
-    if (!userId) {
+    let dbUserId: string | null = null;
+
+    if (userId) {
+      // userId가 있으면 직접 사용 (네이버/구글 로그인)
+      dbUserId = userId;
+    } else if (kakaoId) {
+      // kakaoId로 조회 (카카오 로그인)
+      dbUserId = await getDbUserId(String(kakaoId));
+    } else {
+      return NextResponse.json({ error: 'kakaoId or userId is required' }, { status: 400 });
+    }
+
+    if (!dbUserId) {
       return NextResponse.json({ error: 'User not found in DB' }, { status: 404 });
     }
 
-    console.log("🔍 DELETE: userId =", userId, ", productId =", productId, " – findFirst 시도");
+    console.log("🔍 DELETE: userId =", dbUserId, ", productId =", productId);
     const wishlistItem = await prisma.wishlistItem.findFirst({
       where: {
-        userId: userId,
+        userId: dbUserId,
         productId: productId,
       },
     });
@@ -146,7 +169,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ message: 'Wishlist item deleted' }, { status: 200 });
   } catch (error: any) {
     console.error("❌ DELETE /api/wishlist 에러 상세:", error);
-    if (error.code === 'P2025') { // Prisma not found
+    if (error.code === 'P2025') {
       return NextResponse.json({ error: 'Wishlist item not found' }, { status: 404 });
     }
     return NextResponse.json({ error: 'Failed to delete item: ' + error.message }, { status: 500 });

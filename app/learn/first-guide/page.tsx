@@ -62,7 +62,7 @@ const deleteNote = async (kakaoId: number, noteId: string) => {
 };
 
 const FirstGuideLearnPage = () => {
-    const { user, purchases } = useAuth();
+    const { user, courseAccess } = useAuth();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<'materials' | 'support'>('materials');
     const [activeModule, setActiveModule] = useState<number>(1); // resource ID를 추적
@@ -79,12 +79,14 @@ const FirstGuideLearnPage = () => {
     const PRODUCT_ID = 'first-guide';
 
     const [checklist, setChecklist] = useState<Array<{ id: number; title: string; completed: boolean; completedAt: string | null }>>([
-        { id: 1, title: '6개 핵심 모듈 오리엔테이션 영상 시청', completed: false, completedAt: null },
-        { id: 2, title: 'MODULE 1: 거래소 선택 & 차트 셋업 완료', completed: false, completedAt: null },
-        { id: 3, title: 'MODULE 2: 퀀트 투자 용어 핵심 15개 암기', completed: false, completedAt: null },
-        { id: 4, title: 'MODULE 3: 트레이딩뷰 레이아웃 실전 적용', completed: false, completedAt: null },
-        { id: 5, title: 'MODULE 4~6: 전략 이해 및 백테스팅 실습', completed: false, completedAt: null },
-        { id: 6, title: '1:1 멘토링 채널 접속 및 첫 질문 남기기', completed: false, completedAt: null },
+        { id: 1, title: 'PART 1: 시스템 트레이딩의 비전확인 읽기', completed: false, completedAt: null },
+        { id: 2, title: 'PART 2: 거래소 선택 & 보안 체크리스트 완료', completed: false, completedAt: null },
+        { id: 3, title: 'PART 3: 핵심 용어 15개 암기', completed: false, completedAt: null },
+        { id: 4, title: 'PART 4: 프로의 지표 세팅법 적용', completed: false, completedAt: null },
+        { id: 5, title: 'PART 5: 전략 설계 프레임워크 학습', completed: false, completedAt: null },
+        { id: 6, title: 'PART 6: 첫 매매일지 작성하기', completed: false, completedAt: null },
+        { id: 7, title: 'PART 7: VOD 강의 1개 이상 시청', completed: false, completedAt: null },
+        { id: 8, title: 'PART 8: 수강생 커뮤니티 가입 완료', completed: false, completedAt: null },
     ]);
 
     const [notes, setNotes] = useState<Array<{
@@ -96,11 +98,16 @@ const FirstGuideLearnPage = () => {
         module: string;
     }>>([]);
 
+    // 커뮤니티 가입을 위한 상태
+    const [communityPhone, setCommunityPhone] = useState('');
+    const [communityTelegram, setCommunityTelegram] = useState('');
+    const [communitySubmitted, setCommunitySubmitted] = useState(false);
+
     // 구매 여부 확인
-    const hasPurchased = purchases.some(p => p.productId === 'first-guide');
+    const hasPurchased = courseAccess.some(access => access.productId === 'first-guide' && access.isActive);
 
     // 구매 날짜 가져오기
-    const purchaseDate = purchases.find(p => p.productId === 'first-guide')?.createdAt;
+    const purchaseDate = courseAccess.find(access => access.productId === 'first-guide')?.grantedAt;
     const formattedPurchaseDate = purchaseDate
         ? new Date(purchaseDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric' }).replace(/\. /g, '. ')
         : '2025. 10. 30.';
@@ -146,6 +153,19 @@ const FirstGuideLearnPage = () => {
                     module: note.module
                 }));
                 setNotes(formattedNotes);
+
+                // 커뮤니티 가입 신청 여부 확인
+                const communityRes = await fetch(`/api/community-request?userId=${user.id}&productId=${PRODUCT_ID}`);
+                if (communityRes.ok) {
+                    const communityData = await communityRes.json();
+                    if (communityData.exists) {
+                        setCommunitySubmitted(true);
+                        if (communityData.request) {
+                            setCommunityPhone(communityData.request.phone || '');
+                            setCommunityTelegram(communityData.request.telegramId || '');
+                        }
+                    }
+                }
 
             } catch (error) {
                 console.error('Error loading learning data:', error);
@@ -208,81 +228,86 @@ const FirstGuideLearnPage = () => {
     }
 
     const modules = [
-        { id: 1, number: 'MODULE 01', name: '거래소 선택 가이드', completed: true, resourceIds: [1] },
-        { id: 2, number: 'MODULE 02', name: '차트 셋업 철학', completed: false, resourceIds: [2] },
-        { id: 3, number: 'MODULE 03', name: '퀀트 투자 용어집', completed: false, resourceIds: [3] },
-        { id: 4, number: 'MODULE 04', name: '스캠 필터링 체크리스트', completed: false, resourceIds: [4] },
-        { id: 5, number: 'MODULE 05', name: '데이터 기반 과제집', completed: false, resourceIds: [5] },
-        { id: 6, number: 'MODULE 06', name: '실전 매매일지', completed: false, resourceIds: [6] },
-        { id: 7, number: 'BONUS 1', name: '트레이딩뷰 레이아웃', completed: false, resourceIds: [7] },
-        { id: 8, number: 'BONUS 2', name: '30일 챌린지북', completed: false, resourceIds: [8] },
+        { id: 1, number: 'PART 01', name: '시스템 트레이딩의 비전확인', completed: true, resourceIds: [1] },
+        { id: 2, number: 'PART 02', name: '거래소 선택가이드 & 보안', completed: false, resourceIds: [2] },
+        { id: 3, number: 'PART 03', name: '핵심 용어집', completed: false, resourceIds: [3] },
+        { id: 4, number: 'PART 04', name: '프로의 지표 & 세팅법', completed: false, resourceIds: [4] },
+        { id: 5, number: 'PART 05', name: '전략 설계 프레임워크', completed: false, resourceIds: [5] },
+        { id: 6, number: 'PART 06', name: '실전 매매일지', completed: false, resourceIds: [6] },
+        { id: 7, number: 'PART 07', name: 'VOD 강의', completed: false, resourceIds: [7] },
+        { id: 8, number: 'PART 08', name: '수강생 전용 커뮤니티', completed: false, resourceIds: [8] },
     ];
 
     const learningResources = [
         {
             id: 1,
-            type: 'pdf',
+            type: 'article',
             icon: 'DocumentText',
-            name: '거래소 선택 가이드 & 보안 체크리스트',
-            meta: 'PDF · 2.4MB · 15페이지',
-            description: '안전하고 효율적인 거래소를 선택하는 기준을 제시하는 체크리스트입니다. 보안, 수수료, 기능 등 실전 트레이더 관점에서 검증된 선택 기준을 담았습니다.',
+            name: '시스템 트레이딩의 비전확인',
+            meta: '아티클 · 읽는 시간 약 10분',
+            description: '시스템 트레이딩이 왜 일반인에게 가장 현실적인 투자 방법인지, 그리고 이 과정을 통해 어떤 변화를 만들어갈 수 있는지에 대한 비전을 담았습니다. 시작하기 전에 반드시 읽어주세요.',
+            link: 'https://docs.google.com/document/d/1QRlB-1jmFUYoz8oKbHQxAAKnzPHpQuovMsyrWYNaL00/edit?tab=t.0',
         },
         {
             id: 2,
             type: 'pdf',
-            icon: 'ChartBar',
-            name: '프로의 차트 셋업 철학 & 실전 세팅법',
-            meta: 'PDF · 3.1MB · 22페이지',
-            description: '우리 팀이 데이터를 분석할 때 어떤 기능을, 왜 사용하는지에 대한 관점이 담긴 셋업 가이드입니다. 정보의 홍수 속에서 \'버리는 기준\'을 알려드립니다.',
+            icon: 'DocumentText',
+            name: '거래소 선택가이드 & 보안 체크리스트',
+            meta: 'PDF · 2.4MB · 15페이지',
+            description: '안전하고 효율적인 거래소를 선택하는 기준을 제시하는 체크리스트입니다. 보안, 수수료, 기능 등 실전 트레이더 관점에서 검증된 선택 기준을 담았습니다.',
+            link: 'https://docs.google.com/document/d/1KG0qMmghWosJoKZav9zCrIgneyi17ucDkm7wE_1iqoM/edit?tab=t.0',
         },
         {
             id: 3,
             type: 'pdf',
             icon: 'BookOpen',
-            name: '퀀트 투자 핵심 용어집',
+            name: '시스템 트레이딩 핵심 용어집',
             meta: 'PDF · 1.8MB · 18페이지',
-            description: '단순한 용어 정의가 아닌, 우리 팀이 실전에서 이 용어를 어떻게 해석하고 활용하는지에 대한 관점을 담은 실전 용어집입니다. (핵심용어 15개)',
+            description: '단순한 용어 정의가 아닌, 우리 팀이 실전에서 이 용어를 어떻게 해석하고 활용하는지에 대한 관점을 담은 실전 용어집입니다. EMA, ATR, CCI, VWAP 등 핵심 지표를 포함한 15개 필수 용어를 다룹니다.',
+            link: 'https://docs.google.com/document/d/1zfzYvuZQOc7S4YD8Vw_igAaVzfzIVEwXMjni44hP7tw/edit?tab=t.0',
         },
         {
             id: 4,
             type: 'pdf',
-            icon: 'DocumentText',
-            name: '🛡️ 스캠 필터링 체크리스트',
-            meta: 'PDF · 2.5MB · 18페이지',
-            description: '위험한 사기 정보와 해킹으로부터 자산을 지키는 실전 가이드입니다. 사기성 정보 판별 기준, 해킹 방지법, 디파이 사기 링크 구별법을 체계적으로 정리했습니다.',
+            icon: 'ChartBar',
+            name: '프로의 지표 & 실전 세팅법',
+            meta: 'PDF · 3.1MB · 22페이지',
+            description: '우리 팀이 실제로 사용하는 지표들(EMA, ATR, CCI, VWAP)의 설정값과 해석 방법을 공개합니다. 정보의 홍수 속에서 \'진짜 쓰는 것만\' 골라 담았습니다.',
+            link: 'https://docs.google.com/document/d/1JAJjMP2dY3ZNK7z2Ed9ITMSIVGJWpwFYYpMK5svT5eM/edit?tab=t.0',
         },
         {
             id: 5,
             type: 'pdf',
-            icon: 'ChartBar',
-            name: '📊 데이터 기반 과제집',
-            meta: 'PDF · 3.2MB · 42페이지',
-            description: '감(感)으로 하던 매매를 멈추고, 데이터로 판단하도록 훈련하는 실전 트레이닝북입니다. 당신의 매매 습관을 데이터 기반으로 교정하는 실전 훈련 과제가 포함되어 있으며, 올인원 패키지 이용 시 이 기록을 바탕으로 현역 트레이더의 1:1 피드백을 받을 수 있습니다.',
+            icon: 'DocumentText',
+            name: '프로의 전략 설계 프레임워크',
+            meta: 'PDF · 2.8MB · 25페이지',
+            description: '감(感)이 아닌 데이터 기반으로 전략을 설계하는 체계적인 프레임워크입니다. 진입 조건, 청산 조건, 리스크 관리까지 전략 설계의 A to Z를 담았습니다.',
+            link: 'https://docs.google.com/document/d/1UFTT5l09jnY_sWXrfNPxpOlXhS_vUL75SyG3cyOLffw/edit?tab=t.0',
         },
         {
             id: 6,
-            type: 'pdf',
+            type: 'journal',
             icon: 'DocumentText',
             name: '실전 매매일지 템플릿',
-            meta: 'PDF · 1.8MB · 12페이지',
-            description: '매 거래마다 진입 이유, 감정 상태, 결과 분석을 기록하는 실전 매매일지 템플릿입니다. 스스로의 실력을 데이터로 분석하고 체계적으로 성장하는 가장 확실한 방법입니다. 기록은 성장의 가장 강력한 도구입니다.',
+            meta: '웹 앱 · 실시간 기록',
+            description: '매 거래마다 진입 이유, 감정 상태, 결과 분석을 기록하는 실전 매매일지입니다. 스스로의 실력을 데이터로 분석하고 체계적으로 성장하는 가장 확실한 방법입니다.',
         },
         {
             id: 7,
-            type: 'link',
-            icon: 'Link',
-            name: '트레이딩뷰 레이아웃 즉시 적용',
-            meta: '공유 링크 · 원클릭 세팅',
-            description: '클릭 한 번으로 당신의 트레이딩뷰 차트가 프로 트레이더의 표준 레이아웃(이평선, 지표 등)으로 즉시 변경됩니다.',
+            type: 'vod',
+            icon: 'Play',
+            name: 'VOD 강의',
+            meta: '동영상 · 총 6개 모듈',
+            description: '시스템 트레이딩의 핵심 개념부터 실전 적용까지, 현역 트레이더가 직접 설명하는 6개 모듈의 동영상 강의입니다. 1년간 무제한 시청 가능합니다.',
             special: true,
         },
         {
             id: 8,
-            type: 'pdf',
-            icon: 'BookOpen',
-            name: '30일 학습 습관 형성 챌린지북',
-            meta: 'PDF · 2.8MB · 35페이지',
-            description: '하루 15분씩 꾸준히 실천할 수 있는 학습 루틴을 만드는 30일 챌린지입니다. 매일의 작은 실천이 큰 변화를 만듭니다. 정교하게 설계된 명확한 미션을 수행하며 데이터 기반 사고방식을 체득하게 됩니다.',
+            type: 'community',
+            icon: 'Users',
+            name: '수강생 전용 커뮤니티',
+            meta: '텔레그램 · 실시간 소통',
+            description: '수강생들과 함께 학습하고, 질문하고, 성장하는 전용 커뮤니티입니다. 현역 트레이더의 실시간 인사이트와 수강생들의 매매 공유를 받아볼 수 있습니다.',
             special: true,
         },
     ];
@@ -459,8 +484,59 @@ const FirstGuideLearnPage = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                     </svg>
                 );
+            case 'Play':
+                return (
+                    <svg className={`w-6 h-6 ${colorClass}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                );
+            case 'Users':
+                return (
+                    <svg className={`w-6 h-6 ${colorClass}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                );
             default:
                 return null;
+        }
+    };
+
+    const handleCommunitySubmit = async () => {
+        if (!user) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+        if (!communityPhone.trim() || !communityTelegram.trim()) {
+            alert('전화번호와 텔레그램 ID를 모두 입력해주세요.');
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/community-request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.id,
+                    productId: PRODUCT_ID,
+                    phone: communityPhone.trim(),
+                    telegramId: communityTelegram.trim(),
+                }),
+            });
+
+            if (res.ok) {
+                setCommunitySubmitted(true);
+                alert('커뮤니티 가입 신청이 완료되었습니다. 곧 초대 링크를 보내드리겠습니다.');
+            } else if (res.status === 409) {
+                // 이미 신청한 경우
+                setCommunitySubmitted(true);
+                alert('이미 커뮤니티 가입 신청을 하셨습니다.');
+            } else {
+                alert('신청 중 오류가 발생했습니다. 다시 시도해주세요.');
+            }
+        } catch (error) {
+            console.error('Community request error:', error);
+            alert('신청 중 오류가 발생했습니다. 다시 시도해주세요.');
         }
     };
 
@@ -504,47 +580,91 @@ const FirstGuideLearnPage = () => {
                             </div>
                         </div>
                         <p className="text-gray-600 text-base leading-relaxed mb-5">{resource.description}</p>
-                        <div className="flex gap-2">
-                            {resource.special ? (
-                                <>
-                                    <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                        </svg>
-                                        레이아웃 적용하기
-                                    </button>
-                                    <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                        </svg>
-                                        링크 복사
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <button
-                                        onClick={() => {
-                                            if (resource.id === 6) {
-                                                router.push('/trading-journal');
-                                            }
-                                        }}
-                                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                        열람하기
-                                    </button>
-                                    <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                        </svg>
-                                        다운로드
-                                    </button>
-                                </>
-                            )}
-                        </div>
+
+                        {/* 커뮤니티 타입일 경우 입력 폼 표시 */}
+                        {resource.type === 'community' ? (
+                            <div className="space-y-4">
+                                <div className="bg-gray-50 rounded-lg p-5 space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            전화번호
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            value={communityPhone}
+                                            onChange={(e) => setCommunityPhone(e.target.value)}
+                                            placeholder="010-1234-5678"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                                            disabled={communitySubmitted}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            텔레그램 ID
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={communityTelegram}
+                                            onChange={(e) => setCommunityTelegram(e.target.value)}
+                                            placeholder="@username"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                                            disabled={communitySubmitted}
+                                        />
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={handleCommunitySubmit}
+                                    disabled={communitySubmitted}
+                                    className={`inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                                        communitySubmitted
+                                            ? 'bg-gray-400 text-white cursor-not-allowed'
+                                            : 'bg-green-600 text-white hover:bg-green-700'
+                                    }`}
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    {communitySubmitted ? '신청 완료' : '커뮤니티 가입 신청'}
+                                </button>
+                            </div>
+                        ) : resource.type === 'vod' ? (
+                            /* VOD 타입 */
+                            <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                VOD 시청하기
+                            </button>
+                        ) : resource.type === 'journal' ? (
+                            /* 매매일지 타입 */
+                            <button
+                                onClick={() => router.push('/trading-journal')}
+                                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                매매일지 작성하기
+                            </button>
+                        ) : (
+                            /* 기본 타입 (article, pdf 등) - 열람하기 버튼만 */
+                            <button
+                                onClick={() => {
+                                    if (resource.link) {
+                                        window.open(resource.link, '_blank', 'noopener,noreferrer');
+                                    }
+                                }}
+                                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                열람하기
+                            </button>
+                        )}
                     </div>
                 </div>
             ))}
@@ -783,7 +903,7 @@ const FirstGuideLearnPage = () => {
                         <div className="flex-1">
                             <h3 className="text-xl font-bold text-gray-900 mb-2">현역 트레이더 1:1 기술 지원</h3>
                             <p className="text-gray-600 text-base leading-relaxed">
-                                올인원 패키지 구매자에게는 <span className="font-semibold text-green-700">90일간 무제한 1:1 멘토링</span>이 제공됩니다.
+                                시스템 가이드 구매자에게는 <span className="font-semibold text-green-700">7일간 메신저 1:1 멘토링</span>이 제공됩니다.
                                 학습 중 궁금한 점, 전략 구현 시 막히는 부분, 백테스팅 결과 해석 등 모든 질문에 대해 현역 퀀트 트레이더가 직접 답변해드립니다.
                             </p>
                         </div>
@@ -796,7 +916,7 @@ const FirstGuideLearnPage = () => {
                         </div>
                         <div className="flex justify-between items-center pb-3 border-b border-gray-200">
                             <span className="text-sm font-medium text-gray-600">지원 기간</span>
-                            <span className="text-sm font-semibold text-gray-900">구매일로부터 90일</span>
+                            <span className="text-sm font-semibold text-gray-900">구매일로부터 7일</span>
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="text-sm font-medium text-gray-600">담당 팀원</span>
@@ -975,16 +1095,24 @@ const FirstGuideLearnPage = () => {
                     <h3 className="text-lg font-semibold text-gray-900 mb-5">자주 묻는 질문</h3>
                     <div className="space-y-4">
                         <div className="bg-gray-50 border border-gray-200 rounded-xl p-7">
-                            <h4 className="text-base font-semibold text-gray-900 mb-3">Q. PDF 자료는 몇 번까지 다운로드할 수 있나요?</h4>
-                            <p className="text-gray-600 text-base leading-relaxed">구매하신 자료는 제한 없이 다운로드하실 수 있습니다. 다만, 저작권 보호를 위해 재배포는 금지되어 있습니다.</p>
+                            <h4 className="text-base font-semibold text-gray-900 mb-3">Q. VOD 강의는 얼마나 시청할 수 있나요?</h4>
+                            <p className="text-gray-600 text-base leading-relaxed">구매일로부터 1년간 무제한으로 다시보기가 가능합니다. 원하는 시간에 반복 학습하실 수 있습니다.</p>
                         </div>
                         <div className="bg-gray-50 border border-gray-200 rounded-xl p-7">
-                            <h4 className="text-base font-semibold text-gray-900 mb-3">Q. 트레이딩뷰 레이아웃은 어떻게 적용하나요?</h4>
-                            <p className="text-gray-600 text-base leading-relaxed">"레이아웃 적용하기" 버튼을 클릭하시면 트레이딩뷰 웹사이트로 이동하며, 로그인 후 자동으로 레이아웃이 적용됩니다.</p>
+                            <h4 className="text-base font-semibold text-gray-900 mb-3">Q. 수강생 전용 커뮤니티는 어떻게 가입하나요?</h4>
+                            <p className="text-gray-600 text-base leading-relaxed">학습자료 탭의 PART 08 "수강생 전용 커뮤니티"에서 전화번호와 텔레그램 ID를 입력하시면 신청이 완료됩니다. 확인 후 초대 링크를 보내드립니다.</p>
+                        </div>
+                        <div className="bg-gray-50 border border-gray-200 rounded-xl p-7">
+                            <h4 className="text-base font-semibold text-gray-900 mb-3">Q. PDF 자료는 다운로드할 수 있나요?</h4>
+                            <p className="text-gray-600 text-base leading-relaxed">현재는 웹에서 열람만 가능합니다. 저작권 보호를 위해 다운로드 기능은 제공되지 않습니다.</p>
+                        </div>
+                        <div className="bg-gray-50 border border-gray-200 rounded-xl p-7">
+                            <h4 className="text-base font-semibold text-gray-900 mb-3">Q. 매매일지는 어떻게 사용하나요?</h4>
+                            <p className="text-gray-600 text-base leading-relaxed">PART 06 "실전 매매일지 템플릿"의 "매매일지 작성하기" 버튼을 클릭하시면 웹 앱 형태의 매매일지를 바로 사용하실 수 있습니다. 모든 기록은 자동 저장됩니다.</p>
                         </div>
                         <div className="bg-gray-50 border border-gray-200 rounded-xl p-7">
                             <h4 className="text-base font-semibold text-gray-900 mb-3">Q. 환불 정책은 어떻게 되나요?</h4>
-                            <p className="text-gray-600 text-base leading-relaxed">디지털 콘텐츠 특성상 다운로드 또는 열람 후에는 환불이 불가능합니다. 구매 전 상품 설명을 꼼꼼히 확인해주세요.</p>
+                            <p className="text-gray-600 text-base leading-relaxed">디지털 콘텐츠 특성상 자료 열람 후에는 환불이 불가능합니다. 구매 전 상품 상세 페이지의 커리큘럼과 무료 공개 강의를 꼭 확인해주세요.</p>
                         </div>
                     </div>
                 </div>

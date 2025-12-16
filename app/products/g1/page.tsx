@@ -1,80 +1,58 @@
 "use client";
 
-
 import React, { useState, useEffect } from 'react';
-import Script from 'next/script';
 import styles from './ProductDetail.module.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PaymentModal, { PaymentItem } from "@/components/PaymentModal";
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useScrollFadeIn } from '@/hooks/useScrollFadeIn';
-
-
-import { HeartIcon } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
-
-
 
 const faqItems = [
-    { question: 'Q: 완전 초보도 따라갈 수 있나요?', answer: 'A: 네, 이 패키지는 입문자를 위해 설계되었습니다. 전담 팀원이 당신의 수준에 맞춰 설명해드립니다.' },
-    { question: 'Q: 5일간의 멘토링 후에는 어떻게 하나요?', answer: 'A: 제공된 6가지 모듈 자료는 영구적으로 사용 가능하며, 과제집을 통해 스스로 성장을 이어갈 수 있습니다. 추가 멘토링이 필요한 경우 별도 프로그램을 안내해 드립니다.' },
-    { question: 'Q: 수익을 보장하나요?', answer: 'A: 아니요. 그 어떤 트레이딩 교육도 수익을 보장할 수 없습니다. 우리는 올바른 방법론과 도구, 그리고 안전한 접근법을 가르칩니다. 실제 수익은 당신의 학습, 훈련, 실행에 달려 있습니다.' },
-    { question: 'Q: 환불 정책은 어떻게 되나요?', answer: 'A: 구매 후 24시간 이내, 멘토링 채널 개설 전 100% 환불 가능합니다.' },
+    { question: 'Q: 코딩이나 프로그래밍 경험이 전혀 없어도 따라할 수 있나요?', answer: 'A: 네, 완전 초보자도 따라올 수 있도록 설계되었습니다. 파이썬 & VS Code 개발 환경 구축부터 차근차근 안내해드리며, AI를 활용한 코드 작성법까지 배우기 때문에 프로그래밍 경험이 없어도 봇을 만들 수 있습니다.' },
+    { question: 'Q: 1:1 멘토링은 어떻게 진행되나요?', answer: 'A: 전담 트레이더가 1:1로 배정되어 여러분의 수준에 맞춰 진행됩니다. 거래소 세팅, 지표 설정, 전략 설계, 코드 리뷰까지 실시간으로 함께 진행하며, 궁금한 점은 언제든 질문하실 수 있습니다.' },
+    { question: 'Q: VOD는 얼마나 볼 수 있나요?', answer: 'A: 구매일로부터 1년간 무제한으로 다시보기가 가능합니다. 총 21개의 VOD 강의가 제공되며, 원하는 시간에 반복 학습하실 수 있습니다.' },
+    { question: 'Q: 어떤 거래소를 사용하나요?', answer: 'A: 거래소 선택 가이드를 통해 API 지원 여부, 출금 한도, 수수료, 슬리피지 등을 비교 분석하여 본인에게 맞는 거래소를 선택하실 수 있도록 안내해드립니다. 특정 거래소를 강제하지 않습니다.' },
+    { question: 'Q: 수강생 전용 커뮤니티는 어떤 혜택이 있나요?', answer: 'A: 수강생 전용 커뮤니티에서 다른 수강생들과 전략 아이디어를 공유하고, 질문에 대한 답변을 빠르게 받으실 수 있습니다. 또한 시장 상황에 대한 정보 공유도 활발하게 이루어집니다.' },
 ];
 
-
 const itemForPay: PaymentItem = {
-    title: "일반인을 위한 시스템 투자 올인원",
-    subtitle: "시스템 투자 올인원 패키지",
-    priceLabel: "100원",
-    priceValue: 100,
-    thumbnail: "/로고.png",
+    title: '매일 20만원씩 벌어오는 "시스템 트레이딩" 가이드',
+    subtitle: "시스템 트레이딩 가이드",
+    priceLabel: "107,000원",
+    priceValue: 107000,
+    thumbnail: "/시스템썸넬후보1.png",
 };
 
-
-// 후기 데이터
 const reviews = [
-    { name: '민수현', rating: 5, date: '2일 전', content: '완전 초보인데도 멘토님이 하나하나 다 알려주셔서 정말 도움이 많이 됐어요. 특히 거래소 가입부터 차트 세팅까지 실시간으로 같이 해주셔서 혼자서는 절대 못했을 것 같아요. 자료도 체계적이고 과제집도 유용합니다!' },
-    { name: 'trader_kim', rating: 5, date: '3일 전', content: '5일 멘토링 기간 동안 정말 많이 배웠습니다. 단순히 매매 방법만 알려주는 게 아니라 시스템적으로 접근하는 법을 배워서 앞으로도 계속 성장할 수 있을 것 같아요. 가격 대비 정말 만족스러운 패키지입니다.' },
-    { name: '혜차', rating: 5, date: '5일 전', content: '우연히 유튜브 보고 바로 결제했는데 정말 잘한 선택인 것 같아요! 멘토님이 제 수준에 맞춰서 설명해주시고, 모르는 거 물어보면 바로바로 답변해주셔서 답답함이 없었어요. 원론집 내용도 탄탄하고 실전에 바로 적용할 수 있는 내용들이라 좋습니다.' },
-    { name: 'jjun0825', rating: 5, date: '1주 전', content: '만족했습니다. 기대 이상이에요.' },
-    { name: 'GO(26652)', rating: 4, date: '1주 전', content: '아직 강의 다 듣기 전이지만 지금까지 본 것만으로도 충분히 가치가 있다고 느껴집니다. 특히 스캠 필터링 체크리스트는 정말 유용하네요. 앞으로 더 열심히 공부해서 실전에 적용해보겠습니다!' },
-    { name: 'H.SW', rating: 5, date: '1주 전', content: '이번 패키지는 정말 실전 위주로 구성되어 있어서 좋았어요. 다른 강의들은 이론만 가득한데, 여기는 바로 써먹을 수 있는 도구와 방법론을 제공해주니까 훨씬 효율적입니다. 멘토링도 단순히 질문만 받는 게 아니라 제 상황에 맞춰서 조언해주셔서 정말 도움이 됐습니다.' },
-    { name: '박준영', rating: 5, date: '2주 전', content: '직장인이라 시간이 많지 않은데, 멘토님이 제 스케줄에 맞춰서 진행해주셔서 정말 감사했어요. 5일 동안 집중적으로 배우고 나니 혼자서도 할 수 있겠다는 자신감이 생겼습니다. 과제집으로 계속 연습하면서 실력을 키워나가겠습니다!' },
-    { name: 'cryptolee', rating: 5, date: '2주 전', content: '솔직히 처음엔 가격이 부담스러웠는데, 막상 받아보니 이 정도 퀄리티면 오히려 저렴한 것 같아요. 6가지 모듈 자료도 알차고, 1:1 멘토링은 정말 값진 경험이었습니다. 특히 실제 현역 트레이더분과 직접 소통할 수 있다는 게 큰 장점이에요.' },
-    { name: '이수진', rating: 4, date: '2주 전', content: '전반적으로 만족스럽습니다. 다만 초보자 입장에서는 용어가 좀 어려운 부분도 있었는데, 멘토님께 물어보면 쉽게 설명해주셔서 해결됐어요. 자료들이 평생 쓸 수 있다는 점도 좋고, 앞으로 계속 참고하면서 성장하겠습니다.' },
-    { name: 'quant_rookie', rating: 5, date: '3주 전', content: '시스템 트레이딩에 관심은 많았는데 어디서부터 시작해야 할지 몰라서 고민이었어요. 이 패키지로 확실한 방향성을 잡을 수 있었고, 단계별로 따라가면서 자연스럽게 실력이 늘어나는 걸 느꼈습니다. 강력 추천합니다!' },
-    { name: '최민호', rating: 5, date: '3주 전', content: '5일 멘토링이 끝난 후에도 자료들을 계속 복습하면서 공부하고 있어요. 특히 원론집이 정말 잘 정리되어 있어서 헷갈릴 때마다 찾아보고 있습니다. 과제집도 실전 연습하기 딱 좋게 구성되어 있고요. 이 가격에 이런 퀄리티면 정말 혜자네요.' },
-    { name: 'trading_master', rating: 5, date: '3주 전', content: '다른 유료 강의도 몇 개 들어봤는데, 여기가 가장 체계적이고 실용적이었어요. 이론만 나열하는 게 아니라 실제로 적용할 수 있는 방법을 알려주고, 멘토님이 직접 피드백까지 해주시니까 훨씬 빨리 배울 수 있었습니다.' },
-    { name: '김태희', rating: 4, date: '4주 전', content: '기대했던 것보다 더 알차게 구성되어 있어요. 멘토링 5일이 짧게 느껴질 정도로 배울 게 많았고, 자료들도 퀄리티가 높습니다. 다만 완전 초보라면 사전에 기본 용어 정도는 알고 오시는 게 좋을 것 같아요. 그래도 멘토님이 친절하게 설명해주시긴 합니다!' },
-    { name: 'sys_trader', rating: 5, date: '4주 전', content: '현역 트레이더분의 노하우를 직접 배울 수 있다는 게 가장 큰 메리트인 것 같아요. 책이나 인터넷에서는 절대 얻을 수 없는 실전 팁들을 많이 알려주셨고, 제 질문에도 성심성의껏 답변해주셔서 정말 감사했습니다.' },
-    { name: '박서연', rating: 5, date: '1개월 전', content: '완전 초보였는데 이제는 차트 보는 게 재밌어졌어요! 멘토님이 정말 친절하시고, 제가 이해할 때까지 계속 설명해주셔서 좋았습니다. 30일 과제집도 차근차근 진행하면서 실력을 키워가고 있어요. 강력 추천합니다!' },
-    { name: 'invest_pro', rating: 5, date: '1개월 전', content: '가격 대비 정말 만족스러운 패키지입니다. 특히 스캠 필터링 체크리스트는 정말 유용하더라고요. 덕분에 수상한 프로젝트들을 미리 걸러낼 수 있었습니다. 멘토링도 기대 이상이었고, 자료 퀄리티도 훌륭합니다.' },
-    { name: '정유진', rating: 4, date: '1개월 전', content: '전반적으로 좋았어요. 다만 5일이라는 기간이 좀 짧게 느껴지긴 했는데, 자료들이 워낙 잘 정리되어 있어서 혼자서도 충분히 공부할 수 있을 것 같아요. 과제집 풀면서 계속 연습하고 있습니다!' },
-    { name: 'chart_king', rating: 5, date: '1개월 전', content: '시스템 트레이딩 입문하기 정말 좋은 패키지입니다. 멘토님이 제 수준에 딱 맞춰서 설명해주시고, 실전 예시도 많이 보여주셔서 이해하기 쉬웠어요. 원론집 내용도 정말 알차고, 평생 참고할 만한 자료인 것 같습니다.' },
-    { name: '이지훈', rating: 5, date: '1개월 전', content: '다른 강의들은 이론만 가득한데, 여기는 정말 실전 위주로 구성되어 있어서 좋아요. 바로 써먹을 수 있는 도구들과 방법론을 제공해주니까 훨씬 효율적입니다. 멘토링도 1:1로 진행되어서 제 상황에 맞는 조언을 받을 수 있었어요.' },
-    { name: 'moon_trader', rating: 5, date: '2개월 전', content: '정말 만족스러운 구매였습니다. 5일 멘토링 동안 배운 내용을 바탕으로 지금도 계속 실전 연습하고 있어요. 과제집이 정말 잘 만들어져 있어서 단계별로 따라가면서 자연스럽게 실력이 늘어나는 걸 느낍니다.' },
-    { name: '강민지', rating: 5, date: '2개월 전', content: '처음엔 반신반의했는데, 정말 잘 만든 패키지네요. 특히 현역 트레이더분과 직접 소통할 수 있다는 게 큰 장점이에요. 제 질문에 바로바로 답변해주시고, 실전 팁도 많이 알려주셔서 정말 도움이 됐습니다!' },
-    { name: 'crypto_newbie', rating: 4, date: '2개월 전', content: '완전 초보인 저도 따라갈 수 있을 정도로 친절하게 설명해주셔서 좋았어요. 다만 양이 많아서 5일 안에 다 소화하기는 좀 벅찼는데, 자료를 평생 볼 수 있으니까 천천히 복습하면서 공부하고 있습니다.' },
-    { name: '윤서준', rating: 5, date: '2개월 전', content: '이 가격에 이런 퀄리티는 정말 찾기 힘들 것 같아요. 6가지 모듈 자료도 알차고, 1:1 멘토링은 정말 값진 경험이었습니다. 특히 스캠 필터링 방법을 배운 게 가장 유용했어요. 덕분에 사기 프로젝트를 피할 수 있게 됐습니다.' },
-    { name: 'trading_hero', rating: 5, date: '2개월 전', content: '시스템 트레이딩에 입문하려는 분들한테 강력 추천합니다. 이론부터 실전까지 모든 걸 체계적으로 배울 수 있고, 멘토님의 1:1 지도가 정말 큰 도움이 됩니다. 자료도 평생 쓸 수 있어서 가성비 최고예요!' },
-    { name: '최수현', rating: 5, date: '3개월 전', content: '직장 다니면서 틈틈이 공부하고 있는데, 멘토님이 제 스케줄에 맞춰서 진행해주셔서 정말 편했어요. 5일 동안 집중적으로 배우고 나니 이제는 혼자서도 할 수 있겠다는 자신감이 생겼습니다. 정말 추천합니다!' },
-    { name: 'quant_student', rating: 4, date: '3개월 전', content: '전반적으로 만족스러웠습니다. 자료들이 체계적으로 잘 정리되어 있고, 멘토링도 유익했어요. 다만 초보자 입장에서는 일부 내용이 좀 어려웠는데, 멘토님께 물어보면 쉽게 설명해주셔서 해결됐습니다.' },
-    { name: '김하늘', rating: 5, date: '3개월 전', content: '이런 패키지를 찾고 있었어요! 단순히 이론만 알려주는 게 아니라 실제로 써먹을 수 있는 시스템을 만드는 법을 배울 수 있어서 정말 좋았습니다. 멘토님도 친절하시고, 자료 퀄리티도 훌륭해요. 강력 추천합니다!' },
-    { name: 'sys_master', rating: 5, date: '3개월 전', content: '현역 퀀트 트레이더의 노하우를 이 가격에 배울 수 있다는 게 정말 감사한 일인 것 같아요. 5일 멘토링 동안 정말 많이 배웠고, 지금도 자료들을 계속 참고하면서 실력을 키워가고 있습니다. 최고의 투자였습니다!' },
-    { name: '박지우', rating: 5, date: '3개월 전', content: '완전 초보였는데 이제는 시스템 트레이딩이 뭔지 확실히 알게 됐어요. 멘토님이 제 눈높이에 맞춰서 설명해주시고, 실전 예시도 많이 보여주셔서 이해하기 쉬웠습니다. 과제집도 단계별로 잘 구성되어 있어서 좋아요!' },
-    { name: 'trade_genius', rating: 5, date: '4개월 전', content: '가격 대비 최고의 가성비입니다. 다른 유료 강의 몇 개 들어봤는데 여기가 가장 체계적이고 실용적이었어요. 특히 1:1 멘토링으로 제 상황에 맞는 조언을 받을 수 있었던 게 가장 좋았습니다. 정말 추천합니다!' }
+    { name: '민**', rating: 5, date: '2일 전', content: '완전 초보인데도 멘토님이 하나하나 다 알려주셔서 정말 도움이 많이 됐어요. 특히 거래소 가입부터 차트 세팅까지 실시간으로 같이 해주셔서 혼자서는 절대 못했을 것 같아요. 자료도 체계적이고 과제집도 유용합니다!' },
+    { name: '김**', rating: 5, date: '3일 전', content: '5일 멘토링 기간 동안 정말 많이 배웠습니다. 단순히 매매 방법만 알려주는 게 아니라 시스템적으로 접근하는 법을 배워서 앞으로도 계속 성장할 수 있을 것 같아요. 가격 대비 정말 만족스러운 패키지입니다.' },
+    { name: '이**', rating: 5, date: '5일 전', content: '우연히 유튜브 보고 바로 결제했는데 정말 잘한 선택인 것 같아요! 멘토님이 제 수준에 맞춰서 설명해주시고, 모르는 거 물어보면 바로바로 답변해주셔서 답답함이 없었어요. 원론집 내용도 탄탄하고 실전에 바로 적용할 수 있는 내용들이라 좋습니다.' },
+    { name: '박**', rating: 5, date: '1주 전', content: '거래소 체크리스트 보고 깜짝 놀랐습니다. API 지원 여부, 출금 한도, 슬리피지 차이까지 이렇게 꼼꼼하게 비교해놓은 자료는 처음 봐요. 덕분에 거래소 선택에서 시간 엄청 아꼈습니다.' },
+    { name: '최**', rating: 5, date: '1주 전', content: 'EMA, ATR, CCI, VWAP 지표를 실제로 어떻게 조합해서 쓰는지 구체적으로 배웠습니다. 특히 ATR로 동적 손절/익절 잡는 방법이 실전에서 진짜 유용해요.' },
+    { name: '정**', rating: 5, date: '1주 전', content: '회사 다니면서 차트 볼 시간이 없었는데, 시스템으로 자동화하니까 진짜 편합니다. VOD 다시보기 1년 제공되는 것도 좋고, 모르는 부분 커뮤니티에서 바로 물어볼 수 있어서 좋아요.' },
+    { name: '강**', rating: 5, date: '2주 전', content: 'VWAP 밴드 활용법이 정말 신세계였습니다. 표준편차로 과매수/과매도 구간 잡는 게 이렇게 효과적일 줄 몰랐어요. 백테스트 결과도 좋고요.' },
+    { name: '한**', rating: 4, date: '2주 전', content: '완전 문과생인데 파이썬 환경 세팅부터 차근차근 알려주셔서 따라할 수 있었어요. 다만 코딩 베이스가 아예 없으면 초반에 좀 어려울 수 있을 것 같아요. 그래도 전반적으로 만족합니다!' },
+    { name: 'CryptoJake', rating: 5, date: '2주 전', content: 'Finally found a course that actually teaches systematic trading properly. The EMA trend following + ATR risk management combo is solid. Worth every penny.' },
+    { name: '오**', rating: 5, date: '3주 전', content: '과적합 방지하는 방법, 슬리피지 계산하는 법 등 실전에서 필수인 내용들 다 들어있습니다. 다른 강의들은 그냥 지표 설명만 하는데 여기는 실제 운용 관점에서 알려줘서 차원이 다릅니다.' },
+    { name: '서**', rating: 5, date: '3주 전', content: '1:1 멘토링이 진짜 핵심이에요. 혼자 했으면 몇 달 걸렸을 걸 5일 만에 끝냈습니다. 트레이더님께서 제 코드 직접 봐주시면서 피드백 주신 게 정말 감사했어요. 덕분에 지금은 봇이 잘 돌아가고 있습니다!' },
+    { name: '임**', rating: 5, date: '3주 전', content: '매매일지 템플릿 퀄리티가 장난 아닙니다. 승률, 손익비, 드로우다운 자동 계산되고 시각화까지 되어 있어서 제 트레이딩 패턴 분석하는 데 큰 도움이 됩니다.' },
+    { name: 'TradingNinja', rating: 5, date: '1달 전', content: 'The position sizing module alone is worth the price. Most traders blow their accounts due to poor risk management. This course drills proper sizing into you.' },
+    { name: '안**', rating: 5, date: '1달 전', content: '주식만 하다가 코인 시스템 트레이딩으로 넘어왔는데, 24시간 돌아가는 게 진짜 좋네요. 서버 세팅하는 것도 영상 보면서 그대로 따라하니까 어렵지 않았어요.' },
+    { name: '윤**', rating: 5, date: '1달 전', content: 'AI한테 전략 명세서 작성하는 법 배운 게 제일 유용했습니다. 이제 아이디어만 있으면 바로 코드로 구현할 수 있어요. 강사님께 진심으로 감사드립니다. 1:1 멘토링 때 새벽까지 질문에 답변해주셔서 정말 감동이었어요.' },
+    { name: '송**', rating: 4, date: '1달 전', content: 'CCI 지표 활용법이 특히 좋았어요. 과매수/과매도 반전 구간 잡는 게 생각보다 정확하더라고요. 다만 영상이 좀 길어서 1.5배속으로 봤습니다.' },
+    { name: 'BlockchainBro', rating: 5, date: '1달 전', content: 'Great community support. Whenever I had questions about the code or strategy logic, someone always helped out within hours. The Korean trading community here is very active.' },
+    { name: '홍**', rating: 5, date: '1달 전', content: '퇴근 후에 조금씩 공부해서 2주 만에 첫 봇 돌렸습니다. 아직 수익은 크지 않지만 시스템이 알아서 매매하니까 마음이 편해요. 감정 매매 안 하게 된 게 제일 큰 변화입니다.' },
+    { name: '권**', rating: 5, date: '2달 전', content: '하이브리드 전략 설계 파트가 제일 좋았어요. EMA로 추세 잡고, ATR로 손절 정하고, CCI로 진입 타이밍 잡는 게 체계적으로 정리되어 있어서 바로 적용할 수 있었습니다.' },
+    { name: '조**', rating: 5, date: '2달 전', content: '다른 시스템 트레이딩 강의도 들어봤는데 여기가 실전 위주로 가장 잘 되어 있는 것 같습니다. 특히 슬리피지, 수수료 같은 히든 코스트 관리하는 부분이 현실적이에요.' },
+    { name: '유**', rating: 5, date: '2달 전', content: '처음에는 비싸다고 생각했는데 1:1 멘토링 받고 나서 생각이 바뀌었어요. 월조 트레이더님이 정말 성심성의껏 알려주십니다. 모르는 거 하나하나 다 대답해주시고, 제 상황에 맞는 조언도 해주셔서 너무 감사했습니다. 혼자 삽질할 시간 생각하면 오히려 저렴한 것 같아요.' },
 ];
 
 const ProductDetailPage = () => {
-    const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [paymentOpen, setPaymentOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const reviewsPerPage = 4;
 
-    // 후기 관련 state
     const [dbReviews, setDbReviews] = useState<any[]>([]);
     const [selectedRating, setSelectedRating] = useState(0);
     const [reviewContent, setReviewContent] = useState('');
@@ -84,32 +62,17 @@ const ProductDetailPage = () => {
     const { user, addToWishlist, removeFromWishlist, isLiked, isPurchased } = useAuth();
     const router = useRouter();
 
-
     const productInfo = {
-        id: 'first-guide',  // data/products.ts와 일치하도록 유지
-        title: '일반인을 위한 시스템 투자 올인원',
-        author: 'kobba',
-        price: '100',
-        thumbnail: "/로고.png",
+        id: 'first-guide',
+        title: '매일 20만원씩 벌어오는 "시스템 트레이딩" 가이드',
+        author: '월조',
+        price: '107,000',
+        thumbnail: "/시스템썸넬후보1.png",
     };
 
     const liked = isLiked(productInfo.id);
     const purchased = isPurchased(productInfo.id);
 
-
-    // 스크롤 애니메이션 훅
-    const animMedia = useScrollFadeIn('up', 1, 0);
-    const animHeadline = useScrollFadeIn('up', 1, 0.1);
-    const animPainPoints = useScrollFadeIn('up', 1, 0);
-    const animCallout = useScrollFadeIn('up', 1, 0.1);
-    const animCoreValue = useScrollFadeIn('up', 1, 0);
-    const animPackageIntro = useScrollFadeIn('up', 1, 0);
-    const animModules = useScrollFadeIn('up', 1, 0);
-    const animSpecial = useScrollFadeIn('up', 1, 0.1);
-    const animResults = useScrollFadeIn('up', 1, 0);
-    const animFaq = useScrollFadeIn('up', 1, 0);
-
-    // DB에서 후기 불러오기 (후기 작성 여부도 함께 확인)
     useEffect(() => {
         const fetchReviews = async () => {
             try {
@@ -117,8 +80,6 @@ const ProductDetailPage = () => {
                 if (res.ok) {
                     const data = await res.json();
                     setDbReviews(data.reviews);
-
-                    // 내가 작성한 후기가 있는지 즉시 확인 (추가 API 호출 없이!)
                     if (user) {
                         const myReview = data.reviews.find((r: any) => r.kakaoId === String(user.id));
                         setHasWrittenReview(!!myReview);
@@ -131,7 +92,6 @@ const ProductDetailPage = () => {
         fetchReviews();
     }, [productInfo.id, user]);
 
-    // 후기 섹션으로 스크롤
     useEffect(() => {
         if (window.location.hash === '#review-section') {
             setTimeout(() => {
@@ -142,9 +102,7 @@ const ProductDetailPage = () => {
             }, 100);
         }
     }, []);
-    const animFinal = useScrollFadeIn('up', 1, 0.1);
 
-    // 후기 제출 함수
     const handleSubmitReview = async () => {
         if (!user) {
             alert('로그인이 필요합니다.');
@@ -189,11 +147,7 @@ const ProductDetailPage = () => {
             if (res.ok) {
                 const data = await res.json();
                 alert('후기가 성공적으로 등록되었습니다!');
-
-                // 후기 목록에 새 후기 추가 (맨 위로)
                 setDbReviews([data.review, ...dbReviews]);
-
-                // 폼 초기화
                 setSelectedRating(0);
                 setReviewContent('');
                 setHasWrittenReview(true);
@@ -209,65 +163,6 @@ const ProductDetailPage = () => {
         }
     };
 
-
-    const toggleAccordion = (index: number) => {
-        setActiveIndex(activeIndex === index ? null : index);
-    };
-
-
-    const handlePayRequest = (item: PaymentItem, method: "KAKAOPAY" | "NAVERPAY") => {
-        // @ts-ignore
-        const { IMP } = window;
-        if (!IMP) {
-            alert("결제 모듈 로딩에 실패했습니다. 페이지를 새로고침 후 다시 시도해주세요.");
-            return;
-        }
-        IMP.init('iamport');
-        const payData = {
-            pg: method === 'KAKAOPAY' ? 'kakaopay' : 'html5_inicis.INIpayTest',
-            pay_method: method === 'NAVERPAY' ? 'naverpay' : 'card',
-            merchant_uid: `MAXX-${new Date().getTime()}`,
-            name: item.title,
-            amount: item.priceValue,
-            buyer_email: "test@example.com",
-            buyer_name: user?.nickname || "테스터",
-            buyer_tel: "010-1234-5678",
-        };
-
-        IMP.request_pay(payData, async (rsp: any) => {
-            if (rsp.success) {
-                try {
-                    const response = await fetch('/api/purchases', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            kakaoId: user?.id,
-                            productId: productInfo.id,
-                            amount: payData.amount,
-                        }),
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || '구매 기록 저장에 실패했습니다.');
-                    }
-
-                    alert("결제가 완료되었습니다. 구매내역 페이지에서 확인하실 수 있습니다.");
-
-                } catch (error) {
-                    console.error(error);
-                    const errorMessage = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
-                    alert(`결제는 성공했으나 구매 기록 저장 중 오류가 발생했습니다: ${errorMessage}. 관리자에게 문의해주세요.`);
-                }
-            } else {
-                alert("결제에 실패하였습니다. 에러: " + rsp.error_msg);
-            }
-        });
-    };
-
-
     const handleBuyNowClick = () => {
         if (!user) {
             if (window.confirm("로그인이 필요한 서비스입니다. 로그인 하시겠습니까?")) {
@@ -276,7 +171,6 @@ const ProductDetailPage = () => {
             return;
         }
 
-        // 중복 구매 체크
         if (isPurchased(productInfo.id)) {
             alert("이미 구매하신 상품입니다.");
             return;
@@ -289,7 +183,6 @@ const ProductDetailPage = () => {
         router.push('/learn/first-guide');
     };
 
-
     const handleLikeClick = () => {
         if (!user) {
             if (window.confirm("로그인이 필요한 서비스입니다. 로그인 하시겠습니까?")) {
@@ -298,7 +191,6 @@ const ProductDetailPage = () => {
             return;
         }
 
-
         if (liked) {
             removeFromWishlist(productInfo.id);
         } else {
@@ -306,455 +198,918 @@ const ProductDetailPage = () => {
         }
     };
 
-
-    const handleShareClick = () => {
-        const currentUrl = window.location.href;
-        navigator.clipboard.writeText(currentUrl).then(() => {
-            alert("이 페이지의 주소가 클립보드에 복사되었습니다.");
-        }).catch(err => {
-            console.error('클립보드 복사 실패:', err);
-            alert("클립보드 복사에 실패했습니다.");
-        });
-    };
-
-
     return (
         <div>
-            <Script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js" />
-            
             <Header />
-            <div id="wrapper">
+            <div id="wrapper" style={{maxWidth: '1280px', margin: '0 auto', padding: '40px 16px 0 16px'}}>
                 <div className={styles.mainContainer}>
                     <main className={styles.contentColumn}>
-                        
-                        <section className={`${styles.mediaContainer} ${styles.card}`} {...animMedia}>
-                            <iframe 
+
+                        {/* 유튜브 영상 */}
+                        <section className={styles.mediaContainer}>
+                            <iframe
                                 src="https://www.youtube.com/embed/YOUTUBE_VIDEO_ID"
-                                title="YouTube video player" 
-                                frameBorder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                title="YouTube video player"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen>
                             </iframe>
                         </section>
 
+                        {/* 탭 메뉴 - 스크롤 네비게이션 */}
+                        <div style={{
+                            display: 'flex',
+                            gap: '40px',
+                            borderBottom: '1px solid #e5e7eb',
+                            marginTop: '32px',
+                            marginBottom: '0',
+                            position: 'sticky',
+                            top: '0',
+                            background: '#fff',
+                            zIndex: 10
+                        }}>
+                            {[
+                                { id: 'intro-section', label: '소개' },
+                                { id: 'curriculum-section', label: 'Curriculum' },
+                                { id: 'faq-section', label: 'FAQ' },
+                                { id: 'review-section', label: '후기' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => {
+                                        const element = document.getElementById(tab.id);
+                                        if (element) {
+                                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                        }
+                                    }}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        padding: '16px 4px',
+                                        fontSize: '15px',
+                                        fontWeight: '400',
+                                        color: '#9ca3af',
+                                        cursor: 'pointer',
+                                        borderBottom: '2px solid transparent',
+                                        marginBottom: '-1px',
+                                        transition: 'all 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.color = '#1a1a1a';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.color = '#9ca3af';
+                                    }}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
 
-                        <div className={styles.contentArea}>
-                            {/* 제목 섹션 */}
-                            <section style={{marginTop: '60px', marginBottom: '60px'}}>
+                    <div className={styles.contentArea}>
+                        {/* 소개 섹션 */}
+                        <div id="intro-section" style={{padding: '40px 0', borderBottom: '1px solid #e5e7eb'}}>
+                            <h3 style={{
+                                fontSize: '20px',
+                                fontWeight: '700',
+                                color: '#333',
+                                marginBottom: '32px',
+                                paddingLeft: '16px',
+                                borderLeft: '4px solid #000000'
+                            }}>
+                                소개
+                            </h3>
+
+                            <section style={{marginBottom: '40px'}}>
                                 <h2 className={styles.mainHeadline} style={{textAlign: 'center', marginBottom: '16px'}}>
-                                    현역 퀀트 트레이더와 함께하는<br/>
-                                    2025 일반인을 위한 시스템 투자 올인원
+                                    매일 20만원씩 벌어오는 "시스템 트레이딩" 가이드
                                 </h2>
                                 <p className={styles.mainSubheadline} style={{textAlign: 'center'}}>
-                                    5일간의 1:1 전담 멘토링으로 당신의 매매가 '감'이 아닌 '데이터'로 바뀌는 순간을 경험하세요.
+                                    스스로를 '분석'하고 '성장'시키는 데이터 기반 훈련법입니다.
                                 </p>
                             </section>
 
-                            {/* 소개 문구 */}
-                            <section className={styles.sectionSpacing}>
-                                <p className={styles.bodyText}>
-                                    이 올인원에서는 전략 설정, 기술 사용 등 다루는 정보를 물어보고<br/>
-                                    습득할 수 있도록 현역 트레이더 팀원 한명이 배정됩니다.
-                                </p>
-                                <p className={styles.bodyText}>
-                                    저희는 당신의 성장에 우리의 시간과 인력을 먼저 투자합니다.<br/>
-                                    당신이 길을 잃지 않고 빠르게 성장하는 것이 곧 우리의 목표와 일치하기 때문입니다.
-                                </p>
-                                <p className={styles.bodyText}>
-                                    <strong>위 패키지는 트레이딩 진입장벽을 무너뜨리기 위한 저희의 투자입니다.</strong>
-                                </p>
-                            </section>
+                            <div style={{display: 'flex', flexDirection: 'column'}}>
+                                <img src="/20만원벌어/1번.png" alt="시스템 트레이딩 가이드 - 섹션 1" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                <img src="/20만원벌어/2번.png" alt="시스템 트레이딩 가이드 - 섹션 2" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                <img src="/20만원벌어/3번.png" alt="시스템 트레이딩 가이드 - 섹션 3" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                <img src="/20만원벌어/4번.png" alt="시스템 트레이딩 가이드 - 섹션 4" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                <img src="/20만원벌어/5번.png" alt="시스템 트레이딩 가이드 - 섹션 5" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                <img src="/20만원벌어/6번.png" alt="시스템 트레이딩 가이드 - 섹션 6" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                <img src="/20만원벌어/7번.png" alt="시스템 트레이딩 가이드 - 섹션 7" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                <img src="/20만원벌어/8번.png" alt="시스템 트레이딩 가이드 - 섹션 8" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                <img src="/20만원벌어/9번.png" alt="시스템 트레이딩 가이드 - 섹션 9" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                <img src="/20만원벌어/10번.png" alt="시스템 트레이딩 가이드 - 섹션 10" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                <img src="/20만원벌어/11번.png" alt="시스템 트레이딩 가이드 - 섹션 11" style={{width: '100%', height: 'auto', display: 'block'}} />
+                                <img src="/20만원벌어/12번.png" alt="시스템 트레이딩 가이드 - 섹션 12" style={{width: '100%', height: 'auto', display: 'block'}} />
+                            </div>
+                        </div>
 
-                            <hr className={styles.sectionSeparator} style={{marginBottom: '60px'}} />
+                        {/* Curriculum 섹션 */}
+                        <div id="curriculum-section" style={{padding: '40px 0', borderBottom: '1px solid #e5e7eb'}}>
+                            <h3 style={{
+                                fontSize: '20px',
+                                fontWeight: '700',
+                                color: '#333',
+                                marginBottom: '32px',
+                                paddingLeft: '16px',
+                                borderLeft: '4px solid #000000'
+                            }}>
+                                Curriculum
+                            </h3>
 
-                            {/* 소개 목차 */}
-                            <section style={{marginBottom: '40px'}}>
+                            <div style={{display: 'flex', flexDirection: 'column', gap: '0'}}>
+                                {/* 섹션 1: 노동 소득에서 시스템 소득으로 */}
+                                <div style={{
+                                    padding: '20px 0',
+                                    borderBottom: '1px solid #f3f4f6',
+                                    fontSize: '15px',
+                                    fontWeight: '500',
+                                    color: '#6b7280'
+                                }}>
+                                    노동 소득에서 시스템 소득으로
+                                </div>
+
+                                {/* VOD 1 */}
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '16px 0',
+                                    borderBottom: '1px solid #f3f4f6'
+                                }}>
+                                    <div style={{display: 'flex', alignItems: 'center', gap: '12px', flex: 1}}>
+                                        <div style={{
+                                            width: '32px',
+                                            height: '32px',
+                                            background: '#3b82f6',
+                                            borderRadius: '6px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            flexShrink: 0
+                                        }}>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                                                <path d="M8 5v14l11-7z"/>
+                                            </svg>
+                                        </div>
+                                        <div style={{flex: 1}}>
+                                            <div style={{fontSize: '12px', color: '#9ca3af', marginBottom: '4px', fontWeight: '400'}}>VOD</div>
+                                            <div style={{fontSize: '15px', color: '#374151', fontWeight: '400'}}>OT - 당신이 잠든 사이에도 코드는 돈을 벌고있습니다.</div>
+                                        </div>
+                                    </div>
+                                    <button style={{
+                                        padding: '8px 16px',
+                                        background: '#3b82f6',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        fontSize: '13px',
+                                        fontWeight: '500',
+                                        cursor: 'pointer',
+                                        flexShrink: 0
+                                    }}>
+                                        무료공개 ▶
+                                    </button>
+                                </div>
+
+                                {/* VOD 2 */}
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '16px 0',
+                                    borderBottom: '1px solid #f3f4f6'
+                                }}>
+                                    <div style={{display: 'flex', alignItems: 'center', gap: '12px', flex: 1}}>
+                                        <div style={{
+                                            width: '32px',
+                                            height: '32px',
+                                            background: '#3b82f6',
+                                            borderRadius: '6px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            flexShrink: 0
+                                        }}>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                                                <path d="M8 5v14l11-7z"/>
+                                            </svg>
+                                        </div>
+                                        <div style={{flex: 1}}>
+                                            <div style={{fontSize: '12px', color: '#9ca3af', marginBottom: '4px', fontWeight: '400'}}>VOD</div>
+                                            <div style={{fontSize: '15px', color: '#374151', fontWeight: '400'}}>돈버는 시간대 (지표 제공)</div>
+                                        </div>
+                                    </div>
+                                    <button style={{
+                                        padding: '8px 16px',
+                                        background: '#3b82f6',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        fontSize: '13px',
+                                        fontWeight: '500',
+                                        cursor: 'pointer',
+                                        flexShrink: 0
+                                    }}>
+                                        무료공개 ▶
+                                    </button>
+                                </div>
+
+                                {/* 섹션 2: 기초 용어를 넘어 시장의 '미시구조(Microstructure)'를 이해하는 단계 */}
+                                <div style={{
+                                    padding: '20px 0',
+                                    borderBottom: '1px solid #f3f4f6',
+                                    fontSize: '15px',
+                                    fontWeight: '500',
+                                    color: '#6b7280',
+                                    marginTop: '12px'
+                                }}>
+                                    기초 용어를 넘어 시장의 '미시구조(Microstructure)'를 이해하는 단계
+                                </div>
+
+                                {/* VOD 3-6 */}
+                                {[
+                                    { title: "API 통신과 캔들(OHLCV) 데이터의 구조", time: "00:15:32" },
+                                    { title: "과적합(Overfitting)의 함정과 성과 검증", time: "00:22:18" },
+                                    { title: "슬리피지와 수수료, '히든 코스트' 통제하기", time: "00:18:45" },
+                                    { title: "파산을 막는 '포지션 사이징'과 레버리지", time: "00:24:11" }
+                                ].map((vod, idx) => (
+                                    <div key={idx} style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        padding: '16px 0',
+                                        borderBottom: '1px solid #f3f4f6'
+                                    }}>
+                                        <div style={{display: 'flex', alignItems: 'center', gap: '12px', flex: 1}}>
+                                            <div style={{
+                                                width: '32px',
+                                                height: '32px',
+                                                background: '#3b82f6',
+                                                borderRadius: '6px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                flexShrink: 0
+                                            }}>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                                                    <path d="M8 5v14l11-7z"/>
+                                                </svg>
+                                            </div>
+                                            <div style={{flex: 1}}>
+                                                <div style={{fontSize: '12px', color: '#9ca3af', marginBottom: '4px', fontWeight: '400'}}>VOD</div>
+                                                <div style={{fontSize: '15px', color: '#374151', fontWeight: '400'}}>{vod.title}</div>
+                                            </div>
+                                        </div>
+                                        <div style={{fontSize: '14px', color: '#6b7280', flexShrink: 0, fontWeight: '400'}}>{vod.time}</div>
+                                    </div>
+                                ))}
+
+                                {/* 섹션 3: 프로가 사용하는 4가지 핵심 지표 */}
+                                <div style={{
+                                    padding: '20px 0',
+                                    borderBottom: '1px solid #f3f4f6',
+                                    fontSize: '15px',
+                                    fontWeight: '500',
+                                    color: '#6b7280',
+                                    marginTop: '12px'
+                                }}>
+                                    프로가 사용하는 4가지 핵심 지표
+                                </div>
+
+                                {/* VOD 7-10 */}
+                                {[
+                                    { title: "EMA를 활용한 추세 추종 메커니즘", time: "00:19:27" },
+                                    { title: "ATR을 활용한 동적(Dynamic) 리스크 관리", time: "00:21:33" },
+                                    { title: "CCI로 포착하는 과매수·과매도 반전 구간", time: "00:17:56" },
+                                    { title: "VWAP과 표준편차 밴드의 통계적 활용", time: "00:23:42" }
+                                ].map((vod, idx) => (
+                                    <div key={idx} style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        padding: '16px 0',
+                                        borderBottom: '1px solid #f3f4f6'
+                                    }}>
+                                        <div style={{display: 'flex', alignItems: 'center', gap: '12px', flex: 1}}>
+                                            <div style={{
+                                                width: '32px',
+                                                height: '32px',
+                                                background: '#3b82f6',
+                                                borderRadius: '6px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                flexShrink: 0
+                                            }}>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                                                    <path d="M8 5v14l11-7z"/>
+                                                </svg>
+                                            </div>
+                                            <div style={{flex: 1}}>
+                                                <div style={{fontSize: '12px', color: '#9ca3af', marginBottom: '4px', fontWeight: '400'}}>VOD</div>
+                                                <div style={{fontSize: '15px', color: '#374151', fontWeight: '400'}}>{vod.title}</div>
+                                            </div>
+                                        </div>
+                                        <div style={{fontSize: '14px', color: '#6b7280', flexShrink: 0, fontWeight: '400'}}>{vod.time}</div>
+                                    </div>
+                                ))}
+
+                                {/* 섹션 4: 단순한 매매법이 아닌, 논리적인 '프레임워크'를 갖추는 단계 */}
+                                <div style={{
+                                    padding: '20px 0',
+                                    borderBottom: '1px solid #f3f4f6',
+                                    fontSize: '15px',
+                                    fontWeight: '500',
+                                    color: '#6b7280',
+                                    marginTop: '12px'
+                                }}>
+                                    단순한 매매법이 아닌, 논리적인 '프레임워크'를 갖추는 단계
+                                </div>
+
+                                {/* VOD 11-13 */}
+                                {[
+                                    { title: "직관을 이기는 '확률적 사고'와 기대값", time: "00:26:14" },
+                                    { title: "4가지 지표를 통합한 '하이브리드 전략' 설계", time: "00:31:28" },
+                                    { title: "인간의 한계를 넘는 시스템만의 영역", time: "00:20:55" }
+                                ].map((vod, idx) => (
+                                    <div key={idx} style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        padding: '16px 0',
+                                        borderBottom: '1px solid #f3f4f6'
+                                    }}>
+                                        <div style={{display: 'flex', alignItems: 'center', gap: '12px', flex: 1}}>
+                                            <div style={{
+                                                width: '32px',
+                                                height: '32px',
+                                                background: '#3b82f6',
+                                                borderRadius: '6px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                flexShrink: 0
+                                            }}>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                                                    <path d="M8 5v14l11-7z"/>
+                                                </svg>
+                                            </div>
+                                            <div style={{flex: 1}}>
+                                                <div style={{fontSize: '12px', color: '#9ca3af', marginBottom: '4px', fontWeight: '400'}}>VOD</div>
+                                                <div style={{fontSize: '15px', color: '#374151', fontWeight: '400'}}>{vod.title}</div>
+                                            </div>
+                                        </div>
+                                        <div style={{fontSize: '14px', color: '#6b7280', flexShrink: 0, fontWeight: '400'}}>{vod.time}</div>
+                                    </div>
+                                ))}
+
+                                {/* 섹션 5: 실제 개발 환경을 구축하고 시스템을 '배포(Deploy)'하는 단계 */}
+                                <div style={{
+                                    padding: '20px 0',
+                                    borderBottom: '1px solid #f3f4f6',
+                                    fontSize: '15px',
+                                    fontWeight: '500',
+                                    color: '#6b7280',
+                                    marginTop: '12px'
+                                }}>
+                                    실제 개발 환경을 구축하고 시스템을 '배포(Deploy)'하는 단계
+                                </div>
+
+                                {/* VOD 14-17 */}
+                                {[
+                                    { title: "파이썬 & VS Code 개발 환경 구축하기", time: "00:28:36" },
+                                    { title: "AI가 이해하는 '전략 명세서' 작성법", time: "00:25:19" },
+                                    { title: '"코드 써줘" 한 마디로 완성하는 봇 개발 실습', time: "00:35:47" },
+                                    { title: "24시간 무중단 서버 운영과 알림 시스템", time: "00:29:22" }
+                                ].map((vod, idx) => (
+                                    <div key={idx} style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        padding: '16px 0',
+                                        borderBottom: idx === 3 ? 'none' : '1px solid #f3f4f6'
+                                    }}>
+                                        <div style={{display: 'flex', alignItems: 'center', gap: '12px', flex: 1}}>
+                                            <div style={{
+                                                width: '32px',
+                                                height: '32px',
+                                                background: '#3b82f6',
+                                                borderRadius: '6px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                flexShrink: 0
+                                            }}>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                                                    <path d="M8 5v14l11-7z"/>
+                                                </svg>
+                                            </div>
+                                            <div style={{flex: 1}}>
+                                                <div style={{fontSize: '12px', color: '#9ca3af', marginBottom: '4px', fontWeight: '400'}}>VOD</div>
+                                                <div style={{fontSize: '15px', color: '#374151', fontWeight: '400'}}>{vod.title}</div>
+                                            </div>
+                                        </div>
+                                        <div style={{fontSize: '14px', color: '#6b7280', flexShrink: 0, fontWeight: '400'}}>{vod.time}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* FAQ 섹션 */}
+                        <section id="faq-section" style={{padding: '40px 0', borderBottom: '1px solid #e5e7eb'}}>
+                            <h3 style={{
+                                fontSize: '20px',
+                                fontWeight: '700',
+                                color: '#333',
+                                marginBottom: '32px',
+                                paddingLeft: '16px',
+                                borderLeft: '4px solid #000000'
+                            }}>
+                                자주 묻는 질문 (FAQ)
+                            </h3>
+
+                            <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
+                                {faqItems.map((item, index) => (
+                                    <div key={index} style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
+                                        <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '16px', lineHeight: '1.6'}}>
+                                            {item.question}
+                                        </h4>
+                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#555', margin: '0'}}>
+                                            {item.answer}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* 후기 섹션 */}
+                        <section id="review-section" style={{padding: '40px 0'}}>
+                            <div style={{display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px'}}>
                                 <h3 style={{
-                                    fontSize: '24px',
+                                    fontSize: '20px',
                                     fontWeight: '700',
                                     color: '#333',
                                     margin: '0',
                                     paddingLeft: '16px',
-                                    borderLeft: '4px solid #FF6B35'
+                                    borderLeft: '4px solid #000000'
                                 }}>
-                                    소개
+                                    후기
                                 </h3>
-                            </section>
-
-                            {/* 이미지 섹션 - g1 폴더의 이미지들 */}
-                            <div style={{display: 'flex', flexDirection: 'column'}}>
-                                <img src="/g1/g1.png" alt="시스템 투자 올인원 - 섹션 1" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g2.png" alt="시스템 투자 올인원 - 섹션 2" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g3.gif" alt="시스템 투자 올인원 - 섹션 3" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g4.png" alt="시스템 투자 올인원 - 섹션 4" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g5.png" alt="시스템 투자 올인원 - 섹션 5" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g6.png" alt="시스템 투자 올인원 - 섹션 6" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g7.png" alt="시스템 투자 올인원 - 섹션 7" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g8.png" alt="시스템 투자 올인원 - 섹션 8" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g9.png" alt="시스템 투자 올인원 - 섹션 9" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g10.png" alt="시스템 투자 올인원 - 섹션 10" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g11.png" alt="시스템 투자 올인원 - 섹션 11" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g12.png" alt="시스템 투자 올인원 - 섹션 12" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g13.png" alt="시스템 투자 올인원 - 섹션 13" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g14.png" alt="시스템 투자 올인원 - 섹션 14" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g15.gif" alt="시스템 투자 올인원 - 섹션 15" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g16.png" alt="시스템 투자 올인원 - 섹션 16" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
-                                <img src="/g1/g17.png" alt="시스템 투자 올인원 - 섹션 17" style={{width: '760px', height: 'auto', display: 'block', maxWidth: '100%'}} />
+                                <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                    <span style={{fontSize: '18px', color: '#FFB800'}}>★</span>
+                                    <span style={{fontSize: '16px', fontWeight: '700', color: '#333'}}>4.9</span>
+                                    <span style={{fontSize: '14px', color: '#9ca3af'}}>({dbReviews.length + reviews.length})</span>
+                                </div>
                             </div>
 
-                            <hr className={styles.sectionSeparator} style={{marginTop: '80px', marginBottom: '60px'}} />
-
-                            {/* FAQ 섹션 */}
-                            <section style={{marginBottom: '80px'}}>
-                                <h3 style={{
-                                    fontSize: '24px',
-                                    fontWeight: '700',
-                                    color: '#333',
-                                    margin: '0 0 40px 0',
-                                    paddingLeft: '16px',
-                                    borderLeft: '4px solid #FF6B35'
-                                }}>
-                                    자주 묻는 질문 (FAQ)
-                                </h3>
-
-                                <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
-                                    {/* FAQ 1 */}
-                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
-                                        <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '16px', lineHeight: '1.6'}}>
-                                            Q: 완전 초보도 따라갈 수 있나요?
-                                        </h4>
-                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#555', margin: '0'}}>
-                                            A: 네, 가능합니다. 이 패키지는 '어디서부터 시작할지' 모르는 분들을 위해 설계되었습니다. 1:1 멘토링을 통해 거래소 가입과 같은 기초 단계부터 차트 세팅, 용어 이해까지 모든 과정을 개인의 속도에 맞춰 지원합니다.
-                                        </p>
-                                    </div>
-
-                                    {/* FAQ 2 */}
-                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
-                                        <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '16px', lineHeight: '1.6'}}>
-                                            Q: 5일간의 멘토링 후에는 어떻게 하나요?
-                                        </h4>
-                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#555', margin: '0'}}>
-                                            A: 5일은 당신이 '혼자 설 수 있도록' 시스템의 기초를 다지고 모든 도구를 세팅하는 집중 기간입니다. 5일이 지나도, 당신은 '원론집', '스캠 필터', '과제집' 등 모든 핵심 자산을 영구적으로 소유합니다. 멘토링 기간 동안 습득한 '스스로 검증하고 개선하는 방법론'을 바탕으로 30일, 90일간 트레이닝을 지속하며 성장하게 됩니다.
-                                        </p>
-                                    </div>
-
-                                    {/* FAQ 3 */}
-                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
-                                        <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '16px', lineHeight: '1.6'}}>
-                                            Q: 이 과정을 수료하면 바로 '전업 트레이더'가 될 수 있습니까?
-                                        </h4>
-                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#555', margin: '0'}}>
-                                            A: 당장 사표를 쓰지 마십시오. 그것은 감정적인 결정입니다. 이 패키지의 목적은 당신의 월급을 대체할 '두 번째 현금 흐름(Second Cashflow)'을 만드는 것입니다. 시스템을 통해 얻은 수익이 당신의 월급을 3개월 연속 초과할 때, 그때 선택해도 늦지 않습니다. 우리는 당신이 감정에 휩쓸려 인생을 배팅하는 도박사가 아닌, 냉철하게 자산을 운용하는 '시스템 빌더(System Builder)'가 되기를 원합니다.
-                                        </p>
-                                    </div>
-
-                                    {/* FAQ 4 */}
-                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
-                                        <h4 style={{fontSize: '17px', fontWeight: '700', color: '#333', marginBottom: '16px', lineHeight: '1.6'}}>
-                                            Q: 1:1 멘토링은 어떤 방식으로 진행되나요?
-                                        </h4>
-                                        <p style={{fontSize: '15px', lineHeight: '1.7', color: '#555', margin: '0'}}>
-                                            A: 단순 질의응답이 아닌, '코드 리뷰'와 같습니다. 당신이 과제(백테스팅, 매매 일지)를 수행하면, 담당 현역 트레이더가 그 논리를 점검합니다. "왜 이 구간에서 진입했습니까?", "손절 라인의 근거는 무엇입니까?" 이 치열한 문답 과정을 통해, 당신의 머릿속에 있는 막연한 '감'은 날카로운 '데이터'로 다듬어집니다. 5일간 당신은 든든한 '금융 파트너'를 얻게 될 것입니다.
-                                        </p>
-                                    </div>
+                            {hasWrittenReview ? (
+                                <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#f9fafb', marginBottom: '24px', textAlign: 'center'}}>
+                                    <p style={{fontSize: '15px', color: '#6b7280', margin: 0}}>이미 후기를 작성하셨습니다.</p>
                                 </div>
-                            </section>
-
-                            <hr className={styles.sectionSeparator} style={{marginBottom: '60px'}} />
-
-                            {/* 후기 섹션 */}
-                            <section id="review-section">
-                                <div style={{display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px'}}>
-                                    <h3 style={{
-                                        fontSize: '24px',
-                                        fontWeight: '700',
-                                        color: '#333',
-                                        margin: '0',
-                                        paddingLeft: '16px',
-                                        borderLeft: '4px solid #FF6B35'
-                                    }}>
-                                        후기
-                                    </h3>
-                                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                                        <span style={{fontSize: '20px', color: '#FFB800'}}>★</span>
-                                        <span style={{fontSize: '18px', fontWeight: '700', color: '#333'}}>4.9</span>
-                                        <span style={{fontSize: '14px', color: '#FF6B35', fontWeight: '600'}}>📝 {dbReviews.length + reviews.length}</span>
-                                    </div>
-                                </div>
-
-                                {/* 후기 작성 박스 */}
-                                {hasWrittenReview ? (
-                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#f9fafb', marginBottom: '24px', textAlign: 'center'}}>
-                                        <p style={{fontSize: '15px', color: '#6b7280', margin: 0}}>이미 후기를 작성하셨습니다.</p>
-                                    </div>
-                                ) : (
-                                    <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff', marginBottom: '24px'}}>
-                                        <div style={{display: 'flex', gap: '8px', marginBottom: '16px'}}>
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <span
-                                                    key={star}
-                                                    onClick={() => {
-                                                        if (purchased && user) {
-                                                            setSelectedRating(star);
-                                                        } else if (!user) {
-                                                            alert('로그인이 필요합니다.');
-                                                            router.push('/login');
-                                                        } else if (!purchased) {
-                                                            alert('구매한 상품만 후기를 작성할 수 있습니다.');
-                                                        }
-                                                    }}
-                                                    style={{
-                                                        fontSize: '24px',
-                                                        color: star <= selectedRating ? '#FFB800' : '#e5e7eb',
-                                                        cursor: (purchased && user) ? 'pointer' : 'not-allowed',
-                                                        transition: 'color 0.2s'
-                                                    }}
-                                                >
-                                                    ★
-                                                </span>
-                                            ))}
-                                        </div>
-                                        <textarea
-                                            placeholder={purchased && user ? "후기를 작성해주세요 (최소 10자)" : "구매 후 작성이 가능합니다."}
-                                            disabled={!purchased || !user}
-                                            value={reviewContent}
-                                            onChange={(e) => setReviewContent(e.target.value)}
-                                            maxLength={1000}
-                                            style={{
-                                                width: '100%',
-                                                minHeight: '100px',
-                                                padding: '16px',
-                                                border: '1px solid #e5e7eb',
-                                                borderRadius: '8px',
-                                                fontSize: '15px',
-                                                resize: 'vertical',
-                                                fontFamily: 'inherit',
-                                                color: (purchased && user) ? '#333' : '#9ca3af',
-                                                background: (purchased && user) ? '#fff' : '#f9fafb'
-                                            }}
-                                        />
-                                        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px'}}>
-                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>이모티콘은 제작되어 보여집니다.</span>
-                                            <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
-                                                <span style={{fontSize: '13px', color: '#9ca3af'}}>{reviewContent.length}/1000</span>
-                                                <button
-                                                    onClick={handleSubmitReview}
-                                                    disabled={!purchased || !user || isSubmittingReview || selectedRating === 0 || reviewContent.trim().length < 10}
-                                                    style={{
-                                                        padding: '8px 20px',
-                                                        background: (purchased && user && !isSubmittingReview && selectedRating > 0 && reviewContent.trim().length >= 10) ? '#FF6B35' : '#e5e7eb',
-                                                        color: (purchased && user && !isSubmittingReview && selectedRating > 0 && reviewContent.trim().length >= 10) ? '#fff' : '#9ca3af',
-                                                        border: 'none',
-                                                        borderRadius: '6px',
-                                                        fontSize: '14px',
-                                                        fontWeight: '600',
-                                                        cursor: (purchased && user && !isSubmittingReview && selectedRating > 0 && reviewContent.trim().length >= 10) ? 'pointer' : 'not-allowed',
-                                                        transition: 'background 0.2s'
-                                                    }}
-                                                >
-                                                    {isSubmittingReview ? '등록 중...' : '등록'}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* 후기 카드들 */}
-                                <div style={{display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px'}}>
-                                    {(() => {
-                                        // DB 후기와 더미 후기를 합침 (DB 후기가 맨 위에)
-                                        const allReviews = [...dbReviews, ...reviews];
-                                        const paginatedReviews = allReviews.slice((currentPage - 1) * reviewsPerPage, currentPage * reviewsPerPage);
-
-                                        return paginatedReviews.map((review, idx) => (
-                                            <div key={review.id || `review-${idx}`} style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
-                                                <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
-                                                    <div>
-                                                        <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>
-                                                            {review.userName || review.name}
-                                                        </div>
-                                                        <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>
-                                                            {'★'.repeat(review.rating)}
-                                                        </div>
-                                                    </div>
-                                                    <span style={{fontSize: '13px', color: '#9ca3af'}}>{review.date}</span>
-                                                </div>
-                                                <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
-                                                    {review.content}
-                                                </p>
-                                            </div>
-                                        ));
-                                    })()}
-                                </div>
-
-                                {/* 페이지네이션 */}
-                                <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '32px'}}>
-                                    <button
-                                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                                        disabled={currentPage === 1}
-                                        style={{
-                                            padding: '8px 12px',
-                                            border: 'none',
-                                            borderRadius: '6px',
-                                            background: 'transparent',
-                                            color: currentPage === 1 ? '#d1d5db' : '#6b7280',
-                                            cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                                            fontSize: '18px',
-                                            fontWeight: '400',
-                                            transition: 'color 0.2s'
-                                        }}
-                                    >
-                                        ‹
-                                    </button>
-
-                                    {(() => {
-                                        const allReviews = [...dbReviews, ...reviews];
-                                        const totalPages = Math.ceil(allReviews.length / reviewsPerPage);
-                                        const maxVisible = 5;
-                                        let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-                                        let endPage = Math.min(totalPages, startPage + maxVisible - 1);
-
-                                        if (endPage - startPage + 1 < maxVisible) {
-                                            startPage = Math.max(1, endPage - maxVisible + 1);
-                                        }
-
-                                        return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map(pageNum => (
-                                            <button
-                                                key={pageNum}
-                                                onClick={() => setCurrentPage(pageNum)}
+                            ) : (
+                                <div style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff', marginBottom: '24px'}}>
+                                    <div style={{display: 'flex', gap: '8px', marginBottom: '16px'}}>
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <span
+                                                key={star}
+                                                onClick={() => {
+                                                    if (purchased && user) {
+                                                        setSelectedRating(star);
+                                                    } else if (!user) {
+                                                        alert('로그인이 필요합니다.');
+                                                        router.push('/login');
+                                                    } else if (!purchased) {
+                                                        alert('구매한 상품만 후기를 작성할 수 있습니다.');
+                                                    }
+                                                }}
                                                 style={{
-                                                    padding: '6px 12px',
-                                                    border: 'none',
-                                                    borderRadius: '4px',
-                                                    background: 'transparent',
-                                                    color: currentPage === pageNum ? '#FF6B35' : '#6b7280',
-                                                    cursor: 'pointer',
-                                                    fontSize: '15px',
-                                                    fontWeight: currentPage === pageNum ? '700' : '400',
-                                                    minWidth: '32px',
-                                                    transition: 'all 0.2s'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    if (currentPage !== pageNum) {
-                                                        e.currentTarget.style.color = '#374151';
-                                                    }
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    if (currentPage !== pageNum) {
-                                                        e.currentTarget.style.color = '#6b7280';
-                                                    }
+                                                    fontSize: '24px',
+                                                    color: star <= selectedRating ? '#FFB800' : '#e5e7eb',
+                                                    cursor: (purchased && user) ? 'pointer' : 'not-allowed',
+                                                    transition: 'color 0.2s'
                                                 }}
                                             >
-                                                {pageNum}
-                                            </button>
-                                        ));
-                                    })()}
-
-                                    <button
-                                        onClick={() => {
-                                            const allReviews = [...dbReviews, ...reviews];
-                                            setCurrentPage(prev => Math.min(Math.ceil(allReviews.length / reviewsPerPage), prev + 1));
-                                        }}
-                                        disabled={(() => {
-                                            const allReviews = [...dbReviews, ...reviews];
-                                            return currentPage === Math.ceil(allReviews.length / reviewsPerPage);
-                                        })()}
+                                                ★
+                                            </span>
+                                        ))}
+                                    </div>
+                                    <textarea
+                                        placeholder={purchased && user ? "후기를 작성해주세요 (최소 10자)" : "구매 후 작성이 가능합니다."}
+                                        disabled={!purchased || !user}
+                                        value={reviewContent}
+                                        onChange={(e) => setReviewContent(e.target.value)}
+                                        maxLength={1000}
                                         style={{
-                                            padding: '8px 12px',
-                                            border: 'none',
-                                            borderRadius: '6px',
-                                            background: 'transparent',
-                                            color: (() => {
-                                                const allReviews = [...dbReviews, ...reviews];
-                                                return currentPage === Math.ceil(allReviews.length / reviewsPerPage) ? '#d1d5db' : '#6b7280';
-                                            })(),
-                                            cursor: (() => {
-                                                const allReviews = [...dbReviews, ...reviews];
-                                                return currentPage === Math.ceil(allReviews.length / reviewsPerPage) ? 'not-allowed' : 'pointer';
-                                            })(),
-                                            fontSize: '18px',
-                                            fontWeight: '400',
-                                            transition: 'color 0.2s'
+                                            width: '100%',
+                                            minHeight: '100px',
+                                            padding: '16px',
+                                            border: '1px solid #e5e7eb',
+                                            borderRadius: '8px',
+                                            fontSize: '15px',
+                                            resize: 'vertical',
+                                            fontFamily: 'inherit',
+                                            color: (purchased && user) ? '#333' : '#9ca3af',
+                                            background: (purchased && user) ? '#fff' : '#f9fafb'
                                         }}
-                                    >
-                                        ›
-                                    </button>
-                                </div>
-                            </section>
-                        </div>
-                    </main>
-
-
-                    {/* 사이드바 */}
-                    <aside className={styles.sidebarColumn}>
-                        <div className={styles.sidebarContent}>
-                            <div className={styles.collectionInfo}>
-                                <img src="/로고.png" alt="MAXX Quant System logo" />
-                                <a href="#">MAXX Quant System</a>
-                            </div>
-                            {/* [수정] 사이드바의 메인 상품명에서 <br/> 태그 제거 */}
-                            <h1 className={styles.productTitle}>일반인을 위한 시스템 투자 올인원</h1>
-                            <div className={styles.participants}>
-                                <div className={styles.participantItem}>
-                                    <img src="/코빠로고1.png" alt="Creator logo" />
-                                    <div>
-                                        <span>Creator</span>
-                                        <a href="#">kobba</a>
+                                    />
+                                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px'}}>
+                                        <span style={{fontSize: '13px', color: '#9ca3af'}}>이모티콘은 제작되어 보여집니다.</span>
+                                        <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                                            <span style={{fontSize: '13px', color: '#9ca3af'}}>{reviewContent.length}/1000</span>
+                                            <button
+                                                onClick={handleSubmitReview}
+                                                disabled={!purchased || !user || isSubmittingReview || selectedRating === 0 || reviewContent.trim().length < 10}
+                                                style={{
+                                                    padding: '8px 20px',
+                                                    background: (purchased && user && !isSubmittingReview && selectedRating > 0 && reviewContent.trim().length >= 10) ? '#3b82f6' : '#e5e7eb',
+                                                    color: (purchased && user && !isSubmittingReview && selectedRating > 0 && reviewContent.trim().length >= 10) ? '#fff' : '#9ca3af',
+                                                    border: 'none',
+                                                    borderRadius: '6px',
+                                                    fontSize: '14px',
+                                                    fontWeight: '600',
+                                                    cursor: (purchased && user && !isSubmittingReview && selectedRating > 0 && reviewContent.trim().length >= 10) ? 'pointer' : 'not-allowed',
+                                                    transition: 'background 0.2s'
+                                                }}
+                                            >
+                                                {isSubmittingReview ? '등록 중...' : '등록'}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
+                            )}
+
+                            <div style={{display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px'}}>
+                                {(() => {
+                                    const allReviews = [...dbReviews, ...reviews];
+                                    const paginatedReviews = allReviews.slice((currentPage - 1) * reviewsPerPage, currentPage * reviewsPerPage);
+
+                                    return paginatedReviews.map((review, idx) => (
+                                        <div key={review.id || `review-${idx}`} style={{padding: '24px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff'}}>
+                                            <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
+                                                <div>
+                                                    <div style={{fontWeight: '700', fontSize: '15px', color: '#333', marginBottom: '4px'}}>
+                                                        {review.userName || review.name}
+                                                    </div>
+                                                    <div style={{color: '#FFB800', fontSize: '14px', marginBottom: '8px'}}>
+                                                        {'★'.repeat(review.rating)}
+                                                    </div>
+                                                </div>
+                                                <span style={{fontSize: '13px', color: '#9ca3af'}}>{review.date}</span>
+                                            </div>
+                                            <p style={{fontSize: '15px', lineHeight: '1.7', color: '#333', margin: '0'}}>
+                                                {review.content}
+                                            </p>
+                                        </div>
+                                    ));
+                                })()}
                             </div>
-                            <div className={styles.actionBar}>
+
+                            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '32px'}}>
                                 <button
-                                    onClick={handleLikeClick}
-                                    className={`${styles.actionBtn} ${liked ? styles.liked : ''}`}
+                                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                    disabled={currentPage === 1}
+                                    style={{
+                                        padding: '8px 12px',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        background: 'transparent',
+                                        color: currentPage === 1 ? '#d1d5db' : '#6b7280',
+                                        cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                                        fontSize: '18px',
+                                        fontWeight: '400',
+                                        transition: 'color 0.2s'
+                                    }}
                                 >
-                                    {liked ? (
-                                        <HeartIconSolid className="w-5 h-5" />
-                                    ) : (
-                                        <HeartIcon className="w-5 h-5" />
-                                    )}
+                                    ‹
                                 </button>
-                                <button onClick={handleShareClick} className={styles.actionBtn}>
-                                    ↑ Share
+
+                                {(() => {
+                                    const allReviews = [...dbReviews, ...reviews];
+                                    const totalPages = Math.ceil(allReviews.length / reviewsPerPage);
+                                    const maxVisible = 5;
+                                    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+                                    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+                                    if (endPage - startPage + 1 < maxVisible) {
+                                        startPage = Math.max(1, endPage - maxVisible + 1);
+                                    }
+
+                                    return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map(pageNum => (
+                                        <button
+                                            key={pageNum}
+                                            onClick={() => setCurrentPage(pageNum)}
+                                            style={{
+                                                padding: '6px 12px',
+                                                border: 'none',
+                                                borderRadius: '4px',
+                                                background: 'transparent',
+                                                color: currentPage === pageNum ? '#3b82f6' : '#6b7280',
+                                                cursor: 'pointer',
+                                                fontSize: '15px',
+                                                fontWeight: currentPage === pageNum ? '700' : '400',
+                                                minWidth: '32px',
+                                                transition: 'all 0.2s'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (currentPage !== pageNum) {
+                                                    e.currentTarget.style.color = '#374151';
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (currentPage !== pageNum) {
+                                                    e.currentTarget.style.color = '#6b7280';
+                                                }
+                                            }}
+                                        >
+                                            {pageNum}
+                                        </button>
+                                    ));
+                                })()}
+
+                                <button
+                                    onClick={() => {
+                                        const allReviews = [...dbReviews, ...reviews];
+                                        setCurrentPage(prev => Math.min(Math.ceil(allReviews.length / reviewsPerPage), prev + 1));
+                                    }}
+                                    disabled={(() => {
+                                        const allReviews = [...dbReviews, ...reviews];
+                                        return currentPage === Math.ceil(allReviews.length / reviewsPerPage);
+                                    })()}
+                                    style={{
+                                        padding: '8px 12px',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        background: 'transparent',
+                                        color: (() => {
+                                            const allReviews = [...dbReviews, ...reviews];
+                                            return currentPage === Math.ceil(allReviews.length / reviewsPerPage) ? '#d1d5db' : '#6b7280';
+                                        })(),
+                                        cursor: (() => {
+                                            const allReviews = [...dbReviews, ...reviews];
+                                            return currentPage === Math.ceil(allReviews.length / reviewsPerPage) ? 'not-allowed' : 'pointer';
+                                        })(),
+                                        fontSize: '18px',
+                                        fontWeight: '400',
+                                        transition: 'color 0.2s'
+                                    }}
+                                >
+                                    ›
                                 </button>
-                                <button className={styles.actionBtn}>↻ Refresh</button>
-                                <button className={styles.actionBtn}>···</button>
                             </div>
-                            <hr className={styles.separator} />
-                            <div className={`${styles.priceBox} ${styles.card}`}>
-                                <div className={styles.priceInfo}>
-                                    <span>Price</span>
-                                    <span className={styles.price}>210,000원</span>
-                                    <span className={styles.priceSecondary}>($150)</span>
+                        </section>
+                    </div>
+                    </main>
+
+                    {/* 사이드바 - 구매 카드 */}
+                    <aside className={styles.sidebarColumn} style={{marginLeft: '60px', maxWidth: '350px'}}>
+                        <div style={{
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0',
+                            padding: '24px',
+                            background: '#fff',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
+                        }}>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            alignItems: 'flex-start',
+                            marginBottom: '4px'
+                        }}>
+                            <button
+                                onClick={handleLikeClick}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    padding: '4px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <svg
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill={liked ? '#ef4444' : 'none'}
+                                    stroke={liked ? '#ef4444' : '#9ca3af'}
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div style={{display: 'flex', gap: '8px', marginBottom: '12px'}}>
+                            <div style={{
+                                display: 'inline-block',
+                                padding: '4px 10px',
+                                background: '#fff',
+                                border: '1px solid #FF6B35',
+                                color: '#FF6B35',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                borderRadius: '12px'
+                            }}>
+                                강의
+                            </div>
+                            <div style={{
+                                display: 'inline-block',
+                                padding: '4px 10px',
+                                background: '#ef4444',
+                                color: '#fff',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                borderRadius: '12px'
+                            }}>
+                                NEW
+                            </div>
+                        </div>
+
+                        <h1 style={{
+                            fontSize: '21px',
+                            fontWeight: '700',
+                            lineHeight: '1.35',
+                            color: '#1a1a1a',
+                            marginBottom: '10px',
+                            marginTop: '0'
+                        }}>
+                            매일 20만원씩 벌어오는 "시스템 트레이딩" 가이드
+                        </h1>
+
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            marginBottom: '10px'
+                        }}>
+                            <span style={{color: '#FFB800', fontSize: '14px'}}>★★★★★</span>
+                            <span style={{fontSize: '14px', color: '#333', fontWeight: '600'}}>5.0</span>
+                            <span style={{fontSize: '13px', color: '#9ca3af'}}>(27)</span>
+                        </div>
+
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            fontSize: '13px',
+                            color: '#6b7280',
+                            marginBottom: '20px'
+                        }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            <span>27명 수강</span>
+                        </div>
+
+                        <div style={{marginBottom: '20px'}}>
+                            <p style={{fontSize: '13px', color: '#9ca3af', marginBottom: '4px'}}>12개월 할부 시</p>
+
+                            <div style={{display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '16px'}}>
+                                <span style={{fontSize: '20px', fontWeight: '700', color: '#ef4444'}}>73%</span>
+                                <span style={{fontSize: '14px', color: '#1a1a1a'}}>월</span>
+                                <span style={{fontSize: '26px', fontWeight: '800', color: '#1a1a1a'}}>107,000원</span>
+                            </div>
+
+                            <div style={{display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '14px'}}>
+                                <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                                    <span style={{color: '#9ca3af'}}>권장 소비자 가격</span>
+                                    <span style={{color: '#9ca3af', textDecoration: 'line-through'}}>4,780,000원</span>
                                 </div>
-                                {isPurchased(productInfo.id) ? (
-                                    <button className={styles.buyButton} onClick={handleLearnClick} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
-                                        학습하기 →
-                                    </button>
-                                ) : (
-                                    <button className={styles.buyButton} onClick={handleBuyNowClick}>
-                                        Buy now
-                                    </button>
-                                )}
+                                <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                                    <span style={{color: '#9ca3af'}}>할인 금액</span>
+                                    <span style={{color: '#6b7280'}}>3,490,000원</span>
+                                </div>
+                                <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                                    <span style={{color: '#9ca3af'}}>할인 판매가</span>
+                                    <span style={{color: '#1a1a1a', fontWeight: '700'}}>1,290,000원</span>
+                                </div>
                             </div>
+                        </div>
+
+                        {isPurchased(productInfo.id) ? (
+                            <button
+                                onClick={handleLearnClick}
+                                style={{
+                                    width: '100%',
+                                    padding: '15px',
+                                    background: '#10b981',
+                                    color: '#fff',
+                                    fontSize: '16px',
+                                    fontWeight: '700',
+                                    border: 'none',
+                                    borderRadius: '10px',
+                                    cursor: 'pointer',
+                                    marginBottom: '8px',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = '#059669';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = '#10b981';
+                                }}
+                            >
+                                학습하기
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleBuyNowClick}
+                                style={{
+                                    width: '100%',
+                                    padding: '15px',
+                                    background: '#3b82f6',
+                                    color: '#fff',
+                                    fontSize: '16px',
+                                    fontWeight: '700',
+                                    border: 'none',
+                                    borderRadius: '10px',
+                                    cursor: 'pointer',
+                                    marginBottom: '8px',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = '#2563eb';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = '#3b82f6';
+                                }}
+                            >
+                                구매하기
+                            </button>
+                        )}
+
+                        <button
+                            style={{
+                                width: '100%',
+                                padding: '14px',
+                                background: '#fff',
+                                color: '#3b82f6',
+                                fontSize: '15px',
+                                fontWeight: '600',
+                                border: '1.5px solid #3b82f6',
+                                borderRadius: '10px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#eff6ff';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = '#fff';
+                            }}
+                        >
+                            <span>📺</span> 무료 강의 보기
+                        </button>
+
+                        <hr style={{margin: '24px 0', border: 'none', borderTop: '1px solid #e5e7eb'}} />
+
+                        <div style={{display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px', color: '#6b7280'}}>
+                            <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <span>Enrollment limit: 49/27</span>
+                            </div>
+                            <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                                </svg>
+                                <span>Video: 21</span>
+                            </div>
+                        </div>
                         </div>
                     </aside>
                 </div>
             </div>
-            <Footer />
 
+            <Footer />
 
             {user && (
                 <PaymentModal
                     open={paymentOpen}
                     onClose={() => setPaymentOpen(false)}
                     item={itemForPay}
-                    onPay={handlePayRequest}
+                    productId="first-guide"
                 />
             )}
         </div>
     );
 };
-
 
 export default ProductDetailPage;

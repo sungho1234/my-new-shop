@@ -93,7 +93,7 @@ function HomeContent() {
         {filteredProducts.length > 0 ? (
           <div className="space-y-10">
             {/* 섹션 타이틀: 실시간 베스트 강의 */}
-            <div className="mb-4" style={{ marginTop: '50px' }}>
+            <div id="best-courses" className="mb-4" style={{ marginTop: '50px', scrollMarginTop: '120px' }}>
               <h2 className="text-2xl font-bold text-gray-900">실시간 베스트 강의</h2>
             </div>
 
@@ -111,7 +111,7 @@ function HomeContent() {
                     studentCount="280"
                     price={product.price}
                     href={getProductUrl(product.id)}
-                    badges={["할인", "VOD"]}
+                    badges={product.id === 'growth-book' ? ["할인", "마감", "VOD"] : ["할인", "VOD"]}
                     duration={product.duration}
                     maxStudents={product.maxStudents}
                     instructor={product.instructor}
@@ -119,6 +119,7 @@ function HomeContent() {
                     discount={product.discount}
                     originalPrice={product.originalPrice}
                     reviewCount={product.reviewCount}
+                    soldOut={product.id === 'growth-book'}
                   />
                 ))}
               </div>
@@ -136,7 +137,9 @@ function HomeContent() {
 
       <GlobalProof />
 
-      <YoutubeBanner />
+      <div id="member-reports" style={{ scrollMarginTop: '120px' }}>
+        <YoutubeBanner />
+      </div>
 
       <FeaturedCourse />
 

@@ -12,11 +12,11 @@
     "studio": "set \"DATABASE_URL=postgresql://neondb_owner:npg_atiXYyxO2Pq0@ep-polished-bush-a1irdwzs-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" && set \"DATABASE_URL_UNPOOLED=postgresql://neondb_owner:npg_atiXYyxO2Pq0@ep-polished-bush-a1irdwzs.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" && npx prisma studio"
   },
   "dependencies": {
-    "@auth/prisma-adapter": "^2.11.1",
     "@heroicons/react": "^2.2.0",
     "@prisma/client": "^6.18.0",
+    "@tosspayments/payment-sdk": "^1.9.2",
     "next": "14.2.3",
-    "next-auth": "^4.24.11",
+    "next-auth": "^4.24.8",
     "prisma": "^6.18.0",
     "react": "^18",
     "react-dom": "^18",

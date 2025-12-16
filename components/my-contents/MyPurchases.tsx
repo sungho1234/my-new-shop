@@ -1,58 +1,24 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { ALL_PRODUCTS } from '@/data/products';
 import Link from 'next/link';
 
-// 데이터베이스의 Purchase 모델과 타입을 맞춥니다.
-interface Purchase {
-  id: string;
-  productId: string;
-  amount: number;
-  createdAt: string;
-  userId: string;
-}
-
 // 컴포넌트 이름은 MyPurchasesContent로 유지하여 page.tsx와 호환되게 합니다.
 const MyPurchasesContent = () => {
-    const { user } = useAuth();
-    const [purchases, setPurchases] = useState<Purchase[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchPurchases = async () => {
-            if (!user) {
-                setLoading(false);
-                return;
-            }
-            setLoading(true);
-            try {
-                const response = await fetch(`/api/purchases?userId=${user.id}`);
-                if (!response.ok) {
-                    throw new Error('구매 목록을 불러오지 못했습니다.');
-                }
-                const data = await response.json();
-                setPurchases(data);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchPurchases();
-    }, [user]);
+    const { courseAccess, isLoadingCourseAccess } = useAuth();
 
     // 로딩 중일 때 표시할 화면
-    if (loading) {
+    if (isLoadingCourseAccess) {
         return <div className="text-center py-20">구매 목록을 불러오는 중...</div>;
     }
 
-    // DB에서 가져온 구매내역(productId)과 전체 상품 목록(ALL_PRODUCTS)을 매칭시킵니다.
-    const purchasedProducts = purchases.map(purchase => 
-        ALL_PRODUCTS.find(p => p.id === purchase.productId)
-    ).filter(Boolean); // find가 undefined를 반환할 경우를 대비해 필터링
+    // DB에서 가져온 강의 접근 권한(courseAccess)과 전체 상품 목록(ALL_PRODUCTS)을 매칭시킵니다.
+    const purchasedProducts = courseAccess
+        .filter(access => access.isActive) // 활성화된 접근 권한만
+        .map(access => ALL_PRODUCTS.find(p => p.id === access.productId))
+        .filter(Boolean); // find가 undefined를 반환할 경우를 대비해 필터링
 
     // [합친 부분 1] 구매한 상품이 없을 경우, '콘텐츠 둘러보기' 버튼을 포함하여 보여줍니다.
     if (purchasedProducts.length === 0) {

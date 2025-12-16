@@ -33,7 +33,7 @@ const stories = [
     type: 'image',
     thumbnail: '/블로그썸네일1.png',
     title: '',
-    author: '시스템 트레이더 ㅣ 일반인을 위한 첫번째 안내서',
+    author: '시스템 트레이더',
     description: '분석을 넘어 시스템으로: 코빠의 SMC 구축기',
     href: 'https://blog.naver.com/credit777_31/224072068084',
   },
@@ -41,7 +41,7 @@ const stories = [
     type: 'image',
     thumbnail: 'https://via.placeholder.com/600x400/CCCCCC/000000?text=%EC%A1%B0%ED%9A%8C%EC%88%98+30%EB%B0%B0+%EC%A6%9D%EA%B0%80',
     title: '',
-    author: '대학생 ㅣ 일반인을 위한 시스템 투자 올인원',
+    author: '대학생 ㅣ 매일 20만원씩 벌어오는 시스템 트레이딩 가이드',
     description: '군적금 날려본 알바생의 이야기',
     href: '/success-story',
   },
@@ -49,7 +49,7 @@ const stories = [
     type: 'image',
     thumbnail: 'https://via.placeholder.com/600x400/CCCCCC/000000?text=19%EC%82%B4+%EB%8C%80%ED%95%99%EC%83%9D',
     title: '',
-    author: '컨텐츠 크리에이더 ㅣ 시스템 빌더 풀 패키지',
+    author: '컨텐츠 크리에이터 ㅣ 매일 20만원씩 벌어오는 시스템 트레이딩 가이드',
     description: '추측을 멈추고 설계하기: S. Walker의 회고록',
     href: 'https://medium.com/@invitetel02/i-bought-an-internal-manual-from-a-prop-trading-firm-and-here-is-what-happened-526e906442e3',
   },
@@ -133,12 +133,17 @@ const YoutubeBanner = () => {
 
         {/* 버튼 */}
         <div className="mt-16 flex justify-center">
-          <button className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+          <a
+            href="https://blog.naver.com/credit777_31"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+          >
             <span>시스템 및 실제 데이터 확인하기</span>
             <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
-          </button>
+          </a>
         </div>
       </div>
     </section>

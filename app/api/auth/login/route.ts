@@ -62,6 +62,7 @@ export async function POST(request: Request) {
       nickname: nickname,
       profileImage: profile_image_url,
       email: email,
+      createdAt: dbUser.createdAt, // DB의 가입일 추가
     };
 
     return NextResponse.json(frontendUserFormat, { status: 200 });

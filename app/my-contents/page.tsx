@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
+import { useSession } from 'next-auth/react';
 import { XMarkIcon, BookOpenIcon, HeartIcon, PlayCircleIcon } from '@heroicons/react/24/outline';
 import InquiryModal from '@/components/my-contents/InquiryModal';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -120,7 +121,7 @@ const MyWishlistContent = () => {
 
 const MyPurchasesContent = () => {
     const router = useRouter();
-    const { purchases, isLoadingPurchases } = useAuth();
+    const { courseAccess, isLoadingCourseAccess } = useAuth();
 
     const getLearnPageUrl = (productId: string) => {
         const learnPageMap: { [key: string]: string } = {
@@ -134,17 +135,19 @@ const MyPurchasesContent = () => {
     };
 
     const mergedPurchases = useMemo(() => {
-      const merged = purchases.map(item => {
-        const product = ALL_PRODUCTS.find(p => p.id === item.productId);
-        if (product) {
-          return { ...item, ...product };
-        }
-        return { ...item, title: 'Unknown Product', author: 'Unknown', price: '0', thumbnail: '/placeholder.png' };
-      });
+      const merged = courseAccess
+        .filter(access => access.isActive) // 활성화된 접근 권한만
+        .map(item => {
+          const product = ALL_PRODUCTS.find(p => p.id === item.productId);
+          if (product) {
+            return { ...item, ...product };
+          }
+          return { ...item, title: 'Unknown Product', author: 'Unknown', price: '0', thumbnail: '/placeholder.png' };
+        });
       return merged;
-    }, [purchases]);
+    }, [courseAccess]);
 
-    if (isLoadingPurchases) {
+    if (isLoadingCourseAccess) {
       return (
         <div className="mt-10 text-center py-32">
           <div className="inline-block h-10 w-10 animate-spin rounded-full border-3 border-solid border-gray-900 border-r-transparent"></div>
@@ -278,7 +281,28 @@ const MyPurchasesContent = () => {
 };
 
 const MyProfileContent = () => {
-    const { user } = useAuth();
+    const { user, courseAccess, wishlist } = useAuth();
+    const { data: session } = useSession();
+
+    // 구매한 강의 개수 (활성화된 것만)
+    const purchasedCount = courseAccess.filter(access => access.isActive).length;
+
+    // 찜한 강의 개수
+    const wishlistCount = wishlist.length;
+
+    // 가입일 (NextAuth 세션 또는 카카오 user에서 가져오기)
+    // @ts-ignore - createdAt은 session callback에서 추가한 필드
+    const sessionCreatedAt = session?.user?.createdAt;
+    const userCreatedAt = user?.createdAt;
+    const createdAt = sessionCreatedAt || userCreatedAt;
+
+    const joinDate = createdAt
+        ? new Date(createdAt).toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          }).replace(/\. /g, '-').replace('.', '')
+        : '정보 없음';
 
     return (
         <div className="mt-10 max-w-3xl">
@@ -300,7 +324,7 @@ const MyProfileContent = () => {
                                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm"
                             />
                         </div>
-                        <p className="mt-1.5 text-xs text-gray-500">※ 닉네임은 카카오 로그인 시 자동으로 변경됩니다.</p>
+                        <p className="mt-1.5 text-xs text-gray-500">※ 소셜 로그인 계정의 정보가 자동으로 반영됩니다.</p>
                     </div>
 
                     <div>
@@ -319,65 +343,45 @@ const MyProfileContent = () => {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            *생년월일
+                            구매 목록
                         </label>
                         <div className="relative">
                             <input
                                 type="text"
-                                value="20020608"
+                                value={`${purchasedCount}개`}
+                                disabled
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm font-semibold"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            찜한 목록
+                        </label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={`${wishlistCount}개`}
+                                disabled
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm font-semibold"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            회원 가입일
+                        </label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={joinDate}
                                 disabled
                                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm"
                             />
                         </div>
                     </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            *성별
-                        </label>
-                        <div className="relative">
-                            <select
-                                disabled
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm appearance-none cursor-not-allowed"
-                            >
-                                <option>남</option>
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            *휴대폰번호 인증
-                        </label>
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value="010-3334-7276"
-                                disabled
-                                className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm"
-                            />
-                            <button
-                                disabled
-                                className="px-6 py-3 bg-gray-200 text-gray-500 rounded-lg text-sm font-medium cursor-not-allowed"
-                            >
-                                번호 변경
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mt-8 pt-6 border-t border-gray-200">
-                    <button
-                        disabled
-                        className="w-full bg-gray-300 text-gray-500 px-6 py-3.5 rounded-lg text-sm font-semibold cursor-not-allowed"
-                    >
-                        저장
-                    </button>
                 </div>
             </div>
         </div>

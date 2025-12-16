@@ -1,7 +1,6 @@
 "use client"; 
 
 import React, { useState } from 'react';
-import Script from 'next/script';
 import styles from './ProductDetail.module.css'; // [정보] CSS 파일은 기존 v4/first-guide와 동일한 것을 공유합니다.
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -69,58 +68,6 @@ const ProductDetailPage = () => {
         setActiveIndex(activeIndex === index ? null : index);
     };
 
-    const handlePayRequest = (item: PaymentItem, method: "KAKAOPAY" | "NAVERPAY") => {
-        // @ts-ignore
-        const { IMP } = window;
-        if (!IMP) {
-            alert("결제 모듈 로딩에 실패했습니다. 페이지를 새로고침 후 다시 시도해주세요.");
-            return;
-        }
-        IMP.init('iamport');
-        const payData = {
-            pg: method === 'KAKAOPAY' ? 'kakaopay' : 'html5_inicis.INIpayTest',
-            pay_method: method === 'NAVERPAY' ? 'naverpay' : 'card',
-            merchant_uid: `BUILDER-${new Date().getTime()}`,
-            name: item.title,
-            amount: 100, // 테스트 금액
-            buyer_email: "test@example.com",
-            buyer_name: user?.nickname || "테스터",
-            buyer_tel: "010-1234-5678",
-        };
-
-        IMP.request_pay(payData, async (rsp: any) => {
-            if (rsp.success) {
-                try {
-                    const response = await fetch('/api/purchases', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            kakaoId: user?.id,
-                            productId: productInfo.id,
-                            amount: payData.amount,
-                        }),
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || '구매 기록 저장에 실패했습니다.');
-                    }
-
-                    alert("결제가 완료되었습니다. 구매내역 페이지에서 확인하실 수 있습니다.");
-
-                } catch (error) {
-                    console.error(error);
-                    const errorMessage = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
-                    alert(`결제는 성공했으나 구매 기록 저장 중 오류가 발생했습니다: ${errorMessage}. 관리자에게 문의해주세요.`);
-                }
-            } else {
-                alert("결제에 실패하였습니다. 에러: " + rsp.error_msg);
-            }
-        });
-    };
-
     const handleBuyNowClick = () => {
         if (!user) {
             if (window.confirm("로그인이 필요한 서비스입니다. 로그인 하시겠습니까?")) {
@@ -169,8 +116,6 @@ const ProductDetailPage = () => {
 
     return (
         <div>
-            <Script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js" />
-            
             <Header />
             <div id="wrapper">
                 <div className={styles.mainContainer}>
@@ -400,7 +345,7 @@ const ProductDetailPage = () => {
                     open={paymentOpen}
                     onClose={() => setPaymentOpen(false)}
                     item={itemForPay}
-                    onPay={handlePayRequest}
+                    productId="strategy-vol1"
                 />
             )}
         </div>

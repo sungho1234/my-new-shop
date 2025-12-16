@@ -284,36 +284,9 @@ const AboutPage = () => {
                     </p>
                 </section>
 
-                {/* Stats Section */}
-                <div className="grid grid-cols-2 md:grid-cols-1 gap-12 md:gap-8 mb-24">
-                    <div className="border-t border-[#e5e5e5] pt-6">
-                        <div className="text-[2.5rem] md:text-4xl font-bold tracking-[-1px] text-[#0a0a0a] mb-2">2014</div>
-                        <div className="text-sm text-[#6b6b6b]">팀 설립 연도</div>
-                    </div>
-                    <div className="border-t border-[#e5e5e5] pt-6">
-                        <div className="text-[2.5rem] md:text-4xl font-bold tracking-[-1px] text-[#0a0a0a] mb-2">24/7</div>
-                        <div className="text-sm text-[#6b6b6b]">글로벌 시장 분석</div>
-                    </div>
-                    <div className="border-t border-[#e5e5e5] pt-6">
-                        <div className="text-[2.5rem] md:text-4xl font-bold tracking-[-1px] text-[#0a0a0a] mb-2">100%</div>
-                        <div className="text-sm text-[#6b6b6b]">데이터 기반 전략</div>
-                    </div>
-                    <div className="border-t border-[#e5e5e5] pt-6">
-                        <div className="text-[2.5rem] md:text-4xl font-bold tracking-[-1px] text-[#0a0a0a] mb-2">∞</div>
-                        <div className="text-sm text-[#6b6b6b]">지속 가능한 시스템</div>
-                    </div>
-                </div>
-
-                {/* Footer */}
-                <footer className="border-t border-[#e5e5e5] pt-12 pb-16 text-center">
-                    <p className="text-sm text-[#9a9a9a] mb-4">
-                        © 2025 MAXX Systems. All Rights Reserved.
-                    </p>
-                    <p className="text-sm text-[#9a9a9a] opacity-70">
-                        우리는 예측하지 않고, 설계합니다.
-                    </p>
-                </footer>
             </main>
+
+            <Footer />
 
             <style jsx>{`
                 .fade-in {

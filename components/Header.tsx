@@ -22,7 +22,7 @@ const UserIcon = () => (
 const Header = () => {
     // --- 모든 훅과 함수는 원본 그대로 유지 ---
     const [isScrolled, setIsScrolled] = useState(false);
-    const { user, logout, purchases, wishlist } = useAuth();
+    const { user, courseAccess, wishlist } = useAuth();
     const router = useRouter();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -50,14 +50,22 @@ const Header = () => {
     }, []);
 
     const handleLogoutClick = () => {
-        const KAKAO_REST_API_KEY = "ecddb30378573c07b10d4d51a98e6b0a";
-        let LOGOUT_REDIRECT_URI = "http://localhost:3000/logout";
-        if (window.location.hostname !== 'localhost') {
-            LOGOUT_REDIRECT_URI = `${window.location.origin}/logout`;
+        // 카카오 로그인 사용자인지 확인 (dbId가 없으면 카카오)
+        const isKakaoUser = user && !user.dbId;
+
+        if (isKakaoUser) {
+            // 카카오 로그인 사용자는 카카오 로그아웃 페이지로
+            const KAKAO_REST_API_KEY = "ecddb30378573c07b10d4d51a98e6b0a";
+            let LOGOUT_REDIRECT_URI = "http://localhost:3000/logout";
+            if (window.location.hostname !== 'localhost') {
+                LOGOUT_REDIRECT_URI = `${window.location.origin}/logout`;
+            }
+            const kakaoLogoutUrl = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_REST_API_KEY}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`;
+            window.location.href = kakaoLogoutUrl;
+        } else {
+            // NextAuth 로그인 사용자(네이버/구글)는 /logout 페이지로
+            router.push('/logout');
         }
-        const kakaoLogoutUrl = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_REST_API_KEY}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`;
-        logout();
-        window.location.href = kakaoLogoutUrl;
     };
 
     // 검색 기능
@@ -79,8 +87,8 @@ const Header = () => {
     // --- 최종 수정된 JSX ---
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur-md shadow-sm">
-            <div className="container max-w-7xl mx-auto px-4">
-                <div className={`flex items-center justify-between transition-all duration-300 ${isScrolled ? 'py-3' : 'py-5'}`}>
+            <div className="w-full">
+                <div className={`flex items-center pl-60 pr-72 transition-all duration-300 ${isScrolled ? 'py-3' : 'py-5'}`}>
                     {/* ===== 로고 ===== */}
                     <Link href="/">
                         <h1 className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors cursor-pointer">
@@ -89,7 +97,7 @@ const Header = () => {
                     </Link>
 
                     {/* ===== 중앙 검색바 ===== */}
-                    <div className="hidden lg:flex flex-1 max-w-md mx-8">
+                    <div className="hidden lg:flex w-96 ml-[500px]">
                         <div className="relative w-full">
                             <input
                                 type="text"
@@ -116,7 +124,7 @@ const Header = () => {
                     </div>
 
                     {/* ===== 우측 버튼 그룹 ===== */}
-                    <div className="hidden items-center md:flex gap-3">
+                    <div className="hidden items-center md:flex gap-3 ml-auto">
                         {user ? (
                             <>
                                 <Link
@@ -141,7 +149,7 @@ const Header = () => {
                                                 <div className="flex justify-between items-center">
                                                     <p className="text-lg font-bold text-gray-900">{user.nickname}</p>
                                                     <Link href="/my-contents?tab=my-info" className="text-xs border border-gray-300 rounded-md px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition-colors">
-                                                        정보수정하기
+                                                        나의 정보
                                                     </Link>
                                                 </div>
                                             </div>
@@ -150,7 +158,7 @@ const Header = () => {
                                                 <li>
                                                     <Link href="/my-contents?tab=my-contents" className="flex items-center justify-between px-6 py-3.5 hover:bg-gray-50 transition-colors">
                                                         <span className="text-base font-medium text-gray-800">My콘텐츠</span>
-                                                        <span className="text-sm text-gray-500">{purchases.length}개</span>
+                                                        <span className="text-sm text-gray-500">{courseAccess.length}개</span>
                                                     </Link>
                                                 </li>
                                                 <li>
@@ -195,11 +203,10 @@ const Header = () => {
                 <div
                     className={`overflow-hidden transition-all duration-300 ease-in-out ${isScrolled ? 'max-h-0 opacity-0' : 'max-h-16 opacity-100'}`}
                 >
-                    <nav className="flex items-center space-x-8 pb-4 text-sm font-medium text-gray-700 border-t border-gray-100 pt-4">
-                        <Link href="/builder-start" className="hover:text-blue-600 transition-colors">빌더의 시작</Link>
-                        <Link href="/system-strategy" className="hover:text-blue-600 transition-colors">시스템&전략</Link>
+                    <nav className="flex items-center space-x-8 pb-4 text-sm font-medium text-gray-700 border-t border-gray-100 pt-4 pl-60">
+                        <Link href="/#best-courses" className="hover:text-blue-600 transition-colors">베스트 강의</Link>
+                        <Link href="/#member-reports" className="hover:text-blue-600 transition-colors">멤버 리포트</Link>
                         <Link href="/about" className="hover:text-blue-600 transition-colors">팀소개</Link>
-                        <Link href="/" className="hover:text-blue-600 transition-colors">전체상품</Link>
                     </nav>
                 </div>
             </div>
