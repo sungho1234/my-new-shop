@@ -269,9 +269,6 @@ model TradingRecord {
   roundTripFee      Float    // 왕복 수수료
   entryReason       String   @db.Text // 진입 근거
   exitReason        String   @db.Text // 청산 근거
-  entryEmotion      String   // 진입 감정
-  exitEmotion       String   // 청산 감정
-  lessonLearned     String   @db.Text // 교훈
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

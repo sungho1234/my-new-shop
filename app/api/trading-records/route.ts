@@ -55,9 +55,6 @@ export async function POST(request: Request) {
       roundTripFee,
       entryReason,
       exitReason,
-      entryEmotion,
-      exitEmotion,
-      lessonLearned,
     } = body;
 
     // 필수 필드 검증
@@ -105,9 +102,6 @@ export async function POST(request: Request) {
         roundTripFee,
         entryReason: entryReason || '',
         exitReason: exitReason || '',
-        entryEmotion: entryEmotion || '',
-        exitEmotion: exitEmotion || '',
-        lessonLearned: lessonLearned || '',
       },
     });
 

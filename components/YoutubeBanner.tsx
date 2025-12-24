@@ -39,7 +39,7 @@ const stories = [
   },
   {
     type: 'image',
-    thumbnail: 'https://via.placeholder.com/600x400/CCCCCC/000000?text=%EC%A1%B0%ED%9A%8C%EC%88%98+30%EB%B0%B0+%EC%A6%9D%EA%B0%80',
+    thumbnail: '/대학생 후기.png',
     title: '',
     author: '대학생 ㅣ 매일 20만원씩 벌어오는 시스템 트레이딩 가이드',
     description: '군적금 날려본 알바생의 이야기',
@@ -129,21 +129,6 @@ const YoutubeBanner = () => {
                     </div>
                 );
             })}
-        </div>
-
-        {/* 버튼 */}
-        <div className="mt-16 flex justify-center">
-          <a
-            href="https://blog.naver.com/credit777_31"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-          >
-            <span>시스템 및 실제 데이터 확인하기</span>
-            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </a>
         </div>
       </div>
     </section>

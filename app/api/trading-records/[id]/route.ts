@@ -20,9 +20,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       roundTripFee,
       entryReason,
       exitReason,
-      entryEmotion,
-      exitEmotion,
-      lessonLearned,
     } = body;
 
     // 거래 기록 업데이트
@@ -42,9 +39,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         roundTripFee,
         entryReason,
         exitReason,
-        entryEmotion,
-        exitEmotion,
-        lessonLearned,
       },
     });
 

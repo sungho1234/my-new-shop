@@ -31,9 +31,11 @@ export default function SuccessStoryPage() {
           <div className="space-y-12">
             {/* 이미지 공간 1 */}
             <div className="relative w-full aspect-[16/9] bg-gray-100 rounded-lg overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <p className="text-gray-400 text-base">이미지 공간</p>
-              </div>
+              <img
+                src="/후기1.jpg"
+                alt="수강생 소개"
+                className="w-full h-full object-cover"
+              />
             </div>
 
             {/* Q&A 1 */}
@@ -77,9 +79,11 @@ export default function SuccessStoryPage() {
           <div className="space-y-12">
             {/* 이미지 공간 2 */}
             <div className="relative w-full aspect-[16/9] bg-gray-100 rounded-lg overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <p className="text-gray-400 text-base">이미지 공간</p>
-              </div>
+              <img
+                src="/후기2.jpg"
+                alt="시스템 도입 후의 성과"
+                className="w-full h-full object-cover"
+              />
             </div>
 
             {/* Q&A 1 */}
@@ -121,9 +125,11 @@ export default function SuccessStoryPage() {
           <div className="space-y-12">
             {/* 이미지 공간 3 */}
             <div className="relative w-full aspect-[16/9] bg-gray-100 rounded-lg overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <p className="text-gray-400 text-base">이미지 공간</p>
-              </div>
+              <img
+                src="/후기3.jpg"
+                alt="학습 효과와 효율성"
+                className="w-full h-full object-cover"
+              />
             </div>
 
             {/* Q&A 1 */}
@@ -167,9 +173,11 @@ export default function SuccessStoryPage() {
           <div className="space-y-12">
             {/* 이미지 공간 4 */}
             <div className="relative w-full aspect-[16/9] bg-gray-100 rounded-lg overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <p className="text-gray-400 text-base">이미지 공간</p>
-              </div>
+              <img
+                src="/후기4.jpg"
+                alt="구매후 관점"
+                className="w-full h-full object-cover"
+              />
             </div>
 
             {/* Q&A 1 */}
