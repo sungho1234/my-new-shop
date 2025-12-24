@@ -55,7 +55,11 @@
       "Bash(npx dotenv:*)",
       "Bash(node run-migration.js:*)",
       "Bash(cp:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(if [ -f .env ])",
+      "Bash(then echo \".env 파일 존재\")",
+      "Bash(else echo \".env 파일 없음\")",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": []
