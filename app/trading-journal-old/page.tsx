@@ -32,11 +32,23 @@ const TradingJournalOldPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAddingNew, setIsAddingNew] = useState(false);
 
-  const [formData, setFormData] = useState({
-    symbol: 'BTC/USDT' as const,
+  const [formData, setFormData] = useState<{
+    symbol: 'BTC/USDT' | 'ETH/USDT' | 'SOL/USDT' | 'XRP/USDT' | 'BNB/USDT';
+    entryDateTime: string;
+    exitDateTime: string;
+    positionDirection: 'LONG' | 'SHORT';
+    leverage: number;
+    positionSize: number;
+    entryPrice: number;
+    exitPrice: number;
+    roundTripFee: number;
+    entryReason: string;
+    exitReason: string;
+  }>({
+    symbol: 'BTC/USDT',
     entryDateTime: new Date().toISOString().slice(0, 10),
     exitDateTime: new Date().toISOString().slice(0, 10),
-    positionDirection: 'LONG' as const,
+    positionDirection: 'LONG',
     leverage: 1,
     positionSize: 0,
     entryPrice: 0,
