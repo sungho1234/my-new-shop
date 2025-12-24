@@ -88,10 +88,10 @@ const Header = () => {
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur-md shadow-sm">
             <div className="w-full">
-                <div className={`flex items-center pl-60 pr-72 transition-all duration-300 ${isScrolled ? 'py-3' : 'py-5'}`}>
+                <div className={`flex items-center px-4 lg:pl-60 lg:pr-72 transition-all duration-300 ${isScrolled ? 'py-3' : 'py-4 lg:py-5'}`}>
                     {/* ===== 로고 ===== */}
                     <Link href="/">
-                        <h1 className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors cursor-pointer">
+                        <h1 className="text-xl lg:text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors cursor-pointer">
                             MAXX Systems
                         </h1>
                     </Link>
@@ -124,7 +124,7 @@ const Header = () => {
                     </div>
 
                     {/* ===== 우측 버튼 그룹 ===== */}
-                    <div className="hidden items-center md:flex gap-3 ml-auto">
+                    <div className="hidden lg:flex items-center gap-3 ml-auto">
                         {user ? (
                             <>
                                 <Link
@@ -201,7 +201,7 @@ const Header = () => {
 
                 {/* --- 스크롤 시 사라지는 하단 메뉴 --- */}
                 <div
-                    className={`overflow-hidden transition-all duration-300 ease-in-out ${isScrolled ? 'max-h-0 opacity-0' : 'max-h-16 opacity-100'}`}
+                    className={`hidden lg:block overflow-hidden transition-all duration-300 ease-in-out ${isScrolled ? 'max-h-0 opacity-0' : 'max-h-16 opacity-100'}`}
                 >
                     <nav className="flex items-center space-x-8 pb-4 text-sm font-medium text-gray-700 border-t border-gray-100 pt-4 pl-60">
                         <Link href="/#best-courses" className="hover:text-blue-600 transition-colors">베스트 강의</Link>

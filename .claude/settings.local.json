@@ -59,7 +59,9 @@
       "Bash(if [ -f .env ])",
       "Bash(then echo \".env 파일 존재\")",
       "Bash(else echo \".env 파일 없음\")",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(then echo \".env exists\")",
+      "Bash(else echo \".env not found\")"
     ],
     "deny": [],
     "ask": []

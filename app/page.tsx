@@ -73,14 +73,14 @@ function HomeContent() {
       <PurchaseNotification />
 
       {/* 상품 그리드 섹션 */}
-      <main className="w-full pl-60 py-10">
+      <main className="w-full lg:pl-60 py-6 lg:py-10 px-4 lg:px-0">
         {/* 검색 결과 표시 */}
         {searchQuery && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <div className="mb-6 lg:mb-8">
+            <h2 className="text-xl lg:text-2xl font-bold text-gray-900 mb-2">
               '{searchQuery}' 검색 결과
             </h2>
-            <p className="text-gray-600">
+            <p className="text-sm lg:text-base text-gray-600">
               {filteredProducts.length > 0
                 ? `${filteredProducts.length}개의 상품을 찾았습니다.`
                 : '검색 결과가 없습니다. 다른 키워드로 검색해보세요.'
@@ -91,15 +91,15 @@ function HomeContent() {
 
         {/* 상품 레이아웃 */}
         {filteredProducts.length > 0 ? (
-          <div className="space-y-10">
+          <div className="space-y-6 lg:space-y-10">
             {/* 섹션 타이틀: 실시간 베스트 강의 */}
-            <div id="best-courses" className="mb-4" style={{ marginTop: '50px', scrollMarginTop: '120px' }}>
-              <h2 className="text-2xl font-bold text-gray-900">실시간 베스트 강의</h2>
+            <div id="best-courses" className="mb-3 lg:mb-4" style={{ marginTop: '20px', scrollMarginTop: '120px' }}>
+              <h2 className="text-xl lg:text-2xl font-bold text-gray-900">실시간 베스트 강의</h2>
             </div>
 
             {/* 4개 강의 카드 가로 배치 */}
             <section className="w-full">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                 {filteredProducts.map((product) => (
                   <ProductCard
                     key={product.id}
@@ -126,22 +126,22 @@ function HomeContent() {
             </section>
           </div>
         ) : searchQuery ? (
-          <div className="flex flex-col items-center justify-center py-16">
-            <svg className="w-24 h-24 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex flex-col items-center justify-center py-12 lg:py-16">
+            <svg className="w-16 h-16 lg:w-24 lg:h-24 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <p className="text-gray-500 text-lg">검색 결과가 없습니다</p>
+            <p className="text-gray-500 text-base lg:text-lg">검색 결과가 없습니다</p>
           </div>
         ) : null}
       </main>
 
       {/* 중간 배너 섹션 */}
-      <section className="w-full bg-white py-16">
+      <section className="w-full bg-white py-8 lg:py-16">
         <div className="max-w-7xl mx-auto px-4">
           <img
             src="/중간배너.png"
             alt="Overview Banner"
-            className="w-full rounded-2xl shadow-lg"
+            className="w-full rounded-lg lg:rounded-2xl shadow-lg"
           />
         </div>
       </section>
@@ -154,43 +154,43 @@ function HomeContent() {
 
       <FeaturedCourse />
 
-      <section className="w-full bg-gradient-to-b from-gray-50 to-white py-20 mt-16">
+      <section className="w-full bg-gradient-to-b from-gray-50 to-white py-12 lg:py-20 mt-8 lg:mt-16">
         <div className="container mx-auto max-w-screen-2xl px-4">
-          <div className="grid md:grid-cols-3 gap-12">
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-12">
             <div className="group relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
-              <div className="relative bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 h-full border border-gray-100">
-                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mb-6 shadow-lg">
-                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="relative bg-white p-5 lg:p-8 rounded-xl lg:rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 h-full border border-gray-100">
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg lg:rounded-xl flex items-center justify-center mb-4 lg:mb-6 shadow-lg">
+                  <svg className="w-6 h-6 lg:w-7 lg:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-3">결과로 증명합니다</h4>
-                <p className="text-gray-600 leading-relaxed">우리의 유일한 증명은 '계좌'입니다. 모든 전략과 기술은 실제 데이터와 수익률로 검증되었습니다.</p>
+                <h4 className="text-lg lg:text-xl font-bold text-gray-900 mb-2 lg:mb-3">결과로 증명합니다</h4>
+                <p className="text-sm lg:text-base text-gray-600 leading-relaxed">우리의 유일한 증명은 '계좌'입니다. 모든 전략과 기술은 실제 데이터와 수익률로 검증되었습니다.</p>
               </div>
             </div>
             <div className="group relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
-              <div className="relative bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 h-full border border-gray-100">
-                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mb-6 shadow-lg">
-                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="relative bg-white p-5 lg:p-8 rounded-xl lg:rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 h-full border border-gray-100">
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg lg:rounded-xl flex items-center justify-center mb-4 lg:mb-6 shadow-lg">
+                  <svg className="w-6 h-6 lg:w-7 lg:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-3">예측하지 않고 설계합니다</h4>
-                <p className="text-gray-600 leading-relaxed">우리는 단기적인 수익률(벽돌)이 아닌, 지속 가능한 수익 시스템(설계도)의 기술을 제공합니다.</p>
+                <h4 className="text-lg lg:text-xl font-bold text-gray-900 mb-2 lg:mb-3">예측하지 않고 설계합니다</h4>
+                <p className="text-sm lg:text-base text-gray-600 leading-relaxed">우리는 단기적인 수익률(벽돌)이 아닌, 지속 가능한 수익 시스템(설계도)의 기술을 제공합니다.</p>
               </div>
             </div>
             <div className="group relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
-              <div className="relative bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 h-full border border-gray-100">
-                <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mb-6 shadow-lg">
-                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="relative bg-white p-5 lg:p-8 rounded-xl lg:rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 h-full border border-gray-100">
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg lg:rounded-xl flex items-center justify-center mb-4 lg:mb-6 shadow-lg">
+                  <svg className="w-6 h-6 lg:w-7 lg:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-3">'감'의 영역을 넘어</h4>
-                <p className="text-gray-600 leading-relaxed">당신의 트레이딩을 '감'의 영역에서 '데이터 엔지니어링'의 영역으로 바꿔드립니다. 자신만의 '원칙'과 '시스템'을 갖게 될 것입니다.</p>
+                <h4 className="text-lg lg:text-xl font-bold text-gray-900 mb-2 lg:mb-3">'감'의 영역을 넘어</h4>
+                <p className="text-sm lg:text-base text-gray-600 leading-relaxed">당신의 트레이딩을 '감'의 영역에서 '데이터 엔지니어링'의 영역으로 바꿔드립니다. 자신만의 '원칙'과 '시스템'을 갖게 될 것입니다.</p>
               </div>
             </div>
           </div>
@@ -198,39 +198,39 @@ function HomeContent() {
       </section>
 
       {/* 공지사항 섹션 */}
-      <section className="w-full bg-white py-20">
+      <section className="w-full bg-white py-10 lg:py-20">
         <div className="container mx-auto max-w-screen-2xl px-4">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">공지사항</h2>
-            <button className="text-base text-gray-600 hover:text-gray-900 flex items-center gap-1">
+          <div className="flex items-center justify-between mb-5 lg:mb-8">
+            <h2 className="text-xl lg:text-3xl font-bold text-gray-900">공지사항</h2>
+            <button className="text-sm lg:text-base text-gray-600 hover:text-gray-900 flex items-center gap-1">
               전체보기
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-3 lg:space-y-5">
             {/* 공지사항 아이템 1 */}
-            <div className="bg-gray-50 rounded-xl p-8 shadow-sm hover:shadow-md transition-all cursor-pointer group">
-              <div className="flex items-start gap-5">
-                <span className="px-3 py-1.5 bg-red-50 text-red-600 text-sm font-medium rounded border border-red-100">중요</span>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                    강의 환불 규정 안내 <span className="inline-flex items-center justify-center w-5 h-5 ml-1 bg-blue-500 text-white text-xs rounded-full">N</span>
+            <div className="bg-gray-50 rounded-lg lg:rounded-xl p-4 lg:p-8 shadow-sm hover:shadow-md transition-all cursor-pointer group">
+              <div className="flex items-start gap-3 lg:gap-5">
+                <span className="px-2 py-1 lg:px-3 lg:py-1.5 bg-red-50 text-red-600 text-xs lg:text-sm font-medium rounded border border-red-100 flex-shrink-0">중요</span>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base lg:text-lg font-semibold text-gray-900 mb-2 lg:mb-3">
+                    강의 환불 규정 안내 <span className="inline-flex items-center justify-center w-4 h-4 lg:w-5 lg:h-5 ml-1 bg-blue-500 text-white text-xs rounded-full">N</span>
                   </h3>
-                  <p className="text-base text-gray-600 leading-relaxed mb-4">
+                  <p className="text-sm lg:text-base text-gray-600 leading-relaxed mb-3 lg:mb-4 line-clamp-3 lg:line-clamp-none">
                     안녕하세요, 감각이마나입니다.수강/환불 관련 기준을 아래와 같이 안내드립니다.1) 환불 가능 조건전액 환불은 수강 시작일로부터 7일 이내에만 가능합니다.단, 무료 강의를 제외한 유료 강의에 대해 "수강(시청/이용) 이력이 없는 경우"에 한해 전액 환불이 가능합니다.수강 시작일 기준: 결제 완료일(또는 수강 등록/첫 이용일) 기준으로 산정됩니다.2) 기간별 환불 비율수강 시작일을 기준으로 아래 기준이 적용됩니다.7일 초과 ~ 1개월 이내: 결제금액의 70% 환불1개월 초과 ~ 2개월 이내: 결제금액의 40% 환불2개월 초과: 환불 불가(0%3)) 자료 다운로드/이용 시 '수강 처리' 안내강의 자료(PDF/참부파일 등)를 다운로드하거나 열람한 경우, 해당 강의는 수강한 것으로 간주됩니다.이 경우 전액 환불...
                   </p>
-                  <div className="flex items-center gap-6 text-sm text-gray-500">
-                    <span className="flex items-center gap-1.5">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center gap-3 lg:gap-6 text-xs lg:text-sm text-gray-500">
+                    <span className="flex items-center gap-1 lg:gap-1.5">
+                      <svg className="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       2025.12.22 17:12
                     </span>
-                    <span className="flex items-center gap-1.5">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span className="flex items-center gap-1 lg:gap-1.5">
+                      <svg className="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
@@ -238,32 +238,32 @@ function HomeContent() {
                     </span>
                   </div>
                 </div>
-                <svg className="w-6 h-6 text-blue-500 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="hidden lg:block w-6 h-6 text-blue-500 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </div>
             </div>
 
             {/* 공지사항 아이템 2 */}
-            <div className="bg-gray-50 rounded-xl p-8 shadow-sm hover:shadow-md transition-all cursor-pointer group">
-              <div className="flex items-start gap-5">
-                <span className="px-3 py-1.5 bg-red-50 text-red-600 text-sm font-medium rounded border border-red-100">중요</span>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+            <div className="bg-gray-50 rounded-lg lg:rounded-xl p-4 lg:p-8 shadow-sm hover:shadow-md transition-all cursor-pointer group">
+              <div className="flex items-start gap-3 lg:gap-5">
+                <span className="px-2 py-1 lg:px-3 lg:py-1.5 bg-red-50 text-red-600 text-xs lg:text-sm font-medium rounded border border-red-100 flex-shrink-0">중요</span>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base lg:text-lg font-semibold text-gray-900 mb-2 lg:mb-3">
                     ◆ 무단 배포 / 저작권 침해 관련 공지
                   </h3>
-                  <p className="text-base text-gray-600 leading-relaxed mb-4">
+                  <p className="text-sm lg:text-base text-gray-600 leading-relaxed mb-3 lg:mb-4 line-clamp-3 lg:line-clamp-none">
                     감각이마나에서 제공되는 모든 강의·전략·자료는 저작권법에 의해 보호되고 있습니다.저작권 침해는 수강생분들 눈은 윤리와의 덕목에 무단 배포나 공동 구매 사례가 단 한 번도 없었습니다.이 점 진심으로 감사드립니다.다만, 만약 향후라도 이러한 사안이 발견될 시엔 유통 공동 구매 불법 제배포가 증가하는 추세라 저희도 수강생분들의 권리를 보호하기 위해 아래 규정을 명확히 안내드립니다.◯ 금지되는 행위강의영상·자료·PDF 등 모든 자료의 무단 복사 및 배포타인과의 공동 구매 / 계정 공유자료 일부 또는 전체를 SNS·오픈채팅방·커페에 업로드강의 내용을 2차 가공하여압업 촬용척발 시 조치주시 수급 검한 박별(관불 불가)만 생시상 조치 및 손해배상 청구강의 가격 기준 최소 3배 이...
                   </p>
-                  <div className="flex items-center gap-6 text-sm text-gray-500">
-                    <span className="flex items-center gap-1.5">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center gap-3 lg:gap-6 text-xs lg:text-sm text-gray-500">
+                    <span className="flex items-center gap-1 lg:gap-1.5">
+                      <svg className="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       2025.12.03 19:11
                     </span>
-                    <span className="flex items-center gap-1.5">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span className="flex items-center gap-1 lg:gap-1.5">
+                      <svg className="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
@@ -271,32 +271,32 @@ function HomeContent() {
                     </span>
                   </div>
                 </div>
-                <svg className="w-6 h-6 text-blue-500 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="hidden lg:block w-6 h-6 text-blue-500 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </div>
             </div>
 
             {/* 공지사항 아이템 3 */}
-            <div className="bg-gray-50 rounded-xl p-8 shadow-sm hover:shadow-md transition-all cursor-pointer group">
-              <div className="flex items-start gap-5">
-                <span className="px-3 py-1.5 bg-blue-50 text-blue-600 text-sm font-medium rounded border border-blue-100">일반</span>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+            <div className="bg-gray-50 rounded-lg lg:rounded-xl p-4 lg:p-8 shadow-sm hover:shadow-md transition-all cursor-pointer group">
+              <div className="flex items-start gap-3 lg:gap-5">
+                <span className="px-2 py-1 lg:px-3 lg:py-1.5 bg-blue-50 text-blue-600 text-xs lg:text-sm font-medium rounded border border-blue-100 flex-shrink-0">일반</span>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base lg:text-lg font-semibold text-gray-900 mb-2 lg:mb-3">
                     강의 자료/패블릿 다운받는 방법
                   </h3>
-                  <p className="text-base text-gray-600 leading-relaxed mb-4">
+                  <p className="text-sm lg:text-base text-gray-600 leading-relaxed mb-3 lg:mb-4 line-clamp-3 lg:line-clamp-none">
                     안녕하세요. 강의 중 필요한 자료나 템플릿은 커뮤니티를 탭을 통해 제공됩니다.★ 강의 내용에 따라 업로드된 자료가 다르니, 꼭 해당 강의의 커뮤니티 탭을 확인해주세요1. 강의 자료/패블릿 다운받는 방법📌 PC에서 다운로드 방법강의의 화면 우측 하단에 있는'커뮤니티' 탭을 클릭합니다.게시된 링크 중 원하는 자료를 클릭하면 자동으로 다운로드가 시작됩니다.ㅁ 모바일에서 다운로드 방법강의의 제목 바로 아래에 있는 '커뮤니티' 탭을 눌러 이동니다.제공 강의에 언로드 릴크를 클릭하면 됩니다.
                   </p>
-                  <div className="flex items-center gap-6 text-sm text-gray-500">
-                    <span className="flex items-center gap-1.5">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center gap-3 lg:gap-6 text-xs lg:text-sm text-gray-500">
+                    <span className="flex items-center gap-1 lg:gap-1.5">
+                      <svg className="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       2025.10.15 13:01
                     </span>
-                    <span className="flex items-center gap-1.5">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span className="flex items-center gap-1 lg:gap-1.5">
+                      <svg className="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
@@ -304,7 +304,7 @@ function HomeContent() {
                     </span>
                   </div>
                 </div>
-                <svg className="w-6 h-6 text-blue-500 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="hidden lg:block w-6 h-6 text-blue-500 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </div>
