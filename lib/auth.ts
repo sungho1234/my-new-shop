@@ -6,13 +6,14 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// 환경 변수 디버깅 - Force redeploy
-console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
-console.log('NAVER_CLIENT_ID exists:', !!process.env.NAVER_CLIENT_ID);
-console.log('NAVER_CLIENT_SECRET exists:', !!process.env.NAVER_CLIENT_SECRET);
-console.log('NEXTAUTH_SECRET exists:', !!process.env.NEXTAUTH_SECRET);
+export function getAuthOptions(): NextAuthOptions {
+  // 환경 변수 디버깅 - 런타임에 실행됨
+  console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
+  console.log('NAVER_CLIENT_ID exists:', !!process.env.NAVER_CLIENT_ID);
+  console.log('NAVER_CLIENT_SECRET exists:', !!process.env.NAVER_CLIENT_SECRET);
+  console.log('NEXTAUTH_SECRET exists:', !!process.env.NEXTAUTH_SECRET);
 
-export const authOptions: NextAuthOptions = {
+  return {
   providers: [
     ...(process.env.KAKAO_CLIENT_ID && process.env.KAKAO_CLIENT_SECRET
       ? [
@@ -150,4 +151,5 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET || process.env.SECRET,
-};
+  };
+}
