@@ -6,6 +6,11 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// 환경 변수 디버깅
+console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
+console.log('NAVER_CLIENT_ID exists:', !!process.env.NAVER_CLIENT_ID);
+console.log('NAVER_CLIENT_SECRET exists:', !!process.env.NAVER_CLIENT_SECRET);
+
 export const authOptions: NextAuthOptions = {
   providers: [
     ...(process.env.KAKAO_CLIENT_ID && process.env.KAKAO_CLIENT_SECRET
