@@ -363,19 +363,14 @@ function HomeContent() {
             {/* 텍스트 */}
             <div className="space-y-2 md:space-y-4">
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
-                온라인으로 돈버는 방법,
+                당신의 계좌에 축복이 가득하길
               </h2>
-              <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight">
-                가장 쉽게 알려드려요.
-              </p>
             </div>
 
             {/* 서브 텍스트 */}
             <div className="space-y-1 md:space-y-2 text-gray-300 text-sm sm:text-base md:text-lg">
-              <p>방법부터 실행까지,</p>
-              <p>고독이어 아닌 생활 내는 것까지</p>
-              <p>수강생과 강사분들과 함께하는 플랫폼,</p>
-              <p className="font-semibold text-white">감각이마나.</p>
+              <p>혼자 걷는 길은 막막하고 외롭습니다.</p>
+              <p>하지만 지도가 있고, 나침반이 있고, 먼저 길을 걷는 멘토가 있다면 이야기는 달라집니다.</p>
             </div>
 
             {/* 버튼과 소셜 미디어 */}

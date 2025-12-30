@@ -358,7 +358,9 @@ const ProductDetailPage = () => {
                                             <div style={{fontSize: '15px', color: '#374151', fontWeight: '400'}}>OT - 당신이 잠든 사이에도 코드는 돈을 벌고있습니다.</div>
                                         </div>
                                     </div>
-                                    <button style={{
+                                    <button
+                                        onClick={() => router.push('/learn/first-guide/watch?lecture=lec-1-1')}
+                                        style={{
                                         padding: '8px 16px',
                                         background: '#3b82f6',
                                         color: 'white',
@@ -401,7 +403,9 @@ const ProductDetailPage = () => {
                                             <div style={{fontSize: '15px', color: '#374151', fontWeight: '400'}}>돈버는 시간대 (지표 제공)</div>
                                         </div>
                                     </div>
-                                    <button style={{
+                                    <button
+                                        onClick={() => router.push('/learn/first-guide/watch?lecture=lec-1-2')}
+                                        style={{
                                         padding: '8px 16px',
                                         background: '#3b82f6',
                                         color: 'white',

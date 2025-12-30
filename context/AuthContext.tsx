@@ -1,7 +1,6 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
 export interface Product {
@@ -70,7 +69,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoadingCourseAccess, setIsLoadingCourseAccess] = useState<boolean>(true); // 초기값 true로 시작
   const [isLoadingWishlist, setIsLoadingWishlist] = useState<boolean>(true); // 초기값 true로 시작
   // isLoading은 더 이상 사용하지 않음 - 페이지 전체 블로킹 방지
-  const router = useRouter();
   const { data: session, status } = useSession(); // NextAuth 세션 체크
 
   // 1. 찜 목록 로드 헬퍼 (useCallback으로 안정화 – Hooks 규칙 준수)
@@ -273,7 +271,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await signOut({ redirect: false });
     }
 
-    router.push('/');
+    // router.push는 제거 - /logout 페이지에서 처리
   };
 
   // 5-1. 강의 접근 권한 새로고침용 함수 (외부에서 호출 가능)
